@@ -1,0 +1,113 @@
+{
+  "channel": "pickup",
+  "coords": {
+    "latitude": 21.55662781,
+    "longitude": 39.17014248
+  },
+  "resolvedStore": {
+    "statusCode": 200,
+    "httpCode": 200,
+    "type": "DEFAULT_SUCCESS",
+    "data": {
+      "cityId": 31,
+      "areaId": 8935,
+      "storeId": 97
+    },
+    "message": "Success",
+    "attributes": [],
+    "heading": {
+      "Ar": "",
+      "En": ""
+    },
+    "note": {
+      "En": "",
+      "Ar": ""
+    },
+    "identifier": []
+  },
+  "sampledCategoryIds": [
+    "666",
+    "667",
+    "664",
+    "669",
+    "670",
+    "1480",
+    "662"
+  ],
+  "capturedAt": "2026-08-06T12-17-44-341Z",
+  "stepLog": [
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "name": "console-error",
+      "text": "Creating a worker from 'blob:https://saudi.hardees.me/cc0a9e10-eeba-4387-85e3-c89d258916b2' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' 'unsafe-eval' *.noonpayments.com  *.facebook.net *.googletagmanager.com wzrkt.com *.azureedge.net *.googleapis.com "
+    },
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "name": "console-error",
+      "text": "null"
+    },
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: the server responded with a status of 500 ()"
+    },
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: the server responded with a status of 500 ()"
+    },
+    {
+      "name": "goto-home",
+      "ok": true
+    },
+    {
+      "name": "dismiss-cookie-banner",
+      "ok": true
+    },
+    {
+      "name": "open-self-pickup-modal",
+      "ok": true
+    },
+    {
+      "name": "use-my-location",
+      "ok": true
+    },
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "name": "proceed",
+      "ok": true
+    },
+    {
+      "name": "sample-categories",
+      "ok": true
+    }
+  ],
+  "apiCallCount": 26
+}

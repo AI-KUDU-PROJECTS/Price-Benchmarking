@@ -1,0 +1,417 @@
+{
+  "channel": "DELIVERY",
+  "status": "PARTIAL",
+  "startedAt": "2026-08-01T06:00:00.000Z",
+  "finishedAt": "2026-08-01T06:05:00.000Z",
+  "branchId": 251,
+  "branchName": "SITEEN",
+  "city": "Riyadh",
+  "apiConfigId": "KFC_SA_27",
+  "clusterId": "1_5",
+  "categories": [
+    {
+      "groupId": "KFC_SA_v20_KFC_SA_27",
+      "aKey": "KFC_SA_v20_KFC_SA_27_794",
+      "position": 1,
+      "id": 794,
+      "name": "Exclusive",
+      "isHidden": 0,
+      "code": "imagestemp/cat-exclusive-deals-new_10032026.png",
+      "parentId": 0,
+      "assets": [
+        {
+          "alt": "alt text",
+          "resolution": "40x40",
+          "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/imagestemp/cat-exclusive-deals-new_10032026.png.png",
+          "type": "image"
+        }
+      ],
+      "slug": "",
+      "qrcode": "",
+      "createdAt": 1721379693000,
+      "updatedAt": 1784032628000,
+      "breadcrumb": "",
+      "metaTitle": "Exclusive",
+      "metaKeyword": [],
+      "description": "",
+      "custom": {},
+      "bannerImages": "",
+      "catImages": [],
+      "promoId": 0,
+      "is_toggle": 0,
+      "flashCategory": 0,
+      "tag": "",
+      "services": {
+        "carhop": 0,
+        "delevery": 0,
+        "dine_in": 0,
+        "drivethru": 0,
+        "take_away": 0
+      },
+      "level": 3,
+      "productCount": 8
+    },
+    {
+      "groupId": "KFC_SA_v20_KFC_SA_27",
+      "aKey": "KFC_SA_v20_KFC_SA_27_2720",
+      "position": 2,
+      "id": 2720,
+      "name": "New! Hot Honey",
+      "isHidden": 0,
+      "code": "imagestemp/cap_hothoney.png",
+      "parentId": 0,
+      "assets": [
+        {
+          "alt": "alt text",
+          "resolution": "40x40",
+          "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/imagestemp/cap_hothoney.png.png",
+          "type": "image"
+        }
+      ],
+      "slug": "",
+      "qrcode": "",
+      "createdAt": 1779437705000,
+      "updatedAt": 1784190113000,
+      "breadcrumb": "",
+      "metaTitle": "New! Hot Honey",
+      "metaKeyword": [],
+      "description": "",
+      "custom": {},
+      "bannerImages": "",
+      "catImages": [],
+      "promoId": 0,
+      "is_toggle": 0,
+      "flashCategory": 0,
+      "tag": "",
+      "services": {
+        "carhop": 0,
+        "delevery": 0,
+        "dine_in": 0,
+        "drivethru": 0,
+        "take_away": 0
+      },
+      "level": 3,
+      "productCount": 14
+    }
+  ],
+  "categoryResults": [
+    {
+      "categoryId": 794,
+      "name": "Exclusive",
+      "status": "SUCCESS",
+      "productCount": 8,
+      "error": null
+    },
+    {
+      "categoryId": 999999,
+      "name": "Broken Category",
+      "status": "FAILED",
+      "productCount": 0,
+      "error": "missing expected field: data.products"
+    }
+  ],
+  "expectedCategoryCount": 2,
+  "categoryCount": 1,
+  "completionPercentage": 50.0,
+  "products": [
+    {
+      "aKey": "KFC_SA_v20_KFC_SA_27_794_18182_micro",
+      "allergen_tags": [],
+      "assets": [
+        {
+          "alt": "alt text",
+          "resolution": "40x40",
+          "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/1319-combo.png",
+          "type": "image"
+        }
+      ],
+      "associate_flids": [],
+      "associateid": "",
+      "breadcrumb": "",
+      "bundleTypeId": "bundle",
+      "categories": [
+        794
+      ],
+      "clusterKey": "KFC_SA_v20_KFC_SA_27_micro",
+      "createdAt": 1783947087000,
+      "currency": "SAR",
+      "description": "Zinger+ twister + 2 Fries +2 pc Strips",
+      "disPercentage": "33% OFF",
+      "displayDay": {},
+      "enableNewAddon": 0,
+      "groupId": "KFC_SA_v20_KFC_SA_27_794_micro",
+      "id": 18182,
+      "inSide": 1,
+      "item_tag": [],
+      "item_tag_ar": [],
+      "items": [],
+      "lastWkMonthly": "",
+      "limited_offer": 0,
+      "longDesc": "Zinger+ twister + 2 Fries +2 pc Strips",
+      "luckyDtMonthly": "",
+      "lucky_day": "",
+      "lucky_type": "",
+      "menuKey": "",
+      "metaDesc": "Zinger+ twister + 2 Fries +2 pc Strips",
+      "metaKeyword": [
+        "Double Up Deal"
+      ],
+      "metaTitle": "Double Up Deal",
+      "ministeps": [],
+      "name": "Double Up Deal",
+      "nutrition_facts": [],
+      "originalPrice": 63,
+      "p_position": 1,
+      "productKey": "KFC_SA_v20_KFC_SA_27_18182_micro",
+      "productType": 3,
+      "promoId": 9583,
+      "qrcode": "",
+      "ribbonUrl": [],
+      "ribbonUrlIntoto": "",
+      "ribbonUrl_ar": [],
+      "ribbon_urltwo": "",
+      "selectedItem": 0,
+      "services": {
+        "carhop": 1,
+        "delevery": 1,
+        "dine_in": 1,
+        "drivethru": 1,
+        "take_away": 1
+      },
+      "shortDesc": "",
+      "sku": 1319,
+      "slug": "double_up_deal",
+      "specialPrice": 42,
+      "stepsRemoved": 1,
+      "subOptionStr": "Zinger Sandwich,Lettuce,Twister Sandwich  Original,Lettuce,Tomato,2 Strips Pcs  Spicy,Regular Fries,Regular Fries",
+      "subOptionStrAr": "\u0632\u0646\u062c\u0631 \u0633\u0627\u0646\u062f\u0648\u064a\u062a\u0634,\u062e\u0635,\u062a\u0648\u064a\u0633\u062a\u0631 \u0633\u0627\u0646\u062f\u0648\u064a\u062a\u0634 - \u0639\u0627\u062f\u064a,\u062e\u0635,\u0637\u0645\u0627\u0637\u0645,\u0642\u0637\u0639\u062a\u064a\u0646 \u0627\u0633\u062a\u0631\u064a\u0628\u0633 - \u062d\u0627\u0631,\u0628\u0637\u0627\u0637\u0627 \u062d\u062c\u0645 \u0639\u0627\u062f\u064a,\u0628\u0637\u0627\u0637\u0627 \u062d\u062c\u0645 \u0639\u0627\u062f\u064a",
+      "subOptionStrFr": "",
+      "tagBgColor": "",
+      "tagColor": "",
+      "tagName": "",
+      "tags": [],
+      "typeId": "bundle",
+      "updatedAt": 1784032468000,
+      "variants": [],
+      "virtualGroup": 0,
+      "custom": {},
+      "steps": [
+        {
+          "aKey": "KFC_SA_v20_KFC_SA_27_794_18182_1",
+          "assets": [
+            {
+              "alt": "alt text",
+              "resolution": "40x40",
+              "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+              "type": "image"
+            }
+          ],
+          "clusterKey": "KFC_SA_v20_KFC_SA_27",
+          "compId": 1,
+          "groupId": "KFC_SA_v20_KFC_SA_27_794_18182",
+          "id": 1,
+          "ingredient": 0,
+          "isAddon": 0,
+          "isDependent": 0,
+          "isHidden": 1,
+          "isModifier": 0,
+          "maximum": 1,
+          "minimum": 1,
+          "sCustomize": 1,
+          "subtitle": "Choice of Sandwich",
+          "title": "Choice of Sandwich",
+          "type": "radio"
+        },
+        {
+          "aKey": "KFC_SA_v20_KFC_SA_27_794_18182_2",
+          "assets": [
+            {
+              "alt": "alt text",
+              "resolution": "40x40",
+              "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+              "type": "image"
+            }
+          ],
+          "clusterKey": "KFC_SA_v20_KFC_SA_27",
+          "compId": 1,
+          "groupId": "KFC_SA_v20_KFC_SA_27_794_18182",
+          "id": 2,
+          "ingredient": 1,
+          "isAddon": 0,
+          "isDependent": 1,
+          "isHidden": 0,
+          "isModifier": 1,
+          "maximum": 1,
+          "minimum": 1,
+          "sCustomize": 1,
+          "subtitle": "Choose your condiments",
+          "title": "Choose your condiments",
+          "type": "checkbox"
+        },
+        {
+          "aKey": "KFC_SA_v20_KFC_SA_27_794_18182_3",
+          "assets": [
+            {
+              "alt": "alt text",
+              "resolution": "40x40",
+              "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+              "type": "image"
+            }
+          ],
+          "clusterKey": "KFC_SA_v20_KFC_SA_27",
+          "compId": 1,
+          "groupId": "KFC_SA_v20_KFC_SA_27_794_18182",
+          "id": 3,
+          "ingredient": 0,
+          "isAddon": 1,
+          "isDependent": 1,
+          "isHidden": 0,
+          "isModifier": 1,
+          "maximum": 1,
+          "minimum": 1,
+          "sCustomize": 1,
+          "subtitle": "Add On",
+          "title": "Add On",
+          "type": "stepper"
+        },
+        {
+          "aKey": "KFC_SA_v20_KFC_SA_27_794_18182_4",
+          "assets": [
+            {
+              "alt": "alt text",
+              "resolution": "40x40",
+              "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+              "type": "image"
+            }
+          ],
+          "clusterKey": "KFC_SA_v20_KFC_SA_27",
+          "compId": 2,
+          "groupId": "KFC_SA_v20_KFC_SA_27_794_18182",
+          "id": 4,
+          "ingredient": 0,
+          "isAddon": 0,
+          "isDependent": 0,
+          "isHidden": 1,
+          "isModifier": 0,
+          "maximum": 1,
+          "minimum": 1,
+          "sCustomize": 1,
+          "subtitle": "Choice of Sandwich",
+          "title": "Choice of Sandwich",
+          "type": "radio"
+        },
+        {
+          "aKey": "KFC_SA_v20_KFC_SA_27_794_18182_5",
+          "assets": [
+            {
+              "alt": "alt text",
+              "resolution": "40x40",
+              "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+              "type": "image"
+            }
+          ],
+          "clusterKey": "KFC_SA_v20_KFC_SA_27",
+          "compId": 2,
+          "groupId": "KFC_SA_v20_KFC_SA_27_794_18182",
+          "id": 5,
+          "ingredient": 1,
+          "isAddon": 0,
+          "isDependent": 1,
+          "isHidden": 0,
+          "isModifier": 1,
+          "maximum": 1,
+          "minimum": 1,
+          "sCustomize": 1,
+          "subtitle": "Choose your condiments",
+          "title": "Choose your condiments",
+          "type": "checkbox"
+        },
+        {
+          "aKey": "KFC_SA_v20_KFC_SA_27_794_18182_6",
+          "assets": [
+            {
+              "alt": "alt text",
+              "resolution": "40x40",
+              "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+              "type": "image"
+            }
+          ],
+          "clusterKey": "KFC_SA_v20_KFC_SA_27",
+          "compId": 3,
+          "groupId": "KFC_SA_v20_KFC_SA_27_794_18182",
+          "id": 6,
+          "ingredient": 0,
+          "isAddon": 0,
+          "isDependent": 0,
+          "isHidden": 0,
+          "isModifier": 0,
+          "maximum": 1,
+          "minimum": 1,
+          "sCustomize": 1,
+          "subtitle": "Choice of Strips",
+          "title": "Choice of Strips",
+          "type": "radio"
+        },
+        {
+          "aKey": "KFC_SA_v20_KFC_SA_27_794_18182_7",
+          "assets": [
+            {
+              "alt": "alt text",
+              "resolution": "40x40",
+              "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+              "type": "image"
+            }
+          ],
+          "clusterKey": "KFC_SA_v20_KFC_SA_27",
+          "compId": 4,
+          "groupId": "KFC_SA_v20_KFC_SA_27_794_18182",
+          "id": 7,
+          "ingredient": 0,
+          "isAddon": 0,
+          "isDependent": 0,
+          "isHidden": 0,
+          "isModifier": 0,
+          "maximum": 1,
+          "minimum": 1,
+          "sCustomize": 1,
+          "subtitle": "Choice of Side Item",
+          "title": "Choice of Side Item",
+          "type": "radio"
+        },
+        {
+          "aKey": "KFC_SA_v20_KFC_SA_27_794_18182_8",
+          "assets": [
+            {
+              "alt": "alt text",
+              "resolution": "40x40",
+              "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+              "type": "image"
+            }
+          ],
+          "clusterKey": "KFC_SA_v20_KFC_SA_27",
+          "compId": 5,
+          "groupId": "KFC_SA_v20_KFC_SA_27_794_18182",
+          "id": 8,
+          "ingredient": 0,
+          "isAddon": 0,
+          "isDependent": 0,
+          "isHidden": 0,
+          "isModifier": 0,
+          "maximum": 1,
+          "minimum": 1,
+          "sCustomize": 1,
+          "subtitle": "Choice of Side Item",
+          "title": "Choice of Side Item",
+          "type": "radio"
+        }
+      ],
+      "__categoryId": 794,
+      "__categoryName": "Exclusive",
+      "__sourceEndpoint": "/api/getProductsByCategory"
+    }
+  ],
+  "promotions": [],
+  "productCount": 1,
+  "branchCurrentlyClosed": true,
+  "errorMessage": "1 of 2 categories failed - see categoryResults"
+}

@@ -1,0 +1,79 @@
+# Dependencies (shared at repo root - see root README.md "Installation")
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+
+# Environment (contains no secrets by design, but keep local overrides out of git)
+.env
+
+# --- Per-competitor generated data ------------------------------------------
+# Every competitor follows the same pattern (see root README.md
+# "Gitignore") - only KFC currently has anything under these paths, but
+# the wildcard covers every competitor as they get implemented.
+competitors/*/data/raw/*
+!competitors/*/data/raw/.gitkeep
+competitors/*/data/screenshots/*
+!competitors/*/data/screenshots/.gitkeep
+competitors/*/data/logs/*
+!competitors/*/data/logs/.gitkeep
+competitors/*/data/database/*.db
+competitors/*/data/database/*.db-journal
+competitors/*/data/database/*.db-wal
+competitors/*/data/database/*.db-shm
+!competitors/*/data/database/.gitkeep
+competitors/*/exports/*
+!competitors/*/exports/.gitkeep
+
+# Node collector scratch, per competitor (never commit session/device
+# tokens - see competitors/kfc/research/api-map/api-map.md)
+competitors/*/.artifacts/
+competitors/*/data/raw/.session.json
+
+# Run lock file (KFC's lives at competitors/kfc/data/.collector.lock;
+# future competitors' locks will follow the same per-competitor pattern)
+*.lock
+.collector.lock
+
+# KFC's legacy full-journey crawler outputs (see
+# competitors/kfc/legacy/README.md - contain session data)
+competitors/kfc/legacy/*.har
+competitors/kfc/legacy/visited-pages.json
+competitors/kfc/legacy/failed-pages.json
+competitors/kfc/legacy/discovered-urls.json
+competitors/kfc/legacy/menu-categories.json
+competitors/kfc/legacy/menu-products.json
+competitors/kfc/legacy/product-options.json
+competitors/kfc/legacy/delivery-information.json
+competitors/kfc/legacy/restaurant-availability.json
+competitors/kfc/legacy/cart-calculations.json
+competitors/kfc/legacy/checkout-information.json
+competitors/kfc/legacy/network-errors.json
+competitors/kfc/legacy/crawl-summary.json
+competitors/kfc/legacy/crawl.log
+competitors/kfc/legacy/artifacts/*
+!competitors/kfc/legacy/artifacts/screenshots/
+!competitors/kfc/legacy/artifacts/html/
+competitors/kfc/legacy/artifacts/screenshots/*
+competitors/kfc/legacy/artifacts/html/*
+!competitors/kfc/legacy/artifacts/screenshots/.gitkeep
+!competitors/kfc/legacy/artifacts/html/.gitkeep
+
+# Hardee's live investigation evidence (research/api-map phase - see
+# competitors/hardees/research/api-map/api-map.md "Security & sensitive
+# data notes"). Raw HAR/network captures and any session-bearing file are
+# git-ignored; only sanitized copies and the api-map/ documents are
+# tracked.
+competitors/hardees/research/pickup/raw/*
+!competitors/hardees/research/pickup/raw/.gitkeep
+competitors/hardees/research/delivery/raw/*
+!competitors/hardees/research/delivery/raw/.gitkeep
+competitors/hardees/research/**/*.session.json
+competitors/hardees/research/**/*-session.json
+
+# OS / editor cruft
+.DS_Store
+*.log
+npm-debug.log*
+.pytest_cache/
+.coverage

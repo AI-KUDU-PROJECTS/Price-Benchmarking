@@ -1,0 +1,139 @@
+{
+  "channel": "PICKUP",
+  "status": "SUCCESS",
+  "startedAt": "2026-08-11T06:00:00.000Z",
+  "finishedAt": "2026-08-11T06:05:00.000Z",
+  "branchId": 24,
+  "branchName": "EUROMARCHE-H",
+  "city": "Riyadh",
+  "apiConfigId": "HRD_SA_23",
+  "clusterId": "1_8",
+  "categories": [
+    {
+      "id": 5001,
+      "name": "Deal of the Day",
+      "isHidden": 0,
+      "promoId": 0,
+      "services": { "carhop": 0, "delevery": 0, "dine_in": 0, "drivethru": 0, "take_away": 0 },
+      "productCount": 1
+    },
+    {
+      "id": 5002,
+      "name": "Chargrilled & Thick Burgers",
+      "isHidden": 0,
+      "promoId": 0,
+      "services": { "carhop": 0, "delevery": 0, "dine_in": 0, "drivethru": 0, "take_away": 0 },
+      "productCount": 2
+    }
+  ],
+  "categoryResults": [
+    { "categoryId": 5001, "name": "Deal of the Day", "status": "SUCCESS", "productCount": 1, "error": null },
+    { "categoryId": 5002, "name": "Chargrilled & Thick Burgers", "status": "SUCCESS", "productCount": 2, "error": null }
+  ],
+  "expectedCategoryCount": 2,
+  "categoryCount": 2,
+  "completionPercentage": 100,
+  "products": [
+    {
+      "id": 61001,
+      "productKey": "HRD_SA_23_5001_61001_micro",
+      "name": "Sunday Duo",
+      "metaTitle": "Sunday Duo",
+      "description": "2 Chargrilled Burgers, 2 Regular Fries, 2 Regular Drinks",
+      "longDesc": "2 Chargrilled Burgers, 2 Regular Fries, 2 Regular Drinks",
+      "currency": "SAR",
+      "originalPrice": 24,
+      "specialPrice": 19,
+      "disPercentage": "",
+      "promoId": 6739,
+      "limited_offer": 0,
+      "productType": 3,
+      "typeId": "bundle",
+      "bundleTypeId": "bundle",
+      "sku": 9101,
+      "categories": [5001],
+      "services": { "carhop": 1, "delevery": 1, "dine_in": 1, "drivethru": 1, "take_away": 1 },
+      "assets": [{ "src": "https://hardeesprodnecmsimage.blob.core.windows.net/cmsimages/hrd/ksa/9101-combo.png", "type": "image" }],
+      "variants": [],
+      "subOptionStr": "Chargrilled Burger,Regular Fries,Regular Fries,Pepsi,Pepsi",
+      "steps": [
+        { "id": 1, "title": "Choice of Burger", "subtitle": "Choice of Burger", "type": "radio", "isHidden": 0, "isModifier": 0, "isAddon": 0, "isDependent": 0, "minimum": 1, "maximum": 1 },
+        { "id": 2, "title": "Choose your Drink", "subtitle": "Choose your Drink", "type": "radio", "isHidden": 0, "isModifier": 1, "isAddon": 0, "isDependent": 1, "minimum": 1, "maximum": 1 }
+      ],
+      "__categoryId": 5001,
+      "__categoryName": "Deal of the Day",
+      "__sourceEndpoint": "/api/getProductsByCategory"
+    },
+    {
+      "id": 61002,
+      "productKey": "HRD_SA_23_5002_61002_micro",
+      "name": "Original Thickburger",
+      "metaTitle": "Original Thickburger",
+      "description": "100% pure beef patty with lettuce, tomato, onion and mayo",
+      "longDesc": "100% pure beef patty with lettuce, tomato, onion and mayo",
+      "currency": "SAR",
+      "originalPrice": 22,
+      "specialPrice": 0,
+      "disPercentage": "",
+      "promoId": -1,
+      "limited_offer": 0,
+      "productType": 3,
+      "typeId": "simple",
+      "bundleTypeId": "simple",
+      "sku": 9102,
+      "categories": [5002],
+      "services": { "carhop": 1, "delevery": 1, "dine_in": 1, "drivethru": 1, "take_away": 1 },
+      "assets": [{ "src": "https://hardeesprodnecmsimage.blob.core.windows.net/cmsimages/hrd/ksa/9102.png", "type": "image" }],
+      "variants": [],
+      "subOptionStr": "",
+      "steps": [],
+      "__categoryId": 5002,
+      "__categoryName": "Chargrilled & Thick Burgers",
+      "__sourceEndpoint": "/api/getProductsByCategory"
+    },
+    {
+      "id": 61003,
+      "productKey": "HRD_SA_23_5002_61003_micro",
+      "name": "Low Mein Thickburger Combo",
+      "metaTitle": "Low Mein Thickburger Combo - Medium",
+      "description": "Thickburger with a side and a drink, choice of size",
+      "longDesc": "Thickburger with a side and a drink, choice of size",
+      "currency": "SAR",
+      "originalPrice": 32,
+      "specialPrice": 32,
+      "disPercentage": "",
+      "promoId": -1,
+      "limited_offer": 0,
+      "productType": 3,
+      "typeId": "bundle_group",
+      "bundleTypeId": "bundle_group",
+      "sku": 9103,
+      "categories": [5002],
+      "services": { "carhop": 1, "delevery": 1, "dine_in": 1, "drivethru": 1, "take_away": 1 },
+      "assets": [{ "src": "https://hardeesprodnecmsimage.blob.core.windows.net/cmsimages/hrd/ksa/9103-combo.png", "type": "image" }],
+      "variants": [
+        {
+          "id": 301,
+          "title": "Size",
+          "subtitle": "Choose your Size",
+          "options": [
+            { "id": 3011, "title": "Medium", "isSelected": 1 },
+            { "id": 3012, "title": "Large", "isSelected": 0 }
+          ]
+        }
+      ],
+      "subOptionStr": "Thickburger,Medium Fries,Medium Pepsi",
+      "steps": [
+        { "id": 1, "title": "Choice of Side Item", "subtitle": "Choice of Side Item", "type": "radio", "isHidden": 0, "isModifier": 0, "isAddon": 0, "isDependent": 0, "minimum": 1, "maximum": 1 },
+        { "id": 2, "title": "Choice of Beverages", "subtitle": "Choice of Beverages", "type": "radio", "isHidden": 0, "isModifier": 0, "isAddon": 0, "isDependent": 0, "minimum": 1, "maximum": 1 }
+      ],
+      "__categoryId": 5002,
+      "__categoryName": "Chargrilled & Thick Burgers",
+      "__sourceEndpoint": "/api/getProductsByCategory"
+    }
+  ],
+  "promotions": [],
+  "productCount": 3,
+  "branchCurrentlyClosed": false,
+  "errorMessage": null
+}

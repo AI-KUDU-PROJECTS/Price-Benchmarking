@@ -1,0 +1,21 @@
+{
+  "channel": "PICKUP",
+  "status": "FAILED",
+  "startedAt": "2026-08-11T06:00:00.000Z",
+  "finishedAt": "2026-08-11T06:00:05.000Z",
+  "branchId": 24,
+  "branchName": "EUROMARCHE-H",
+  "city": "Riyadh",
+  "apiConfigId": null,
+  "clusterId": null,
+  "categories": [],
+  "categoryResults": [],
+  "expectedCategoryCount": 0,
+  "categoryCount": 0,
+  "completionPercentage": 0,
+  "products": [],
+  "promotions": [],
+  "productCount": 0,
+  "branchCurrentlyClosed": false,
+  "errorMessage": "getNewStore resolved storeId=0 for the configured coordinates, but HRD_STORE_ID=24 - the nearest pickup branch for this location has changed"
+}

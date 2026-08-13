@@ -1,0 +1,21 @@
+{
+  "channel": "PICKUP",
+  "status": "FAILED",
+  "startedAt": "2026-08-01T06:00:00.000Z",
+  "finishedAt": "2026-08-01T06:00:05.000Z",
+  "branchId": 11474,
+  "branchName": "Dabab Street",
+  "city": "Riyadh",
+  "apiConfigId": null,
+  "clusterId": null,
+  "categories": [],
+  "categoryResults": [],
+  "expectedCategoryCount": 0,
+  "categoryCount": 0,
+  "completionPercentage": 0,
+  "products": [],
+  "promotions": [],
+  "productCount": 0,
+  "branchCurrentlyClosed": false,
+  "errorMessage": "GetRestaurants returned no branch matching BK_STORE_ID=11474 within the configured search radius - the nearest branch for this location may have changed"
+}

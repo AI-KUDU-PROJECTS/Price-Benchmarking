@@ -1,0 +1,111 @@
+{
+  "brand": "Burger King Saudi Arabia",
+  "baseSite": "https://burgerking.com.sa/en/",
+  "platform": "RBI (Restaurant Brands International) digital-blue global ordering platform, shared with Popeyes/Tim Hortons in other markets",
+  "lastVerifiedAt": "2026-08-11",
+  "robotsTxt": {
+    "url": "https://burgerking.com.sa/robots.txt",
+    "disallow": [],
+    "note": "User-agent: * / Disallow: (empty) - nothing is disallowed. Sitemap: https://www.burgerking.com.sa/sitemap.xml. No robots.txt-based crawl restriction applies to this brand, unlike KFC."
+  },
+  "endpoints": {
+    "GetRestaurants": {
+      "method": "POST",
+      "url": "https://euc1-prod-bk-gateway.rbictg.com/graphql",
+      "operationName": "GetRestaurants",
+      "authRequired": false,
+      "verifiedStandaloneNoBrowser": true,
+      "purpose": "Find candidate restaurants near a coordinate (used for both Pickup discovery and as the general store directory).",
+      "requiredHeaders": ["content-type: application/json", "x-ui-language: en", "x-ui-region: SA", "x-ui-platform: web", "x-user-datetime: <ISO8601 with offset>", "x-session-id: <client-generated random UUID, not tied to a real account>"],
+      "requestVariablesShape": {
+        "input": {
+          "filter": "NEARBY | DELIVERY_DELIVERS_TO",
+          "coordinates": { "userLat": "number", "userLng": "number", "searchRadius": "number (meters)" },
+          "first": "number (page size, e.g. 1000)",
+          "status": "OPEN",
+          "parallelFlag": false
+        }
+      },
+      "responseShape": {
+        "data.restaurants.pageInfo": "{hasNextPage, endCursor}",
+        "data.restaurants.totalCount": "number",
+        "data.restaurants.nodes[]": "{_id, storeId, isAvailable, posVendor, hasMobileOrdering, mobileOrderingStatus (live|temporary_unavailable), hasDelivery, hasTakeOut, hasCurbside, hasDriveThru, hasDineIn, franchiseGroupId, franchiseGroupName, physicalAddress{...}, curbsideHours/deliveryHours/diningRoomHours/driveThruHours (per-weekday open/close), currentLocalTime, distanceInMiles, name}"
+      },
+      "notes": "Confirmed live: 15 Riyadh results for a central-Riyadh NEARBY search. mobileOrderingStatus/hasMobileOrdering is the field to filter on for 'can this branch actually take an online order' - isAvailable alone is not sufficient (some entries had isAvailable=false but mobileOrderingStatus=live and vice versa depending on real-time open/closed state)."
+    },
+    "GetRestaurant": {
+      "method": "POST",
+      "url": "https://euc1-prod-bk-gateway.rbictg.com/graphql",
+      "operationName": "GetRestaurant",
+      "authRequired": false,
+      "verifiedStandaloneNoBrowser": false,
+      "purpose": "Single-restaurant lookup by storeId - hours + availability. Used as the branch-existence/availability check (equivalent of KFC's getStoreList branch check, but a direct ID lookup instead of scanning a city list).",
+      "requestVariablesShape": { "storeId": "string, e.g. \"11474\"" },
+      "responseShape": {
+        "data.restaurant": "{available, curbsideHours, deliveryHours, diningRoomHours, driveThruHours, currentLocalTime}"
+      },
+      "notes": "Response is intentionally thin (just hours/availability) - full address/name comes from GetRestaurants instead."
+    },
+    "DeliveryRestaurant": {
+      "method": "POST",
+      "url": "https://euc1-prod-bk-gateway.rbictg.com/graphql",
+      "operationName": "DeliveryRestaurant",
+      "authRequired": false,
+      "verifiedStandaloneNoBrowser": false,
+      "purpose": "Delivery-availability + quote check for a dropoff address - this is Burger King's equivalent of KFC's validateLocation.",
+      "requestVariablesShape": {
+        "dropoff": {
+          "addressLine1": "string", "addressLine2": "string", "city": "string", "route": "string",
+          "state": "string", "streetNumber": "string", "zip": "string", "country": "SAU",
+          "latitude": "number", "longitude": "number", "phoneNumber": "string (leave empty - never fill for automated collection)"
+        },
+        "searchRadius": "number (meters)",
+        "platform": "web"
+      },
+      "responseShape": {
+        "data.deliveryRestaurant": "{storeStatus (OPEN|CLOSED), quote (QUOTE_UNAVAILABLE|...), nextEarliestOpen, deliverySurchargeFeeCents, quoteId, unavailabilityReason, preOrderTimeSlots, restaurant{storeId, physicalAddress, hasDelivery, hasMobileOrdering, mobileOrderingStatus, deliveryHours, ...}}"
+      },
+      "notes": "Confirmed live twice: once returning storeStatus=CLOSED/quote=QUOTE_UNAVAILABLE for a real Riyadh address outside the resolved branch's delivery hours (correct, expected behavior, not an error), and once (moments later, different branch resolved) returning storeStatus=OPEN/quote=QUOTE_SUCCESSFUL with a real quoteId. Uses the -gateway host, NOT the plain euc1-prod-bk.rbictg.com host - verified by capturing the actual request URL, not assumed."
+    },
+    "featureMenu": {
+      "method": "POST",
+      "url": "https://czqk28jt.apicdn.sanity.io/v2023-08-01/graphql/prod_bk_sa/gen3",
+      "operationName": "featureMenu",
+      "authRequired": false,
+      "verifiedStandaloneNoBrowser": true,
+      "purpose": "Resolves the current live Menu document's Sanity _id (data.FeatureMenu.defaultMenu._id), which GetMenuSections needs as its 'id' variable. Called once per channel collection run instead of hardcoding a menu id, in case Sanity content is republished under a new one.",
+      "requestVariablesShape": {
+        "featureMenuId": "the fixed literal string 'feature-menu-singleton'"
+      },
+      "responseShape": {
+        "data.FeatureMenu.defaultMenu._id": "the Menu document id passed to GetMenuSections"
+      },
+      "notes": "The rest of this query's payload (upsell/checkout-donation item content) is not used by this collector - only defaultMenu._id is read."
+    },
+    "GetMenuSections": {
+      "method": "POST",
+      "url": "https://czqk28jt.apicdn.sanity.io/v2023-08-01/graphql/prod_bk_sa/gen3?operationName=GetMenuSections",
+      "operationName": "GetMenuSections",
+      "authRequired": false,
+      "verifiedStandaloneNoBrowser": true,
+      "purpose": "Full menu structure: sections (categories) -> combos/items, with bilingual (en/ar) names, images, and PLU/modifier configuration. This is Sanity CMS content, NOT store-scoped - it returns the same structure regardless of which branch/channel is selected.",
+      "requestVariablesShape": { "id": "string, the Menu document _id (e.g. \"9670fe1e-0342-41b7-9f92-a8fb1907120f\" - confirmed stable, but re-read from featureMenu.defaultMenu._id each run rather than hardcoding)" },
+      "responseShape": {
+        "data.Menu._id/name.locale/name._locFb": "menu id + EN/AR name",
+        "data.Menu.options[]": "sections (_type='section'): _id, name.locale/_locFb (category EN/AR name), showInStaticMenu, options[] (the section's products)",
+        "data.Menu.options[].options[]": "products - _type is 'combo' (a deal/meal bundle) or 'item' (a single product): _id, name.locale/_locFb, image.asset.url, itemSize, itemUnit, options (nested modifier/component tree for combos, e.g. required side/drink choices), and (for combos) a modifierMultiplier tree carrying pluConfigs per vendor (ncr/partner/sicom/...) with constantPlu / sizeBasedPlu / discountPlu codes used by the POS - these are pricing LOOK-UP KEYS, not prices themselves."
+      },
+      "notes": "IMPORTANT / KNOWN LIMITATION: this response contains ZERO price fields (confirmed by exhaustively grepping the full ~250KB response for 'price', 'cost', 'amount', 'Cents', and the exact SAR values rendered on screen - none matched). Live prices ARE rendered on saudi.kfc.me's sibling app.burgerking.com.sa /en/menu page once a store is selected, sourced from a client-side pricing hook (`isPricesLoading` / `.prices` / `price.default` / `price.min` - found by grepping the site's own compiled JS bundles), but the exact network call that populates it was not identified within this session's research time (no request/response pair captured during a full page load+store-selection flow contained the visible SAR values, in either GraphQL endpoint). See collector/price-scraper.js and this project's README 'Known limitations' for how this is handled (DOM-text extraction as a documented, deliberate deviation from the pure-API approach, pending a future session with manual browser DevTools inspection to close this gap properly)."
+    }
+  },
+  "clientGeneratedValues": {
+    "x-session-id": "A random UUID generated per collector run (not a real user/account session) - required header, but the server does not appear to validate it against any prior state.",
+    "x-user-datetime": "Current ISO8601 datetime with local UTC offset, e.g. 2026-08-11T10:04:46+03:00"
+  },
+  "whatIsNeverRecorded": [
+    "No login/account credentials - this brand's storefront does not require login to browse or check availability.",
+    "No real phone number (DeliveryRestaurant's dropoff.phoneNumber is always left empty).",
+    "No cookies or device/session tokens are persisted to disk or git - x-session-id is generated fresh per run and only lives in memory.",
+    "No payment, cart-submission, or checkout call is ever made."
+  ]
+}

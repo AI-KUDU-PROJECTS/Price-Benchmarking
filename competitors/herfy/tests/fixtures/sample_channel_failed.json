@@ -1,0 +1,21 @@
+{
+  "channel": "PICKUP",
+  "status": "FAILED",
+  "startedAt": "2026-08-01T06:00:00.000Z",
+  "finishedAt": "2026-08-01T06:00:05.000Z",
+  "branchId": 29696,
+  "branchName": "RUH - Al Mogarazat - Eirad Plaza Mall 1073",
+  "city": "Riyadh",
+  "apiConfigId": null,
+  "clusterId": null,
+  "categories": [],
+  "categoryResults": [],
+  "expectedCategoryCount": 0,
+  "categoryCount": 0,
+  "completionPercentage": 0,
+  "products": [],
+  "promotions": [],
+  "productCount": 0,
+  "branchCurrentlyClosed": false,
+  "errorMessage": "getLocationsNearby returned no branch matching HERFY_LOCATION_ID=29696 within the configured search radius - the nearest branch for this location may have changed"
+}

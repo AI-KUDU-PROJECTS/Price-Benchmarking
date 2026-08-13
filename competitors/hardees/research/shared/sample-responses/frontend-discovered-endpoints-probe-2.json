@@ -1,0 +1,63 @@
+{
+  "cluster": "1_8",
+  "configId": "HRD_SA_23",
+  "productInfo2": {
+    "status": 200,
+    "body": {
+      "statusCode": 200,
+      "httpCode": 200,
+      "type": "DEFAULT_SUCCESS",
+      "data": {},
+      "message": "Success",
+      "attributes": [],
+      "heading": {
+        "Ar": "",
+        "En": ""
+      },
+      "note": {
+        "En": "",
+        "Ar": ""
+      },
+      "identifier": [],
+      "etag": "1786013220807"
+    }
+  },
+  "bundleStep2": {
+    "status": 500,
+    "body": {
+      "statusCode": 422,
+      "httpCode": 422,
+      "type": "DEFAULT_VALIDATION_ERROR",
+      "message": "Invalid info provided",
+      "attributes": [],
+      "heading": {
+        "Ar": "",
+        "En": ""
+      },
+      "note": {
+        "En": "",
+        "Ar": ""
+      },
+      "identifier": []
+    }
+  },
+  "offers2": {
+    "status": 500,
+    "body": {
+      "statusCode": 422,
+      "httpCode": 422,
+      "type": "DEFAULT_VALIDATION_ERROR",
+      "message": "Invalid info provided",
+      "attributes": [],
+      "heading": {
+        "Ar": "",
+        "En": ""
+      },
+      "note": {
+        "En": "",
+        "Ar": ""
+      },
+      "identifier": []
+    }
+  }
+}

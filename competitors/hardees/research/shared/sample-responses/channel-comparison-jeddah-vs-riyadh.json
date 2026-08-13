@@ -1,0 +1,1291 @@
+{
+  "note": "Second branch/cluster re-test of unresolved-items.md item #9, per the recommendation in api-map.md \"Known limitations\". Riyadh (storeId=24 Pickup / storeId=5796 Delivery, ~950km away) vs Jeddah (storeId=97 Pickup / storeId=7 Delivery) - two ENTIRELY SEPARATE Playwright browser contexts per channel (separate guest sessions, separate deviceids, separate cookie jars), run via tools/capture-network.js --lat=<Jeddah coord> --lng=<Jeddah coord>.",
+  "pickupBranch": {
+    "storeId": 97,
+    "cityId": 31,
+    "areaId": 8935,
+    "coords": {
+      "latitude": 21.55662781,
+      "longitude": 39.17014248
+    }
+  },
+  "deliveryBranch": {
+    "storeId": 7,
+    "name_en": "ANDALOS-WH",
+    "cityId": 31,
+    "areaId": 8952,
+    "promiseTime": 45,
+    "coords": {
+      "latitude": 21.51462262,
+      "longitude": 39.16611246
+    }
+  },
+  "menuConfigIdBothChannels": "HRD_SA_23",
+  "clusterIdBothChannels": "1_8",
+  "sameAsRiyadhCluster": true,
+  "allSevenCategoriesIdentical": true,
+  "allSampledProductPricesIdentical": true,
+  "perCategoryDiff": {
+    "662": {
+      "categoryName": "App Exclusive",
+      "products": [
+        {
+          "id": 13110,
+          "name": "The Goal Bundle",
+          "pickup": {
+            "originalPrice": 69,
+            "specialPrice": 69,
+            "promoId": 17271
+          },
+          "delivery": {
+            "originalPrice": 69,
+            "specialPrice": 69,
+            "promoId": 17271
+          },
+          "identical": true
+        },
+        {
+          "id": 12425,
+          "name": "Classic Box for 4",
+          "pickup": {
+            "originalPrice": 59,
+            "specialPrice": 59,
+            "promoId": 17242
+          },
+          "delivery": {
+            "originalPrice": 59,
+            "specialPrice": 59,
+            "promoId": 17242
+          },
+          "identical": true
+        },
+        {
+          "id": 12426,
+          "name": "Classic Box for 6",
+          "pickup": {
+            "originalPrice": 79,
+            "specialPrice": 79,
+            "promoId": 17243
+          },
+          "delivery": {
+            "originalPrice": 79,
+            "specialPrice": 79,
+            "promoId": 17243
+          },
+          "identical": true
+        },
+        {
+          "id": 77772554,
+          "name": "Double Treat Meal",
+          "pickup": {
+            "originalPrice": 65,
+            "specialPrice": 49,
+            "promoId": 6544
+          },
+          "delivery": {
+            "originalPrice": 65,
+            "specialPrice": 49,
+            "promoId": 6544
+          },
+          "identical": true
+        }
+      ]
+    },
+    "664": {
+      "categoryName": "Boxes",
+      "products": [
+        {
+          "id": 77772960,
+          "name": "Roast Beef Box",
+          "pickup": {
+            "originalPrice": 39,
+            "specialPrice": 0,
+            "promoId": 17237
+          },
+          "delivery": {
+            "originalPrice": 39,
+            "specialPrice": 0,
+            "promoId": 17237
+          },
+          "identical": true
+        },
+        {
+          "id": 77772577,
+          "name": "Super Star Mushroom Box",
+          "pickup": {
+            "originalPrice": 46,
+            "specialPrice": 0,
+            "promoId": 6652
+          },
+          "delivery": {
+            "originalPrice": 46,
+            "specialPrice": 0,
+            "promoId": 6652
+          },
+          "identical": true
+        },
+        {
+          "id": 77772601,
+          "name": "Steak Loader Box",
+          "pickup": {
+            "originalPrice": 41,
+            "specialPrice": 0,
+            "promoId": 6637
+          },
+          "delivery": {
+            "originalPrice": 41,
+            "specialPrice": 0,
+            "promoId": 6637
+          },
+          "identical": true
+        },
+        {
+          "id": 77772600,
+          "name": "Cheese steak Box",
+          "pickup": {
+            "originalPrice": 42,
+            "specialPrice": 0,
+            "promoId": 6636
+          },
+          "delivery": {
+            "originalPrice": 42,
+            "specialPrice": 0,
+            "promoId": 6636
+          },
+          "identical": true
+        },
+        {
+          "id": 77772572,
+          "name": "Chicken SantaFe Box",
+          "pickup": {
+            "originalPrice": 39,
+            "specialPrice": 0,
+            "promoId": 6642
+          },
+          "delivery": {
+            "originalPrice": 39,
+            "specialPrice": 0,
+            "promoId": 6642
+          },
+          "identical": true
+        },
+        {
+          "id": 77772573,
+          "name": "Chicken Fillet Box",
+          "pickup": {
+            "originalPrice": 38,
+            "specialPrice": 0,
+            "promoId": 6641
+          },
+          "delivery": {
+            "originalPrice": 38,
+            "specialPrice": 0,
+            "promoId": 6641
+          },
+          "identical": true
+        },
+        {
+          "id": 77772574,
+          "name": "Big Deluxe Box",
+          "pickup": {
+            "originalPrice": 38,
+            "specialPrice": 0,
+            "promoId": 6638
+          },
+          "delivery": {
+            "originalPrice": 38,
+            "specialPrice": 0,
+            "promoId": 6638
+          },
+          "identical": true
+        },
+        {
+          "id": 77772570,
+          "name": "Super Star Chicken Spicy Box",
+          "pickup": {
+            "originalPrice": 44,
+            "specialPrice": 0,
+            "promoId": 6644
+          },
+          "delivery": {
+            "originalPrice": 44,
+            "specialPrice": 0,
+            "promoId": 6644
+          },
+          "identical": true
+        },
+        {
+          "id": 77772569,
+          "name": "Super Star Chicken Box",
+          "pickup": {
+            "originalPrice": 43,
+            "specialPrice": 0,
+            "promoId": 6643
+          },
+          "delivery": {
+            "originalPrice": 43,
+            "specialPrice": 0,
+            "promoId": 6643
+          },
+          "identical": true
+        },
+        {
+          "id": 77772568,
+          "name": "Super Star Box",
+          "pickup": {
+            "originalPrice": 43,
+            "specialPrice": 0,
+            "promoId": 6640
+          },
+          "delivery": {
+            "originalPrice": 43,
+            "specialPrice": 0,
+            "promoId": 6640
+          },
+          "identical": true
+        }
+      ]
+    },
+    "666": {
+      "categoryName": "Chargrilled & Thick Burgers",
+      "products": [
+        {
+          "id": 77772542,
+          "name": "Super Star Burger Combo",
+          "pickup": {
+            "originalPrice": 38,
+            "specialPrice": 0,
+            "promoId": 6504
+          },
+          "delivery": {
+            "originalPrice": 38,
+            "specialPrice": 0,
+            "promoId": 6504
+          },
+          "identical": true
+        },
+        {
+          "id": 77772576,
+          "name": "Super Star Mushroom Combo",
+          "pickup": {
+            "originalPrice": 41,
+            "specialPrice": 0,
+            "promoId": 6650
+          },
+          "delivery": {
+            "originalPrice": 41,
+            "specialPrice": 0,
+            "promoId": 6650
+          },
+          "identical": true
+        },
+        {
+          "id": 77772545,
+          "name": "Cheese Steak Burger Combo",
+          "pickup": {
+            "originalPrice": 37,
+            "specialPrice": 0,
+            "promoId": 6511
+          },
+          "delivery": {
+            "originalPrice": 37,
+            "specialPrice": 0,
+            "promoId": 6511
+          },
+          "identical": true
+        },
+        {
+          "id": 77772551,
+          "name": "Mushroom N Swiss Burger Combo",
+          "pickup": {
+            "originalPrice": 34,
+            "specialPrice": 0,
+            "promoId": 6509
+          },
+          "delivery": {
+            "originalPrice": 34,
+            "specialPrice": 0,
+            "promoId": 6509
+          },
+          "identical": true
+        },
+        {
+          "id": 77772550,
+          "name": "Big Deluxe Burger Combo",
+          "pickup": {
+            "originalPrice": 35,
+            "specialPrice": 0,
+            "promoId": 6506
+          },
+          "delivery": {
+            "originalPrice": 35,
+            "specialPrice": 0,
+            "promoId": 6506
+          },
+          "identical": true
+        },
+        {
+          "id": 77772562,
+          "name": "Double Cheeseburger Combo",
+          "pickup": {
+            "originalPrice": 18,
+            "specialPrice": 0,
+            "promoId": 6590
+          },
+          "delivery": {
+            "originalPrice": 18,
+            "specialPrice": 0,
+            "promoId": 6590
+          },
+          "identical": true
+        },
+        {
+          "id": 9074,
+          "name": "Super Star Mushroom Sandwich",
+          "pickup": {
+            "originalPrice": 29,
+            "specialPrice": 29,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 29,
+            "specialPrice": 29,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9107,
+          "name": "Steak Loader Sandwich",
+          "pickup": {
+            "originalPrice": 27,
+            "specialPrice": 27,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 27,
+            "specialPrice": 27,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9099,
+          "name": "Cheese Steak Burger Sandwich",
+          "pickup": {
+            "originalPrice": 28,
+            "specialPrice": 28,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 28,
+            "specialPrice": 28,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9097,
+          "name": "Mushroom N Swiss Burger Sandwich",
+          "pickup": {
+            "originalPrice": 24,
+            "specialPrice": 24,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 24,
+            "specialPrice": 24,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9062,
+          "name": "Big Deluxe Burger",
+          "pickup": {
+            "originalPrice": 23,
+            "specialPrice": 23,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 23,
+            "specialPrice": 23,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9103,
+          "name": "Classic Double Cheeseburger",
+          "pickup": {
+            "originalPrice": 10,
+            "specialPrice": 10,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 10,
+            "specialPrice": 10,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9096,
+          "name": "Super Star Burger Sandwich",
+          "pickup": {
+            "originalPrice": 28,
+            "specialPrice": 28,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 28,
+            "specialPrice": 28,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 12147,
+          "name": "Roast Beef Sanwich",
+          "pickup": {
+            "originalPrice": 25,
+            "specialPrice": 25,
+            "promoId": 17235
+          },
+          "delivery": {
+            "originalPrice": 25,
+            "specialPrice": 25,
+            "promoId": 17235
+          },
+          "identical": true
+        },
+        {
+          "id": 77772950,
+          "name": "Roast Beef Combo",
+          "pickup": {
+            "originalPrice": 29,
+            "specialPrice": 0,
+            "promoId": 17235
+          },
+          "delivery": {
+            "originalPrice": 29,
+            "specialPrice": 0,
+            "promoId": 17235
+          },
+          "identical": true
+        }
+      ]
+    },
+    "667": {
+      "categoryName": "Hand Breaded Chicken",
+      "products": [
+        {
+          "id": 77773066,
+          "name": "Mighty Tenders Combo",
+          "pickup": {
+            "originalPrice": 33,
+            "specialPrice": 0,
+            "promoId": 6738
+          },
+          "delivery": {
+            "originalPrice": 33,
+            "specialPrice": 0,
+            "promoId": 6738
+          },
+          "identical": true
+        },
+        {
+          "id": 77772556,
+          "name": "Super Star Chicken Spicy Combo",
+          "pickup": {
+            "originalPrice": 39,
+            "specialPrice": 0,
+            "promoId": 6542
+          },
+          "delivery": {
+            "originalPrice": 39,
+            "specialPrice": 0,
+            "promoId": 6542
+          },
+          "identical": true
+        },
+        {
+          "id": 77772546,
+          "name": "Super Star Chicken Combo Orignal",
+          "pickup": {
+            "originalPrice": 38,
+            "specialPrice": 0,
+            "promoId": 6518
+          },
+          "delivery": {
+            "originalPrice": 38,
+            "specialPrice": 0,
+            "promoId": 6518
+          },
+          "identical": true
+        },
+        {
+          "id": 77772552,
+          "name": "Jalapeno Chicken Combo",
+          "pickup": {
+            "originalPrice": 35,
+            "specialPrice": 0,
+            "promoId": 6512
+          },
+          "delivery": {
+            "originalPrice": 35,
+            "specialPrice": 0,
+            "promoId": 6512
+          },
+          "identical": true
+        },
+        {
+          "id": 77772555,
+          "name": "Santa Fe Chicken Spicy Combo",
+          "pickup": {
+            "originalPrice": 34,
+            "specialPrice": 0,
+            "promoId": 6508
+          },
+          "delivery": {
+            "originalPrice": 34,
+            "specialPrice": 0,
+            "promoId": 6508
+          },
+          "identical": true
+        },
+        {
+          "id": 77772553,
+          "name": "Chicken Fillet Combo",
+          "pickup": {
+            "originalPrice": 33,
+            "specialPrice": 0,
+            "promoId": 6505
+          },
+          "delivery": {
+            "originalPrice": 33,
+            "specialPrice": 0,
+            "promoId": 6505
+          },
+          "identical": true
+        },
+        {
+          "id": 77772548,
+          "name": "Mighty tenders combo Original",
+          "pickup": {
+            "originalPrice": 35,
+            "specialPrice": 0,
+            "promoId": 6530
+          },
+          "delivery": {
+            "originalPrice": 35,
+            "specialPrice": 0,
+            "promoId": 6530
+          },
+          "identical": true
+        },
+        {
+          "id": 77772547,
+          "name": "Mighty Tenders Combo Spicy",
+          "pickup": {
+            "originalPrice": 38,
+            "specialPrice": 0,
+            "promoId": 6531
+          },
+          "delivery": {
+            "originalPrice": 38,
+            "specialPrice": 0,
+            "promoId": 6531
+          },
+          "identical": true
+        },
+        {
+          "id": 77772566,
+          "name": "Solo Wraptor",
+          "pickup": {
+            "originalPrice": 34,
+            "specialPrice": 0,
+            "promoId": 17063
+          },
+          "delivery": {
+            "originalPrice": 34,
+            "specialPrice": 0,
+            "promoId": 17063
+          },
+          "identical": true
+        },
+        {
+          "id": 77772564,
+          "name": "Wraptor Combo",
+          "pickup": {
+            "originalPrice": 24,
+            "specialPrice": 0,
+            "promoId": 6609
+          },
+          "delivery": {
+            "originalPrice": 24,
+            "specialPrice": 0,
+            "promoId": 6609
+          },
+          "identical": true
+        },
+        {
+          "id": 77772565,
+          "name": "Spicy Wraptor",
+          "pickup": {
+            "originalPrice": 25,
+            "specialPrice": 0,
+            "promoId": 6610
+          },
+          "delivery": {
+            "originalPrice": 25,
+            "specialPrice": 0,
+            "promoId": 6610
+          },
+          "identical": true
+        },
+        {
+          "id": 9110,
+          "name": "Super Star Chicken Sandwich - Original",
+          "pickup": {
+            "originalPrice": 28,
+            "specialPrice": 28,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 28,
+            "specialPrice": 28,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9111,
+          "name": "Super Star Chicken Sandwich -  Spicy",
+          "pickup": {
+            "originalPrice": 29,
+            "specialPrice": 29,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 29,
+            "specialPrice": 29,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9100,
+          "name": "Jalapeno Chicken Sandwich",
+          "pickup": {
+            "originalPrice": 25,
+            "specialPrice": 25,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 25,
+            "specialPrice": 25,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9098,
+          "name": "Santa Fe Chicken Spicy Sandwich",
+          "pickup": {
+            "originalPrice": 24,
+            "specialPrice": 24,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 24,
+            "specialPrice": 24,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9065,
+          "name": "Chicken Fillet Sandwich",
+          "pickup": {
+            "originalPrice": 23,
+            "specialPrice": 23,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 23,
+            "specialPrice": 23,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9108,
+          "name": "Wraptor",
+          "pickup": {
+            "originalPrice": 11,
+            "specialPrice": 11,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 11,
+            "specialPrice": 11,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9109,
+          "name": "Spicy Wraptor",
+          "pickup": {
+            "originalPrice": 12,
+            "specialPrice": 12,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 12,
+            "specialPrice": 12,
+            "promoId": -1
+          },
+          "identical": true
+        }
+      ]
+    },
+    "669": {
+      "categoryName": "Sides Items",
+      "products": [
+        {
+          "id": 12021,
+          "name": "Nacho Cheese Bites (6 Pieces)",
+          "pickup": {
+            "originalPrice": 15,
+            "specialPrice": 15,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 15,
+            "specialPrice": 15,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 10577,
+          "name": "Philly Steak Fries",
+          "pickup": {
+            "originalPrice": 18,
+            "specialPrice": 18,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 18,
+            "specialPrice": 18,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 8996,
+          "name": "Loaded Fries",
+          "pickup": {
+            "originalPrice": 14,
+            "specialPrice": 14,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 14,
+            "specialPrice": 14,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9141,
+          "name": "Golden Bites",
+          "pickup": {
+            "originalPrice": 10,
+            "specialPrice": 10,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 10,
+            "specialPrice": 10,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9118,
+          "name": "Crispy Curls",
+          "pickup": {
+            "originalPrice": 11,
+            "specialPrice": 11,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 11,
+            "specialPrice": 11,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9397,
+          "name": "Skin On Fries",
+          "pickup": {
+            "originalPrice": 10,
+            "specialPrice": 10,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 10,
+            "specialPrice": 10,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 8987,
+          "name": "Cheddar Cheese Cup - Large",
+          "pickup": {
+            "originalPrice": 5,
+            "specialPrice": 5,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 5,
+            "specialPrice": 5,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 8980,
+          "name": "Cheddar Cheese Cup - Small",
+          "pickup": {
+            "originalPrice": 3,
+            "specialPrice": 3,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 3,
+            "specialPrice": 3,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9007,
+          "name": "Barbeque Cup",
+          "pickup": {
+            "originalPrice": 3,
+            "specialPrice": 3,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 3,
+            "specialPrice": 3,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 8981,
+          "name": "Ranch Sauce Cup",
+          "pickup": {
+            "originalPrice": 3,
+            "specialPrice": 3,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 3,
+            "specialPrice": 3,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 8983,
+          "name": "Mayonnaise Cup",
+          "pickup": {
+            "originalPrice": 3,
+            "specialPrice": 3,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 3,
+            "specialPrice": 3,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9008,
+          "name": "Mustard Cup",
+          "pickup": {
+            "originalPrice": 3,
+            "specialPrice": 3,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 3,
+            "specialPrice": 3,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 8982,
+          "name": "Honey Mustard Cup",
+          "pickup": {
+            "originalPrice": 3,
+            "specialPrice": 3,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 3,
+            "specialPrice": 3,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9009,
+          "name": "Santafe Cup",
+          "pickup": {
+            "originalPrice": 3,
+            "specialPrice": 3,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 3,
+            "specialPrice": 3,
+            "promoId": -1
+          },
+          "identical": true
+        }
+      ]
+    },
+    "670": {
+      "categoryName": "Desserts & Beverages",
+      "products": [
+        {
+          "id": 8989,
+          "name": "Classic Hershey’s Chocolate Chip Cookie",
+          "pickup": {
+            "originalPrice": 6,
+            "specialPrice": 6,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 6,
+            "specialPrice": 6,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9121,
+          "name": "Mini Churros",
+          "pickup": {
+            "originalPrice": 10,
+            "specialPrice": 10,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 10,
+            "specialPrice": 10,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9006,
+          "name": "Orange Juice",
+          "pickup": {
+            "originalPrice": 10,
+            "specialPrice": 10,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 10,
+            "specialPrice": 10,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9000,
+          "name": "Pepsi Medium",
+          "pickup": {
+            "originalPrice": 6,
+            "specialPrice": 6,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 6,
+            "specialPrice": 6,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9001,
+          "name": "Diet Pepsi Medium",
+          "pickup": {
+            "originalPrice": 6,
+            "specialPrice": 6,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 6,
+            "specialPrice": 6,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9002,
+          "name": "Medium Mirinda",
+          "pickup": {
+            "originalPrice": 6,
+            "specialPrice": 6,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 6,
+            "specialPrice": 6,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9003,
+          "name": "Mountain Dew Medium",
+          "pickup": {
+            "originalPrice": 6,
+            "specialPrice": 6,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 6,
+            "specialPrice": 6,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9004,
+          "name": "7UP Medium",
+          "pickup": {
+            "originalPrice": 6,
+            "specialPrice": 6,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 6,
+            "specialPrice": 6,
+            "promoId": -1
+          },
+          "identical": true
+        },
+        {
+          "id": 9005,
+          "name": "Small Water",
+          "pickup": {
+            "originalPrice": 3,
+            "specialPrice": 3,
+            "promoId": -1
+          },
+          "delivery": {
+            "originalPrice": 3,
+            "specialPrice": 3,
+            "promoId": -1
+          },
+          "identical": true
+        }
+      ]
+    },
+    "1480": {
+      "categoryName": "Deal of the Day",
+      "products": [
+        {
+          "id": 77773070,
+          "name": "Monday Double",
+          "pickup": {
+            "originalPrice": 62,
+            "specialPrice": 39,
+            "promoId": 6740
+          },
+          "delivery": {
+            "originalPrice": 62,
+            "specialPrice": 39,
+            "promoId": 6740
+          },
+          "identical": true
+        },
+        {
+          "id": 77773071,
+          "name": "Sunday Duo",
+          "pickup": {
+            "originalPrice": 24,
+            "specialPrice": 19,
+            "promoId": 6739
+          },
+          "delivery": {
+            "originalPrice": 24,
+            "specialPrice": 19,
+            "promoId": 6739
+          },
+          "identical": true
+        },
+        {
+          "id": 77773067,
+          "name": "Foodie Mix",
+          "pickup": {
+            "originalPrice": 30,
+            "specialPrice": 25,
+            "promoId": 6744
+          },
+          "delivery": {
+            "originalPrice": 30,
+            "specialPrice": 25,
+            "promoId": 6744
+          },
+          "identical": true
+        },
+        {
+          "id": 11616,
+          "name": "The Classics Big Box - Regular",
+          "pickup": {
+            "originalPrice": 29,
+            "specialPrice": 29,
+            "promoId": 6720
+          },
+          "delivery": {
+            "originalPrice": 29,
+            "specialPrice": 29,
+            "promoId": 6720
+          },
+          "identical": true
+        },
+        {
+          "id": 77773069,
+          "name": "The Taster Mix",
+          "pickup": {
+            "originalPrice": 32,
+            "specialPrice": 25,
+            "promoId": 6741
+          },
+          "delivery": {
+            "originalPrice": 32,
+            "specialPrice": 25,
+            "promoId": 6741
+          },
+          "identical": true
+        },
+        {
+          "id": 12839,
+          "name": "Friday Feast",
+          "pickup": {
+            "originalPrice": 137,
+            "specialPrice": 75,
+            "promoId": 6743
+          },
+          "delivery": {
+            "originalPrice": 137,
+            "specialPrice": 75,
+            "promoId": 6743
+          },
+          "identical": true
+        },
+        {
+          "id": 77773068,
+          "name": "Super Night Deal",
+          "pickup": {
+            "originalPrice": 96,
+            "specialPrice": 69,
+            "promoId": 6742
+          },
+          "delivery": {
+            "originalPrice": 96,
+            "specialPrice": 69,
+            "promoId": 6742
+          },
+          "identical": true
+        }
+      ]
+    }
+  },
+  "prepTimeAcrossThreeDifferentStores": {
+    "prep97": {
+      "status": 200,
+      "body": {
+        "statusCode": 200,
+        "httpCode": 200,
+        "type": "DEFAULT_SUCCESS",
+        "data": {
+          "prepTime": 3
+        },
+        "message": "Success",
+        "attributes": [],
+        "heading": {
+          "Ar": "",
+          "En": ""
+        },
+        "note": {
+          "En": "",
+          "Ar": ""
+        },
+        "identifier": []
+      }
+    },
+    "prep7": {
+      "status": 200,
+      "body": {
+        "statusCode": 200,
+        "httpCode": 200,
+        "type": "DEFAULT_SUCCESS",
+        "data": {
+          "prepTime": 3
+        },
+        "message": "Success",
+        "attributes": [],
+        "heading": {
+          "Ar": "",
+          "En": ""
+        },
+        "note": {
+          "En": "",
+          "Ar": ""
+        },
+        "identifier": []
+      }
+    },
+    "prep24": {
+      "status": 200,
+      "body": {
+        "statusCode": 200,
+        "httpCode": 200,
+        "type": "DEFAULT_SUCCESS",
+        "data": {
+          "prepTime": 3
+        },
+        "message": "Success",
+        "attributes": [],
+        "heading": {
+          "Ar": "",
+          "En": ""
+        },
+        "note": {
+          "En": "",
+          "Ar": ""
+        },
+        "identifier": []
+      }
+    }
+  },
+  "prepTimeObservation": "getPrepTime returned {\"prepTime\":3} for storeId=24 (Riyadh), storeId=97 (Jeddah pickup), AND storeId=7 (Jeddah delivery) - identical across three different stores in two different cities. This raises doubt about whether prepTime is genuinely store-specific or a fixed platform default - see unresolved-items.md.",
+  "deliveryFeeOrMinOrderObserved": false,
+  "deliveryFeeOrMinOrderNote": "validateLocation success response for storeId=7 (Jeddah) carries the same field set as storeId=5796 (Riyadh) did originally: promiseTime only, no fee or minimum-order-value field. Consistent absence across both branches tested."
+}

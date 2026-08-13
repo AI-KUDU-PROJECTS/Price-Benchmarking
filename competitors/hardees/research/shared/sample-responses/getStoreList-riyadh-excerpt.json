@@ -1,0 +1,169 @@
+{
+  "cityId": 11,
+  "cityName": "Riyadh",
+  "totalStoresInRiyadh": 46,
+  "sampleStores": [
+    {
+      "cityId": 11,
+      "storeId": 7742,
+      "menuId": 1,
+      "active": 1,
+      "sdmStatus": 1,
+      "cmsStatus": 1,
+      "name_en": "Mahdya",
+      "name_ar": "المهدية",
+      "phone1": "",
+      "email": "",
+      "services": {
+        "carHop": 1,
+        "del": 0,
+        "din": 1,
+        "driveThru": 1,
+        "tak": 1
+      },
+      "active_status": 0,
+      "dintable_info": 1,
+      "location": {
+        "description": "Al-Sail Al-Kabir Road,Mahdia,Riyadh",
+        "latitude": 24.650617,
+        "longitude": 46.503748,
+        "radius": 500
+      },
+      "address_en": "Al-Sail Al-Kabir Road,Mahdia,Riyadh",
+      "address_ar": "، طريق السيل الكبير، المهدية، الرياض",
+      "areaId": 12446,
+      "startTime": "2023-12-15T11:00:00Z",
+      "endTime": "2023-12-15T04:00:59Z",
+      "nextday": 1,
+      "menuTempId": 8,
+      "sdmStoreNo": 14176,
+      "sdmCountryId": 1,
+      "enterpriseUnit": "18afbe90bc8a4ff0aeb141a25d9782f0",
+      "deliveryMode": "",
+      "advanceOrder": {
+        "carHop": 1,
+        "del": 0,
+        "din": 1,
+        "driveThru": 1,
+        "tak": 1
+      },
+      "promiseTime": 0,
+      "description": "",
+      "storeIdAs": "2_7742_12446_2_HRD",
+      "prepTimeBuf": 0,
+      "displayTableNo": {
+        "editable": 0,
+        "enabled": 0,
+        "mandatory": 0
+      }
+    },
+    {
+      "cityId": 11,
+      "storeId": 87,
+      "menuId": 1,
+      "active": 1,
+      "sdmStatus": 1,
+      "cmsStatus": 1,
+      "name_en": "HARDEES Alshefa",
+      "name_ar": "هارديز الشفاء",
+      "phone1": "596103169  stor",
+      "email": "",
+      "services": {
+        "carHop": 0,
+        "del": 1,
+        "din": 1,
+        "driveThru": 1,
+        "tak": 1
+      },
+      "active_status": 0,
+      "dintable_info": 0,
+      "location": {
+        "description": "6512 Ibn Taymeeyah Rd, Al Marwah, Riyadh 14721 4194, Saudi Arabia",
+        "latitude": 24.54399284,
+        "longitude": 46.69208296,
+        "radius": 0
+      },
+      "address_en": "almaared street RD with sittin street RD front of sasco gas station",
+      "address_ar": "طريق شارع المعارض مع تقاطع شارع الستين امام محطه بنزين ساسكو",
+      "areaId": 8222,
+      "startTime": "2017-07-15T11:00:00Z",
+      "endTime": "2017-07-15T04:00:59Z",
+      "nextday": 1,
+      "menuTempId": 8,
+      "sdmStoreNo": 14136,
+      "sdmCountryId": 6,
+      "enterpriseUnit": "be9ffd0d2b1f4973bf1736d9fcc9c76a",
+      "deliveryMode": "",
+      "advanceOrder": {
+        "carHop": 1,
+        "del": 1,
+        "din": 1,
+        "driveThru": 1,
+        "tak": 1
+      },
+      "promiseTime": 45,
+      "description": "",
+      "storeIdAs": "2_87_8222_2_HRD",
+      "prepTimeBuf": 0,
+      "displayTableNo": {
+        "editable": 0,
+        "enabled": 0,
+        "mandatory": 0
+      }
+    },
+    {
+      "cityId": 11,
+      "storeId": 24,
+      "menuId": 1,
+      "active": 1,
+      "sdmStatus": 1,
+      "cmsStatus": 1,
+      "name_en": "EUROMARCHE-H",
+      "name_ar": "هارديز اليورومارشيه",
+      "phone1": "592753639 store",
+      "email": "",
+      "services": {
+        "carHop": 0,
+        "del": 1,
+        "din": 1,
+        "driveThru": 1,
+        "tak": 1
+      },
+      "active_status": 0,
+      "dintable_info": 0,
+      "location": {
+        "description": "7878 التخصصي، Al Mathar Ash Shamali, Riyadh 12334 3033, Saudi Arabia",
+        "latitude": 24.70452479,
+        "longitude": 46.66425169,
+        "radius": 500
+      },
+      "address_en": "Hardees Euromarche AL mathar al shamali Takasushi",
+      "address_ar": "اليورومارشية شارع التخصصى",
+      "areaId": 8072,
+      "startTime": "2017-07-15T11:00:00Z",
+      "endTime": "2017-07-15T04:00:59Z",
+      "nextday": 1,
+      "menuTempId": 8,
+      "sdmStoreNo": 14103,
+      "sdmCountryId": 6,
+      "enterpriseUnit": "6e7c06804b3e4558b33e7f4e7ee1bc45",
+      "deliveryMode": "",
+      "advanceOrder": {
+        "carHop": 0,
+        "del": 0,
+        "din": 1,
+        "driveThru": 1,
+        "tak": 1
+      },
+      "promiseTime": 45,
+      "description": "",
+      "storeIdAs": "2_24_8072_2_HRD",
+      "prepTimeBuf": 0,
+      "displayTableNo": {
+        "editable": 0,
+        "enabled": 0,
+        "mandatory": 0
+      }
+    }
+  ]
+}

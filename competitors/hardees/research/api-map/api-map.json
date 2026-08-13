@@ -1,0 +1,802 @@
+{
+  "$schema": "internal://hardees-api-map/v1",
+  "baseUrl": "https://saudi.hardees.me",
+  "lastVerificationDate": "2026-08-11",
+  "verificationMethod": [
+    "Live network capture of a real headless-Chromium Playwright session against https://saudi.hardees.me/en/home (research/pickup/raw/, research/delivery/raw/ - git-ignored raw HARs + api-calls.json; sanitized copies retained under research/pickup/sanitized/, research/delivery/sanitized/).",
+    "Two full end-to-end runs of tools/capture-network.js (--channel=pickup and --channel=delivery), plus five earlier exploratory Playwright sessions during development of that tool - see investigation-log.md for the full session-by-session trail.",
+    "Direct same-origin fetch() calls executed from inside the already-authenticated browser tab (page.evaluate) to sample all 12 real menu categories and to probe several frontend-discovered endpoints (getNutritionInfo, getPrepTime, product, product-bundle-step, getPromotion) without fighting the product grid's lazy-rendered click targets.",
+    "Static analysis of the site's own production JS bundles (spwa-ui-e89ec732.js, index-41f2264d.js) - the literal endpoint-definition table and request-thunk implementations - as a first pass for endpoints that were hard to trigger live, then labeled per-endpoint below by exactly how far live verification actually got (see research/shared/frontend-analysis/bundle-findings.md for the full table and labeling convention).",
+    "A small, sequential, low-volume direct-HTTP (no browser) probe using Node's built-in https module, formalized as tools/probe-public-api.js - see research/shared/sample-requests/direct-http-probe-transcript.md."
+  ],
+  "notes": [
+    "This file documents PUBLIC, unauthenticated (guest-session) endpoints only. No login, OTP, payment, cart, or checkout endpoint was ever called by this investigation.",
+    "Hardee's Saudi runs on the SAME 'AMR' (Americana Restaurants) backend platform family as KFC Saudi (competitors/kfc/) - getAppConfig's response carries an 'amr':{...} block, and Hardee's own guest-session localStorage.profileDraft carries 'appbundle':'com.kfc.me' (a shared mobile-app bundle id across the group's brand apps). This explains why several endpoint NAMES resemble KFC's (getMenuConfig, getMenu, getProductsByCategory, getNewStore, validateLocation, getStoreList, guestLogin, getAppConfig, getHome, getProgressivePromotion). It does NOT mean the payloads/response shapes are identical - every endpoint below was independently re-verified against Hardee's own live responses; see each endpoint's verificationNote for the concrete differences found (e.g. getStoreList's much richer store object, getProductsByCategory's nested items[]/steps[] product structure, the 'delevery' misspelling, the day-of-week displayDay offer field).",
+    "'Session' fields (cookies, deviceid, the 't'/'_t'/'lat'/'lrt' JWT cookies) are captured fresh per run by tools/capture-network.js and held only in the Playwright browser context's own cookie jar for that process. They are NEVER written into this file, api-map.md, git, or any log - see 'Security & sensitive data notes' in api-map.md.",
+    "The site's edge sits behind an Azure Application Gateway WAF that returns a plain HTML 403 for any request missing browser-shaped user-agent/origin/referer headers - live-confirmed directly (see tools/probe-public-api.js output). This is the same WAF behavior documented for saudi.kfc.me, independently re-confirmed here on saudi.hardees.me's own domain.",
+    "Sentinel values confirmed live and independently re-verified from KFC's documented pattern: specialPrice<=0 (observed exactly 0) does NOT mean free - it means 'this bundle_group wrapper does not carry a simple fixed-discount price here', while its own promoId is still a real positive value. promoId=-1 means 'no active offer'. See the quirks list in api-map.md.",
+    "UPDATED 2026-08-06 (second research session): /api/product and /api/product-bundle-step are now FULLY RESOLVED and live-verified with populated data (see their endpoint entries below and unresolved-items.md item #1's resolution) - the missing fields in the first session's guesses were `categoryId` and `service`. `getPromotion` remains unresolved (still 500/DEFAULT_VALIDATION_ERROR on every payload guessed - it was not part of this session's resolution work). getMenuConfig's 'channel-independent for one cluster' finding was RE-TESTED this session against a second branch ~950km away (Jeddah, storeId=97/7) with identical results - see api-map.md 'Channel separation mechanism' update and unresolved-items.md item #9.",
+    "UPDATED 2026-08-11 (fourth session): a real, working production Node.js collector (competitors/hardees/collector/) and Python backend/dashboard were built and live-verified end to end (both channels, 12/12 categories, 110 real products each, status SUCCESS) - see ../../README.md and the note at the top of api-map.md. Confirmed the production branch is EUROMARCHE-H (storeId=24) via a full getStoreList dump of 46 real Riyadh branches, matching the storeId=24 used as an example throughout this file's earlier sessions. Three real, previously-undiscovered issues were found and fixed while building the collector (none were caught by the earlier research-only sessions, which never exercised a full run): (1) getStoreList's response carries a leading UTF-8 BOM that breaks JSON.parse(); (2) saudi.hardees.me's own TLS certificate was found expired at verification time; (3) getStoreList intermittently returns a transient Azure BlobNotFound 500 that clears within 1-2s on retry."
+  ],
+  "sharedPlatformNote": "See research/shared/frontend-analysis/bundle-findings.md 'Notable code-level observations' - the compiled bundle contains brand-switch logic (hrd/phd/...) confirming several brand apps share this exact bundle and backend family.",
+  "endpoints": [
+    {
+      "endpoint_id": "guestLogin",
+      "purpose": "Bootstraps an anonymous guest session (deviceid + cart id + guest JWT cookies). Fires automatically on every page load for every anonymous visitor - not a real account login, no credentials/OTP involved.",
+      "base_url": "https://saudi.hardees.me",
+      "path": "/api/guestLogin",
+      "http_method": "POST",
+      "request_content_type": "application/json",
+      "request_payload": {},
+      "query_parameters": null,
+      "required_public_headers": [
+        "brand",
+        "country",
+        "language",
+        "version",
+        "devicemodel",
+        "is-dark-mode",
+        "deviceid",
+        "user-agent",
+        "origin",
+        "referer"
+      ],
+      "optional_headers": [
+        "refreshtoken (empty string on a first call)"
+      ],
+      "session_dependency": "none (this call CREATES the session)",
+      "cookie_dependency": "none required; response sets 't' (guest auth JWT) and '_t' (refresh JWT) cookies, both HttpOnly/Secure/SameSite=Strict",
+      "token_dependency": "none required",
+      "branch_dependency": "none",
+      "channel_dependency": "none",
+      "location_dependency": "none",
+      "response_status": "200 on success; 422/500 if deviceid/headers are missing (see notes); 403 HTML from the WAF if browser-shaped headers are missing entirely",
+      "response_root_shape": "{statusCode, httpCode, type, data:{brand,country,isGuest,deviceid,appbundle,_id,cartId,language,phnNo,cCode,email,name}, message, attributes, heading, note, identifier}",
+      "important_response_paths": [
+        "data.deviceid",
+        "data.cartId",
+        "data._id"
+      ],
+      "pagination": "none",
+      "rate_limit_observations": "none observed in low-volume sequential testing (a handful of requests, seconds apart)",
+      "error_responses": {
+        "403": "WAF block (Azure Application Gateway) - missing browser-shaped headers, plain HTML body",
+        "422_wrapped_in_500": "DEFAULT_VALIDATION_ERROR - missing/invalid deviceid, even with all other headers present"
+      },
+      "source_evidence": [
+        "research/pickup/sanitized/api-calls-sanitized.json",
+        "research/shared/sample-requests/direct-http-probe-transcript.md"
+      ],
+      "last_verified_at": "2026-08-06",
+      "verificationNote": "Live-confirmed via both a real browser session AND a raw Node https client with no cookie jar at all (see direct-http-probe-transcript.md) - a fresh guest session can be created with zero prior state, given only browser-shaped headers plus any self-chosen deviceid string."
+    },
+    {
+      "endpoint_id": "getAppConfig",
+      "purpose": "Global app configuration: OTP digit count, blob-storage SAS token (blobBaseUrl.SASToken/.jsonBase, required by getStoreList/getMenu/getHome), payment URLs (out of scope), store-closing-soon message templates, and the 'amr' platform-family block.",
+      "base_url": "https://saudi.hardees.me",
+      "path": "/api/getAppConfig",
+      "http_method": "GET",
+      "request_content_type": null,
+      "request_payload": null,
+      "query_parameters": null,
+      "required_public_headers": [
+        "brand",
+        "country",
+        "language",
+        "version"
+      ],
+      "optional_headers": [],
+      "session_dependency": "none",
+      "cookie_dependency": "none",
+      "token_dependency": "none",
+      "branch_dependency": "none",
+      "channel_dependency": "none",
+      "location_dependency": "none",
+      "response_status": "200",
+      "response_root_shape": "{statusCode, data:{otpDigits, blobBaseUrl:{SASToken,product,home,jsonBase}, amr:{E,S,ST}, paymentSuccessUrl, paymentFailureUrl, ...}}",
+      "important_response_paths": [
+        "data.blobBaseUrl.SASToken",
+        "data.blobBaseUrl.jsonBase"
+      ],
+      "pagination": "none",
+      "rate_limit_observations": "none observed",
+      "error_responses": {},
+      "source_evidence": [
+        "research/pickup/sanitized/api-calls-sanitized.json"
+      ],
+      "last_verified_at": "2026-08-06",
+      "verificationNote": "Live-confirmed even via a raw HTTP client with a synthetic deviceid and no cookie jar (see direct-http-probe-transcript.md, probe #3) - this call needs no established session at all."
+    },
+    {
+      "endpoint_id": "getStoreList",
+      "purpose": "Full city/branch directory for Saudi Arabia. Used to discover/verify the fixed Riyadh branch before any channel-specific call.",
+      "base_url": "https://saudi.hardees.me",
+      "path": "/api/getStoreList",
+      "http_method": "POST",
+      "request_content_type": "application/json",
+      "request_payload": {
+        "payload": {
+          "path": "<blobBaseUrl.jsonBase>",
+          "country": "ksa",
+          "subPath": "<blobBaseUrl.SASToken>"
+        }
+      },
+      "query_parameters": null,
+      "required_public_headers": [
+        "brand",
+        "country",
+        "language",
+        "version",
+        "deviceid"
+      ],
+      "optional_headers": [],
+      "session_dependency": "guest session established (deviceid) recommended, not strictly required for this call alone",
+      "cookie_dependency": "none required",
+      "token_dependency": "none",
+      "branch_dependency": "none (this IS the branch directory)",
+      "channel_dependency": "none (directory covers all channels; per-store 'services' flags indicate del/tak/din/driveThru/carHop support)",
+      "location_dependency": "none",
+      "response_status": "200",
+      "response_root_shape": "{statusCode, data:[{id, cityId, sdmCityId, cityName, name_en, cityNameAr, name_ar, countryId, sdmCountryId, store:[{storeId, menuId, active, sdmStatus, cmsStatus, name_en, name_ar, phone1, email, services:{carHop,del,din,driveThru,tak}, active_status, dintable_info, location:{description,latitude,longitude,radius}, address_en, address_ar, areaId, startTime, endTime, nextday, menuTempId, sdmStoreNo, sdmCountryId, enterpriseUnit, deliveryMode, advanceOrder:{carHop,del,din,driveThru,tak}, promiseTime, description, storeIdAs, prepTimeBuf, displayTableNo:{editable,enabled,mandatory}}]}]}",
+      "important_response_paths": [
+        "data[].cityId",
+        "data[].cityName",
+        "data[].store[].storeId",
+        "data[].store[].name_en",
+        "data[].store[].active",
+        "data[].store[].cmsStatus",
+        "data[].store[].services",
+        "data[].store[].location",
+        "data[].store[].promiseTime"
+      ],
+      "pagination": "none - one call returns every city/store in the country (35 cities observed live, 46 stores under Riyadh alone)",
+      "rate_limit_observations": "none observed",
+      "error_responses": {},
+      "source_evidence": [
+        "research/pickup/sanitized/api-calls-sanitized.json",
+        "research/shared/sample-responses/getStoreList-riyadh-excerpt.json"
+      ],
+      "last_verified_at": "2026-08-06",
+      "verificationNote": "MUCH richer store object than KFC's equivalent - carries sdmStatus/active_status/dintable_info/enterpriseUnit/deliveryMode/advanceOrder/promiseTime/storeIdAs/prepTimeBuf/displayTableNo, none of which KFC's getStoreList response carries. 'storeIdAs' is a composite key ('2_<storeId>_<areaId>_2_HRD') distinct from the plain numeric storeId used everywhere else - not yet resolved what consumes this composite form specifically; see unresolved-items.md."
+    },
+    {
+      "endpoint_id": "getNewStore",
+      "purpose": "Resolves the nearest PICKUP-capable branch for a given lat/lng - the 'USE MY LOCATION' button in the Self-Pickup branch picker.",
+      "base_url": "https://saudi.hardees.me",
+      "path": "/api/getNewStore",
+      "http_method": "POST",
+      "request_content_type": "application/json",
+      "request_payload": {
+        "lat": "number",
+        "lng": "number"
+      },
+      "query_parameters": null,
+      "required_public_headers": [
+        "brand",
+        "country",
+        "language",
+        "version",
+        "deviceid"
+      ],
+      "optional_headers": [],
+      "session_dependency": "guest session recommended",
+      "cookie_dependency": "none required",
+      "token_dependency": "none",
+      "branch_dependency": "resolves the branch from coordinates",
+      "channel_dependency": "PICKUP",
+      "location_dependency": "yes - lat/lng required",
+      "response_status": "200",
+      "response_root_shape": "{statusCode, data:{cityId, areaId, storeId}}",
+      "important_response_paths": [
+        "data.storeId",
+        "data.cityId",
+        "data.areaId"
+      ],
+      "pagination": "none",
+      "rate_limit_observations": "none observed",
+      "error_responses": {},
+      "source_evidence": [
+        "research/pickup/sanitized/api-calls-sanitized.json"
+      ],
+      "last_verified_at": "2026-08-06",
+      "verificationNote": "Live-confirmed twice with the exact same coordinate ({lat:24.70452479,lng:46.66425169}) -> identical {cityId:11,areaId:8072,storeId:24} both times - fully reproducible for this branch. Identical path/method/payload/response shape to KFC's own getNewStore, independently re-verified here rather than assumed."
+    },
+    {
+      "endpoint_id": "validateLocation",
+      "purpose": "Resolves DELIVERY serviceability + the full servicing branch object for a given lat/lng. Also used for a lightweight 'is this point deliverable' check at other screens (HOME banner, CART) with a different payload shape.",
+      "base_url": "https://saudi.hardees.me",
+      "path": "/api/validateLocation",
+      "http_method": "POST",
+      "request_content_type": "application/json",
+      "request_payload": {
+        "lat": "number",
+        "lng": "number",
+        "screen": "LOCATION | HOME | CART",
+        "addressSubType": "DELIVERY"
+      },
+      "query_parameters": null,
+      "required_public_headers": [
+        "brand",
+        "country",
+        "language",
+        "version",
+        "deviceid"
+      ],
+      "optional_headers": [],
+      "session_dependency": "guest session recommended",
+      "cookie_dependency": "none required",
+      "token_dependency": "none",
+      "branch_dependency": "resolves the branch from coordinates",
+      "channel_dependency": "DELIVERY",
+      "location_dependency": "yes - lat/lng required",
+      "response_status": "200 when deliverable; the underlying HTTP transport status was 500 in EVERY 'not deliverable' case observed live, with the real outcome encoded in the JSON body's own statusCode/httpCode field (409 or 400) rather than the HTTP status line - see quirks in api-map.md",
+      "response_root_shape": "success: {statusCode:200, data:{menuId, menuTempId, store:{storeId, countryId, areaId, cityId, name_en, name_ar, isOnline, services, advanceOrder, promiseTime, location, displayTableNo, prepTimeBuf, startTime, endTime, nextday}}}; failure (HTTP 500): {statusCode:409|400, httpCode:409|400, type:'OUTSIDE_DELIVERY_AREA_CONFIRM_LOC'|'OUTSIDE_DELIVERY_AREA'|'LOCATION_NOT_FOUND', message, attributes:[{type:'REDIRECTION',action:'location-delivery'|'menu',...}]}",
+      "important_response_paths": [
+        "data.store.storeId",
+        "data.store.name_en",
+        "data.menuId",
+        "data.menuTempId",
+        "type (on failure)"
+      ],
+      "pagination": "none",
+      "rate_limit_observations": "none observed",
+      "error_responses": {
+        "500_body_409_OUTSIDE_DELIVERY_AREA_CONFIRM_LOC": "coordinate not deliverable, screen=HOME context - offers 'Change'/'Explore Menu' redirection actions",
+        "500_body_400_OUTSIDE_DELIVERY_AREA": "coordinate not deliverable, screen=CART context",
+        "500_body_409_LOCATION_NOT_FOUND": "observed with screen=LOCATION and a coordinate that could not be resolved to any address at all"
+      },
+      "source_evidence": [
+        "research/delivery/sanitized/api-calls-sanitized.json",
+        "research/delivery/notes.md"
+      ],
+      "last_verified_at": "2026-08-06",
+      "verificationNote": "Live-confirmed BOTH outcomes with the identical literal coordinate (24.7136,46.6753) on different runs the same day - once resolved to a deliverable Riyadh address (storeId=5796 'Sulimanya- H'), once to a non-deliverable one - a genuine, observed non-determinism in the site's own reverse-geocoding, not a bug in this investigation. The success response's store object is FAR richer than KFC's equivalent (KFC's validateLocation only returns {storeId,name_en,location})."
+    },
+    {
+      "endpoint_id": "getMenuConfig",
+      "purpose": "Given an order channel, returns the menuConfigId + clusterId that scope every subsequent menu/category/product call.",
+      "base_url": "https://saudi.hardees.me",
+      "path": "/api/getMenuConfig",
+      "http_method": "POST",
+      "request_content_type": "application/json",
+      "request_payload": {
+        "orderType": "PICKUP | DELIVERY",
+        "storeId": "number (optional - included once a specific Pickup branch is resolved)"
+      },
+      "query_parameters": null,
+      "required_public_headers": [
+        "brand",
+        "country",
+        "language",
+        "version",
+        "deviceid"
+      ],
+      "optional_headers": [],
+      "session_dependency": "guest session recommended",
+      "cookie_dependency": "none required",
+      "token_dependency": "none",
+      "branch_dependency": "optional via storeId - did not change the observed result for this cluster (see verificationNote)",
+      "channel_dependency": "PICKUP or DELIVERY (mutually exclusive per call)",
+      "location_dependency": "none direct (branch context comes from storeId or the session's last-validated address)",
+      "response_status": "200",
+      "response_root_shape": "{statusCode, data:{expiryTime, menuConfigId, clusterId}}",
+      "important_response_paths": [
+        "data.menuConfigId",
+        "data.clusterId"
+      ],
+      "pagination": "none",
+      "rate_limit_observations": "none observed",
+      "error_responses": {},
+      "source_evidence": [
+        "research/pickup/sanitized/api-calls-sanitized.json",
+        "research/delivery/sanitized/api-calls-sanitized.json",
+        "research/pickup/sanitized/jeddah-branch/api-calls-sanitized.json",
+        "research/delivery/sanitized/jeddah-branch/api-calls-sanitized.json"
+      ],
+      "last_verified_at": "2026-08-06",
+      "verificationNote": "MAJOR FINDING - see api-map.md 'Channel separation'. Every single getMenuConfig call observed live in this investigation ({\"orderType\":\"PICKUP\"}, {\"orderType\":\"DELIVERY\"}, {\"orderType\":\"PICKUP\",\"storeId\":24}, {\"orderType\":\"PICKUP\",\"storeId\":5796}) returned the IDENTICAL {\"menuConfigId\":\"HRD_SA_23\",\"clusterId\":\"1_8\"} - across both the Pickup and Delivery capture-network.js runs, and across multiple manual exploration sessions on 2026-08-06. This is the opposite of what was assumed going in (that this would be the channel-fixing call, as it is for KFC) - for THIS branch/cluster, orderType and storeId did not change the resolved config at all. RE-CONFIRMED in a second research session against a Jeddah branch (storeId=97 Pickup, storeId=7 Delivery, ~950km from the original Riyadh branch, cityId=31 vs 11) via TWO fully separate Playwright browser contexts (separate guest sessions/deviceids/cookies) - every getMenuConfig call in BOTH sessions again resolved the identical HRD_SA_23/1_8, with the identical 12-category list and byte-identical prices on every one of 40+ products spot-checked (see research/shared/sample-responses/channel-comparison-jeddah-vs-riyadh.json). This strongly suggests Hardee's Saudi uses ONE NATIONWIDE cluster for this channel-independence behavior, not a per-branch quirk - though see unresolved-items.md item #9 for what is still not proven (a delivery-fee/minimum-order cart-level difference remains untested)."
+    },
+    {
+      "endpoint_id": "getMenu",
+      "purpose": "Returns the full category tree (id, name, productCount) for a menuConfigId. Category objects do not include products.",
+      "base_url": "https://saudi.hardees.me",
+      "path": "/api/getMenu",
+      "http_method": "POST",
+      "request_content_type": "application/json",
+      "request_payload": {
+        "payload": {
+          "path": "",
+          "brand": "hrd",
+          "country": "ksa",
+          "defMenu": 1,
+          "menu": "<menuTempId>",
+          "locale": "En",
+          "service": "PICKUP | DELIVERY",
+          "menuConfigId": "<menuConfigId>",
+          "subPath": "<blobBaseUrl.SASToken>"
+        }
+      },
+      "query_parameters": null,
+      "required_public_headers": [
+        "brand",
+        "country",
+        "language",
+        "version",
+        "deviceid"
+      ],
+      "optional_headers": [],
+      "session_dependency": "guest session recommended",
+      "cookie_dependency": "none required",
+      "token_dependency": "none",
+      "branch_dependency": "inherited from menuConfigId",
+      "channel_dependency": "the 'service' payload field is set to whichever channel is currently selected in the UI, but see verificationNote - it did not change the returned category list in this investigation",
+      "location_dependency": "none",
+      "response_status": "200",
+      "response_root_shape": "{statusCode, data:{categories:[{groupId, aKey, position, id, name, isHidden, code, parentId, assets, slug, createdAt, updatedAt, metaTitle, description, custom, bannerImages, catImages, promoId, is_toggle, flashCategory, tag, services:{carhop,delevery,dine_in,drivethru,take_away}, level, productCount}], tags:[]}}",
+      "important_response_paths": [
+        "data.categories[].id",
+        "data.categories[].name",
+        "data.categories[].productCount",
+        "data.categories[].services"
+      ],
+      "pagination": "none - one call returns all 12 categories for this cluster",
+      "rate_limit_observations": "none observed",
+      "error_responses": {},
+      "source_evidence": [
+        "research/pickup/sanitized/api-calls-sanitized.json",
+        "research/shared/sample-responses/all-12-categories-pickup-default.json"
+      ],
+      "last_verified_at": "2026-08-06",
+      "verificationNote": "12 categories live-confirmed for HRD_SA_23/1_8: 662 App Exclusive, 664 Boxes, 666 Chargrilled & Thick Burgers, 667 Hand Breaded Chicken, 668 Kids Meals, 669 Sides Items, 670 Desserts & Beverages, 661 Crave N' Save, 1480 Deal of the Day, 1494 What's New - Overloaders, 1471 What's New - One Piece, 1527 What's New/ Tornado. Category services object spells delivery as 'delevery' (not a typo introduced here - verified byte-for-byte in the live response) - see quirks in api-map.md. name_ar was NOT present on any category object despite the field existing in KFC's schema - see unresolved-items.md."
+    },
+    {
+      "endpoint_id": "getProductsByCategory",
+      "purpose": "Returns every product in one category: price, discount, promo id, and (for combo/box products) a nested items[] array with build steps and size/flavor variants. THE primary product+price+offer data source.",
+      "base_url": "https://saudi.hardees.me",
+      "path": "/api/getProductsByCategory",
+      "http_method": "POST",
+      "request_content_type": "application/json",
+      "request_payload": {
+        "cluster": "<clusterId>",
+        "id": "<categoryId, as a STRING>",
+        "Language": "En",
+        "configId": "<menuConfigId>"
+      },
+      "query_parameters": null,
+      "required_public_headers": [
+        "brand",
+        "country",
+        "language",
+        "version",
+        "deviceid",
+        "devicemodel",
+        "is-dark-mode",
+        "refreshtoken"
+      ],
+      "optional_headers": [
+        "user-agent, origin, referer required when calling via raw HTTP outside a browser context - see WAF note"
+      ],
+      "session_dependency": "guest session recommended",
+      "cookie_dependency": "none required beyond the app headers above",
+      "token_dependency": "none",
+      "branch_dependency": "inherited from cluster/configId - NOT store-specific in the branch/store-id sense (see verificationNote)",
+      "channel_dependency": "NONE OBSERVED - no service/orderType/channel field anywhere in this payload; see api-map.md 'Channel separation'",
+      "location_dependency": "none",
+      "response_status": "200",
+      "response_root_shape": "{statusCode, data:{groupId, aKey, position, id, name, isHidden, code, parentId, assets, promoId, services:{carhop,delevery,dine_in,drivethru,take_away}, level, productCount, updatedAt, products:[{...see field-map.json...}]}}",
+      "important_response_paths": [
+        "data.id",
+        "data.name",
+        "data.products[].id",
+        "data.products[].originalPrice",
+        "data.products[].specialPrice",
+        "data.products[].promoId",
+        "data.products[].limited_offer",
+        "data.products[].typeId",
+        "data.products[].bundleTypeId",
+        "data.products[].variants",
+        "data.products[].steps",
+        "data.products[].items[]",
+        "data.products[].services"
+      ],
+      "pagination": "none - one call returns every product in the category (observed 3 to 18 products per category)",
+      "rate_limit_observations": "none observed at ~1 request/800ms sequential across 7-12 categories",
+      "error_responses": {
+        "500_DEFAULT_VALIDATION_ERROR_422": "observed when required app headers (brand/country/language/version/devicemodel/is-dark-mode/deviceid) were omitted from a same-origin fetch() call - see investigation-log.md"
+      },
+      "source_evidence": [
+        "research/pickup/sanitized/api-calls-sanitized.json",
+        "research/delivery/sanitized/api-calls-sanitized.json",
+        "research/shared/sample-responses/all-12-categories-pickup-default.json"
+      ],
+      "last_verified_at": "2026-08-06",
+      "verificationNote": "Live-verified for all 12 categories under BOTH a Pickup-selected session (storeId=24) and a Delivery-selected session (storeId=5796) - product 77772960 'Super Star Burger Combo' returned the IDENTICAL {originalPrice:38, specialPrice:0, promoId:6504} in both, with no service/channel field in the request at all. Structurally very different from KFC's response: products can nest a full items[] array of real purchasable sub-products (each with its own id/sku/price/promoId/steps), NOT present in KFC's flatter shape - see field-map.json 'notes' for the three-level nesting model."
+    },
+    {
+      "endpoint_id": "getHome",
+      "purpose": "Homepage banner/deal-rail content. Not used for product/price data in this investigation; included because the site's own frontend calls it automatically on every load.",
+      "base_url": "https://saudi.hardees.me",
+      "path": "/api/getHome",
+      "http_method": "POST",
+      "request_content_type": "application/json",
+      "request_payload": {
+        "path": "",
+        "country": "ksa",
+        "defMenu": 1,
+        "defTemp": "<menuTempId>",
+        "cluster": "<clusterId>",
+        "locale": "En",
+        "subPath": "<blobBaseUrl.SASToken>",
+        "menuConfigId": "<menuConfigId>"
+      },
+      "query_parameters": null,
+      "required_public_headers": [
+        "brand",
+        "country",
+        "language",
+        "version",
+        "deviceid"
+      ],
+      "optional_headers": [],
+      "session_dependency": "guest session recommended",
+      "cookie_dependency": "none required",
+      "token_dependency": "none",
+      "branch_dependency": "inherited from cluster/menuConfigId",
+      "channel_dependency": "none observed",
+      "location_dependency": "none",
+      "response_status": "200",
+      "response_root_shape": "{statusCode, data:{menuId, menuTempId, data:[...banner rail, unused]}}",
+      "important_response_paths": [
+        "data.menuId (candidate input to getProgressivePromotion, not confirmed live - see unresolved-items.md)"
+      ],
+      "pagination": "none",
+      "rate_limit_observations": "none observed",
+      "error_responses": {},
+      "source_evidence": [
+        "research/pickup/sanitized/api-calls-sanitized.json"
+      ],
+      "last_verified_at": "2026-08-06",
+      "verificationNote": "Live-confirmed request/response shape; fires 2-3 times per page load automatically. Not read for any product/price/offer field by this investigation's tooling."
+    },
+    {
+      "endpoint_id": "getPrepTime",
+      "purpose": "Kitchen preparation time (minutes) for a given store/country - a candidate input toward 'estimated delivery time', though it is prep time only, not a full drive-time-inclusive ETA.",
+      "base_url": "https://saudi.hardees.me",
+      "path": "/api/getPrepTime",
+      "http_method": "POST",
+      "request_content_type": "application/json",
+      "request_payload": {
+        "payload": {
+          "country": "ksa",
+          "storeId": "number"
+        }
+      },
+      "query_parameters": null,
+      "required_public_headers": [
+        "brand",
+        "country",
+        "language",
+        "version",
+        "deviceid"
+      ],
+      "optional_headers": [],
+      "session_dependency": "guest session recommended",
+      "cookie_dependency": "none required",
+      "token_dependency": "none",
+      "branch_dependency": "explicit via storeId",
+      "channel_dependency": "none observed in the payload",
+      "location_dependency": "none direct (via storeId only)",
+      "response_status": "200",
+      "response_root_shape": "{statusCode, data:{prepTime: number}}",
+      "important_response_paths": [
+        "data.prepTime"
+      ],
+      "pagination": "none",
+      "rate_limit_observations": "none observed",
+      "error_responses": {},
+      "source_evidence": [
+        "research/shared/sample-responses/frontend-discovered-endpoints-probe-1.json"
+      ],
+      "last_verified_at": "2026-08-06",
+      "verificationNote": "Live-confirmed: {payload:{country:'ksa',storeId:24}} -> {\"prepTime\":3} (minutes). Path/method/payload reconstructed from the compiled bundle's getPrepTime thunk, then live-tested successfully - matches the payloadVerified:true tier."
+    },
+    {
+      "endpoint_id": "getNutritionInfo",
+      "purpose": "Nutrition/calorie information for the menu. Does NOT return per-product structured calorie data - returns a link to a single static PDF document covering the whole menu.",
+      "base_url": "https://saudi.hardees.me",
+      "path": "/api/getNutritionInfo",
+      "http_method": "POST",
+      "request_content_type": "application/json",
+      "request_payload": {},
+      "query_parameters": null,
+      "required_public_headers": [
+        "brand",
+        "country",
+        "language",
+        "version",
+        "deviceid"
+      ],
+      "optional_headers": [],
+      "session_dependency": "guest session recommended",
+      "cookie_dependency": "none required",
+      "token_dependency": "none",
+      "branch_dependency": "none observed",
+      "channel_dependency": "none",
+      "location_dependency": "none",
+      "response_status": "200",
+      "response_root_shape": "{location: <string, a PDF URL>}",
+      "important_response_paths": [
+        "location"
+      ],
+      "pagination": "none",
+      "rate_limit_observations": "none observed",
+      "error_responses": {},
+      "source_evidence": [
+        "research/shared/sample-responses/frontend-discovered-endpoints-probe-1.json"
+      ],
+      "last_verified_at": "2026-08-06",
+      "verificationNote": "Live-confirmed: empty payload {} -> {\"location\":\"https://devmtstorage.blob.core.windows.net/hrdimageblob/hrd/ksa/Nutiritional_Info_HRD_updated.pdf\"}. Confirms products[].nutrition_facts being an empty array on every sampled product (same empty-array quirk KFC has) is NOT a bug or missing feature - Hardee's genuinely does not expose per-product calories via this API family, only a whole-menu PDF."
+    },
+    {
+      "endpoint_id": "getPromotion",
+      "purpose": "Frontend-code discovered as the main promotions/offers-list endpoint (the 'getOffers' thunk, action type 'offer/fetchAll', distinct from getProgressivePromotion). Existence confirmed live; the exact request schema needed to get real data back was not resolved. UPDATED 2026-08-07: strong evidence (see verificationNote) this is dead/unreachable code in the current frontend build, not merely an untried payload.",
+      "base_url": "https://saudi.hardees.me",
+      "path": "/api/getPromotion",
+      "http_method": "POST",
+      "request_content_type": "application/json",
+      "request_payload": "UNRESOLVED - every combination of real, live-observed identifiers tried and rejected identically: {cluster, configId/menuConfigId, categoryId, service/orderType, storeId, cityId, promoId, productId, Language}, and an empty body; see unresolved-items.md item #5",
+      "query_parameters": null,
+      "required_public_headers": [
+        "brand",
+        "country",
+        "language",
+        "version",
+        "deviceid"
+      ],
+      "optional_headers": [],
+      "session_dependency": "unknown - not resolved",
+      "cookie_dependency": "unknown - not resolved",
+      "token_dependency": "unknown - not resolved",
+      "branch_dependency": "unknown - not resolved",
+      "channel_dependency": "unknown - not resolved",
+      "location_dependency": "unknown - not resolved",
+      "response_status": "500 (with a structured JSON error body) for every payload guessed",
+      "response_root_shape": "on the guessed/failing payloads: {statusCode:422, httpCode:422, type:'DEFAULT_VALIDATION_ERROR', message:'Invalid info provided'} - byte-identical for every payload variant tried, including ones with real, valid, live-observed identifiers",
+      "important_response_paths": [],
+      "pagination": "unknown",
+      "rate_limit_observations": "none observed across 9 cumulative attempts (2 in the second research session, 7 in the Streamlit-integration session)",
+      "error_responses": {
+        "500_body_422": "DEFAULT_VALIDATION_ERROR on every payload guessed - endpoint exists and is reachable, request schema not resolved"
+      },
+      "source_evidence": [
+        "research/shared/sample-responses/frontend-discovered-endpoints-probe-1.json",
+        "research/shared/sample-responses/frontend-discovered-endpoints-probe-2.json",
+        "research/shared/frontend-analysis/bundle-findings.md",
+        "research/api-map/unresolved-items.md item #5"
+      ],
+      "last_verified_at": "2026-08-07",
+      "verificationTier": "frontend-code discovered; existence live-verified; payload NOT verified",
+      "verificationNote": "2026-08-07: three independent findings now point to this being dead/unreachable code rather than an unguessed payload: (1) no UI trigger found live - the homepage's only 'offers' surface ('Great Offers') is a bare static <img> with no href/onClick/role, confirmed by dumping its DOM; (2) the client-side 'offer/fetchAll' action creator is a bare pass-through with no payload-construction logic, and grepping every downloaded bundle file (spwa-ui, index, vendor, utils) for a call site that dispatches it found zero matches; (3) every payload variant tried (7 in this session alone, using only real observed identifiers, never brute-forced ids) returned the byte-identical generic validation error, unlike /api/product's wrong-payload attempts, which returned a DIFFERENT, more informative failure (empty data:{}) that itself pointed toward the fix. See api-map.md 'getPromotion findings' and unresolved-items.md item #5 for the full write-up."
+    },
+    {
+      "endpoint_id": "getProductInfo",
+      "purpose": "Single-product detail lookup (path is literally /api/product) - RESOLVED 2026-08-06 (second research session): this IS the source of a product's full sauce/add-on/side/beverage option lists, plus its currency field. The first session's guesses were missing two required fields: categoryId and service.",
+      "base_url": "https://saudi.hardees.me",
+      "path": "/api/product",
+      "http_method": "POST",
+      "request_content_type": "application/json",
+      "request_payload": {
+        "id": "number - see verificationNote for the bundle_group nested-item-id rule",
+        "cluster": "<clusterId>",
+        "categoryId": "<categoryId, number>",
+        "service": "PICKUP | DELIVERY (accepted; live-confirmed to have NO effect on price - see verificationNote)",
+        "Language": "En",
+        "menuConfigId": "<menuConfigId>"
+      },
+      "query_parameters": null,
+      "required_public_headers": [
+        "brand",
+        "country",
+        "language",
+        "version",
+        "deviceid"
+      ],
+      "optional_headers": [],
+      "session_dependency": "guest session recommended",
+      "cookie_dependency": "none required",
+      "token_dependency": "none",
+      "branch_dependency": "NONE - the payload carries no storeId/branch field of any kind; identical response regardless of which store the current session resolved (live-confirmed against a Riyadh session AND a Jeddah session, ~950km apart)",
+      "channel_dependency": "accepts a service field but it does NOT change the response - live-confirmed byte-for-byte identical output for service=PICKUP, service=DELIVERY, and the field omitted entirely, for the same product id",
+      "location_dependency": "none",
+      "response_status": "200",
+      "response_root_shape": "{statusCode:200, data:{clusterKey, groupId, aKey, productKey, id, services, originalPrice, specialPrice, promoId, currency:'SAR', sku, name, longDesc, description, typeId, bundleTypeId, variants:[{id,title,subtitle,options:[{id,title,isSelected}]}], steps:[{id,compId,title,subtitle,type,minimum,maximum,isTopping,options:[{id,sku,title,price,defaultSelected,minimum,maximum,subOptions:[{id,title:'Regular'|'Extra',price,default}]}]}], items:[], displayDay, allergen_tags, nutrition_facts}, message:'Success', etag}",
+      "important_response_paths": [
+        "data.currency",
+        "data.steps[].options[].title",
+        "data.steps[].options[].price",
+        "data.steps[].options[].subOptions[]",
+        "data.variants[].options[]"
+      ],
+      "pagination": "none",
+      "rate_limit_observations": "none observed across ~10 live calls",
+      "error_responses": {
+        "200_empty_data": "sending a bundle_group WRAPPER's own top-level id, OR its raw selectedItem value (a sku, not an id - see verificationNote correction), returns HTTP 200 with data:{} - not an error status, but effectively empty"
+      },
+      "source_evidence": [
+        "research/shared/sample-responses/product-endpoint-resolved.json"
+      ],
+      "last_verified_at": "2026-08-06",
+      "verificationTier": "Live verified - real, fully populated responses retrieved for 6 representative products across every required family",
+      "verificationNote": "RESOLUTION: discovered by driving a REAL 'Customize' click in a real Playwright browser (the button is a styled <span>, not a <button> element, and product cards measure 0x0 until their lazy-load image observer fires at least once - see investigation-log.md) and inspecting the exact request it sent: {id,cluster,service,categoryId,Language,menuConfigId}. Live-confirmed for: burger/simple (id=9074 'Super Star Mushroom Sandwich' -> 15 condiment options with Regular/Extra sub-tiers); meal/box (wrapper id=77772960 'Roast Beef Box' -> its items[] entry with id=12187 'Roast Beef Box - Regular' returns 7 fully-populated steps: Choice of Box/Sandwich/condiments(12)/side(6)/Beverages(6)/Tender(2)/AddOns(11); switching the SIZE variant to 'Large' inside the modal re-issued this same call with id=12189, a DIFFERENT nested item, price 44 vs Regular's 39); side/configurable (id=9118 'Crispy Curls' -> SIZE variant Medium/Large, also fired /api/productUpgrades with a near-identical payload {productId,menuConfigId}); drink-dessert/configurable (id=9121 'Mini Churros' -> FLAVOR variant Sweet Creamy/Caramel); promotional item (wrapper id=77772554 'Double Treat Meal', originalPrice=65/specialPrice=49/promoId=6544 -> its items[] entry with id=10545 -> 14 steps: two independent sandwich/condiment/side/beverage step-pairs plus one shared Add Ons step; the nested item's OWN originalPrice=49 already equals the wrapper's specialPrice, i.e. the discount is 'baked into' the nested item rather than double-applied). Also re-verified against a second, ~950km-distant branch (Jeddah, storeId=97/7) with byte-identical results - see api-map.md 'Channel separation mechanism' update. CORRECTION (2026-08-06, Streamlit-integration session): the nested-item-id lookup rule stated above and in earlier passes of this file was imprecise - the wrapper's `selectedItem` field is that item's **sku**, not its **id** (live-confirmed: wrapper 77772960's selectedItem=945, a sku, matching items[] entry id=12187 - sending 945 itself also returns an empty data:{}). Correct rule: match `items[].sku == wrapper.selectedItem`, then use that entry's `id`. Caught by a live smoke test while building services/menu_service.py::resolve_detail_lookup_id() for the Streamlit preview page - every concrete id value quoted above (12187, 12189, 10545) was and remains correct; only the one-line derivation rule was wrong."
+    },
+    {
+      "endpoint_id": "getProductBundleStep",
+      "purpose": "RESOLVED 2026-08-06: returns the full steps[] array (with populated options[]) for a product - functionally a lighter-weight alternative to /api/product's steps[] field, not a per-step lazy-load as first hypothesized. Same two missing fields (categoryId, service) were the fix.",
+      "base_url": "https://saudi.hardees.me",
+      "path": "/api/product-bundle-step",
+      "http_method": "POST",
+      "request_content_type": "application/json",
+      "request_payload": {
+        "id": "<productId - same nested-item-id rule as /api/product>",
+        "cluster": "<clusterId>",
+        "categoryId": "<categoryId>",
+        "service": "PICKUP | DELIVERY",
+        "Language": "En",
+        "menuConfigId": "<menuConfigId>",
+        "stepId": "number (accepted but did NOT filter the response in any attempt - see verificationNote)"
+      },
+      "query_parameters": null,
+      "required_public_headers": [
+        "brand",
+        "country",
+        "language",
+        "version",
+        "deviceid"
+      ],
+      "optional_headers": [],
+      "session_dependency": "guest session recommended",
+      "cookie_dependency": "none required",
+      "token_dependency": "none",
+      "branch_dependency": "none - same as /api/product",
+      "channel_dependency": "accepts service, not confirmed to affect output (not separately diffed - assumed consistent with /api/product's confirmed no-effect finding)",
+      "location_dependency": "none",
+      "response_status": "200",
+      "response_root_shape": "{statusCode:200, data:[{id, compId, title, subtitle, ingredient, type, isModifier, options:[...]}]} - NOTE: data is a bare ARRAY here, not nested under a product object like /api/product",
+      "important_response_paths": [
+        "data[].title",
+        "data[].options[]"
+      ],
+      "pagination": "none",
+      "rate_limit_observations": "none observed across 4 live attempts",
+      "error_responses": {
+        "500_body_422": "occurs when categoryId and/or service are missing from the payload - this was every guess in the first research session"
+      },
+      "source_evidence": [
+        "research/shared/sample-responses/product-endpoint-resolved.json"
+      ],
+      "last_verified_at": "2026-08-06",
+      "verificationTier": "Live verified - real, fully populated response retrieved (7/7 steps for product id=12187, matching /api/product's own steps[] content exactly)",
+      "verificationNote": "Live-confirmed with 4 payload variants (stepId only; compId only; both; +groupId) against id=12187 (Roast Beef Box nested item) - ALL FOUR returned the identical full 7-step array regardless of the stepId/compId value sent, in a different order each time. This strongly suggests the parameter is not actually used to filter/select one step server-side for this product - the endpoint returns everything every time. Its purpose relative to /api/product (which already returns the same steps[] inline) was not conclusively determined - see unresolved-items.md."
+    },
+    {
+      "endpoint_id": "productUpgrades",
+      "purpose": "Fires alongside /api/product for a 'configurable' typeId product (one with a SIZE/FLAVOR variant but no build steps) when its Add-to-cart/Customize control is clicked - appears to be an upsell/upgrade-suggestion lookup, but its response carries the same variants[]/items[] data as /api/product for that product.",
+      "base_url": "https://saudi.hardees.me",
+      "path": "/api/productUpgrades",
+      "http_method": "POST",
+      "request_content_type": "application/json",
+      "request_payload": {
+        "productId": "number",
+        "menuConfigId": "<menuConfigId>"
+      },
+      "query_parameters": null,
+      "required_public_headers": [
+        "brand",
+        "country",
+        "language",
+        "version",
+        "deviceid"
+      ],
+      "optional_headers": [],
+      "session_dependency": "guest session recommended",
+      "cookie_dependency": "none required",
+      "token_dependency": "none",
+      "branch_dependency": "none observed - payload has no storeId field",
+      "channel_dependency": "none observed - payload has no service/orderType field",
+      "location_dependency": "none",
+      "response_status": "200",
+      "response_root_shape": "{statusCode:200, data:{list:[{...same per-product shape as /api/product, including variants[], items[]...}]}}",
+      "important_response_paths": [
+        "data.list[]"
+      ],
+      "pagination": "none",
+      "rate_limit_observations": "none observed",
+      "error_responses": {},
+      "source_evidence": [
+        "research/shared/sample-responses/product-endpoint-resolved.json"
+      ],
+      "last_verified_at": "2026-08-06",
+      "verificationTier": "Live verified - fired organically (not manually triggered) during a real Customize-click flow for product id=9118 ('Crispy Curls', typeId=configurable)",
+      "verificationNote": "Discovered by observing what the real frontend calls on its own, not guessed. Not part of this investigation's original scope (previously listed under notUsedFrontendDiscoveredOutOfScope as an 'upsell' surface) - re-classified here because its response turned out to carry real, usable variant/price data, not just upsell suggestions. A collector does not need to call this separately since /api/product already returns the same data for the same product id."
+    },
+    {
+      "endpoint_id": "getProgressivePromotion",
+      "purpose": "Tiered/progressive promotions (e.g. 'spend X get Y'), by analogy with KFC's identically-named endpoint. Path/method only - NOT live-verified in this investigation.",
+      "base_url": "https://saudi.hardees.me",
+      "path": "/api/getProgressivePromotion",
+      "http_method": "POST",
+      "request_content_type": "application/json",
+      "request_payload": "UNKNOWN - inferred by analogy with KFC's own getProgressivePromotion payload shape ({orderType, menuId, menuTempId, curMenuId, curMenuTemplateId, cluster, configId}), NOT tested live against Hardee's - see unresolved-items.md. Do not trust this shape without live verification.",
+      "query_parameters": null,
+      "required_public_headers": [
+        "brand",
+        "country",
+        "language",
+        "version",
+        "deviceid"
+      ],
+      "optional_headers": [],
+      "session_dependency": "unknown",
+      "cookie_dependency": "unknown",
+      "token_dependency": "unknown",
+      "branch_dependency": "unknown",
+      "channel_dependency": "unknown",
+      "location_dependency": "unknown",
+      "response_status": "unknown - never called",
+      "response_root_shape": "unknown - never called",
+      "important_response_paths": [],
+      "pagination": "unknown",
+      "rate_limit_observations": "n/a",
+      "error_responses": {},
+      "source_evidence": [
+        "research/shared/frontend-analysis/bundle-findings.md"
+      ],
+      "last_verified_at": "2026-08-06",
+      "verificationTier": "frontend-code discovered (path/method only); NOT live verified; payload is an unverified analogy with KFC, not evidence"
+    }
+  ],
+  "notUsedButObservedLive": [
+    {
+      "endpoint_id": "profile",
+      "method": "GET",
+      "path": "/api/profile",
+      "reason": "Guest profile echo (device id, cart id). No product/price data."
+    },
+    {
+      "endpoint_id": "server-timer",
+      "method": "GET",
+      "path": "/api/server-timer",
+      "reason": "Server clock sync for countdown UI. No product/price data."
+    },
+    {
+      "endpoint_id": "getTotalOrdersCount",
+      "method": "GET",
+      "path": "/api/getTotalOrdersCount",
+      "reason": "Marketing counter ('X orders served'). No product/price data."
+    },
+    {
+      "endpoint_id": "personaliseGetConfig",
+      "method": "POST",
+      "path": "/api/personaliseGetConfig",
+      "reason": "Personalization-engine config/flags. Fires automatically; not read by this investigation's tooling."
+    },
+    {
+      "endpoint_id": "amr-loyalty/config, kfcloyalty/auth, kfcloyalty/loyalty-config",
+      "method": "GET/POST",
+      "path": "/api/amr-loyalty/config, /api/kfcloyalty/*",
+      "reason": "Walaa/AMR loyalty program surface, shared with KFC. Fires automatically from the homepage; out of scope (no login, no loyalty points)."
+    }
+  ],
+  "notUsedFrontendDiscoveredOutOfScope": [
+    "/api/product/search, /api/getSearchTags - search, not needed for a fixed-branch daily collector",
+    "/api/getGreenConfig - no-cutlery option config, not a price/menu field",
+    "/api/getupsell, /api/personaliseGetUpsell, /api/personaliseGetPromotion, /api/personaliseGetProductsTag, /api/personaliseGetMenu - personalized upsell/cross-sell surfaces, not primary catalog data. (/api/productUpgrades was moved OUT of this list in the second research session - see its own endpoint entry above; its response turned out to carry real, usable variant data.)",
+    "/api/discountedItems - candidate cross-category discount listing, not live-verified this session, worth checking in a future session (see unresolved-items.md)",
+    "/api/allstore - an alternate GET-based store directory; getStoreList (POST) already confirmed live and richer",
+    "Every checkout/cart/account/payment/OTP endpoint listed in bundle-findings.md - explicitly out of scope for a read-only price/menu monitor"
+  ],
+  "schemaValidation": {
+    "strategy": "Not yet implemented (no collector exists yet - this is the research phase only). A future collector should mirror competitors/kfc/backend/schema_validator.py's approach: check HTTP 200 + expected top-level keys present + expected array fields are actually arrays before using any value.",
+    "onMismatch": "Not yet implemented - see competitors/kfc/backend/schema_validator.py and channel-collector.js for the pattern to follow once Hardee's collector work begins."
+  }
+}

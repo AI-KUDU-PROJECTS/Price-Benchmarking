@@ -1,0 +1,64 @@
+{
+  "channel": "DELIVERY",
+  "status": "PARTIAL",
+  "startedAt": "2026-08-11T06:00:00.000Z",
+  "finishedAt": "2026-08-11T06:05:00.000Z",
+  "branchId": 24,
+  "branchName": "EUROMARCHE-H",
+  "city": "Riyadh",
+  "apiConfigId": "HRD_SA_24",
+  "clusterId": "1_8",
+  "categories": [
+    {
+      "id": 5001,
+      "name": "Deal of the Day",
+      "isHidden": 0,
+      "promoId": 0,
+      "services": { "carhop": 0, "delevery": 0, "dine_in": 0, "drivethru": 0, "take_away": 0 },
+      "productCount": 1
+    }
+  ],
+  "categoryResults": [
+    { "categoryId": 5001, "name": "Deal of the Day", "status": "SUCCESS", "productCount": 1, "error": null },
+    { "categoryId": 999999, "name": "Broken Category", "status": "FAILED", "productCount": 0, "error": "missing expected field: data.products" }
+  ],
+  "expectedCategoryCount": 2,
+  "categoryCount": 1,
+  "completionPercentage": 50.0,
+  "products": [
+    {
+      "id": 61001,
+      "productKey": "HRD_SA_24_5001_61001_micro",
+      "name": "Sunday Duo",
+      "metaTitle": "Sunday Duo",
+      "description": "2 Chargrilled Burgers, 2 Regular Fries, 2 Regular Drinks",
+      "longDesc": "2 Chargrilled Burgers, 2 Regular Fries, 2 Regular Drinks",
+      "currency": "SAR",
+      "originalPrice": 24,
+      "specialPrice": 19,
+      "disPercentage": "",
+      "promoId": 6739,
+      "limited_offer": 0,
+      "productType": 3,
+      "typeId": "bundle",
+      "bundleTypeId": "bundle",
+      "sku": 9101,
+      "categories": [5001],
+      "services": { "carhop": 1, "delevery": 1, "dine_in": 1, "drivethru": 1, "take_away": 1 },
+      "assets": [{ "src": "https://hardeesprodnecmsimage.blob.core.windows.net/cmsimages/hrd/ksa/9101-combo.png", "type": "image" }],
+      "variants": [],
+      "subOptionStr": "Chargrilled Burger,Regular Fries,Regular Fries,Pepsi,Pepsi",
+      "steps": [
+        { "id": 1, "title": "Choice of Burger", "subtitle": "Choice of Burger", "type": "radio", "isHidden": 0, "isModifier": 0, "isAddon": 0, "isDependent": 0, "minimum": 1, "maximum": 1 },
+        { "id": 2, "title": "Choose your Drink", "subtitle": "Choose your Drink", "type": "radio", "isHidden": 0, "isModifier": 1, "isAddon": 0, "isDependent": 1, "minimum": 1, "maximum": 1 }
+      ],
+      "__categoryId": 5001,
+      "__categoryName": "Deal of the Day",
+      "__sourceEndpoint": "/api/getProductsByCategory"
+    }
+  ],
+  "promotions": [],
+  "productCount": 1,
+  "branchCurrentlyClosed": false,
+  "errorMessage": "1 of 2 categories failed - see categoryResults"
+}

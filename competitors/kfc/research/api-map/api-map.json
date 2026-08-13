@@ -1,0 +1,319 @@
+{
+  "$schema": "internal://kfc-api-map/v1",
+  "baseUrl": "https://saudi.kfc.me",
+  "lastVerificationDate": "2026-08-05",
+  "verificationMethod": [
+    "Live network capture (HAR) of a real browser session on saudi.kfc.me/en/home",
+    "Live re-verification via a fresh Playwright session on 2026-08-05 (guestLogin, getAppConfig, getStoreList, getMenuConfig, getMenu, getHome, validateLocation, getNewStore all reconfirmed 200 OK live)",
+    "Static analysis of the site's own production JS bundles (endpoint path + HTTP method + payload-construction code read directly from the minified React bundle) as a first pass for getProductsByCategory and getProgressivePromotion specifically, to have a candidate payload shape to test",
+    "A full end-to-end live collector run (collector/collect.js --channel=PICKUP) against the fixed branch on 2026-08-05, which confirmed getProductsByCategory across all 12 real categories and getProgressivePromotion, and surfaced two corrections versus the bundle-based reconstruction (see each endpoint's verificationNote) plus the WAF header requirement (see notes)"
+  ],
+  "notes": [
+    "This file documents PUBLIC, unauthenticated (guest-session) endpoints only. No login, OTP, payment, or cart/checkout endpoint is used by this system.",
+    "'Session' fields (cookies, deviceid, authorization, refreshtoken) are captured fresh every run by collector/api-bootstrap.js and held in memory only for that process. They are NEVER written into this file, api-map.md, git, or any log.",
+    "Every endpoint below, INCLUDING getProductsByCategory and getProgressivePromotion, was live-verified end to end on 2026-08-05 with a real request/response pair against the fixed branch (Riyadh/SITEEN/storeId=251) under PICKUP - see each endpoint's verificationNote. The two endpoints initially reconstructed from the site's compiled JS bundle both required one correction versus the bundle's own optional-chaining code once tested live (see their verificationNote) - which is exactly why this system validates every response's shape at runtime instead of trusting any one source permanently.",
+    "The direct HTTPS calls made after the Playwright bootstrap must include browser-shaped `user-agent`, `origin`, and `referer` headers - the site's edge WAF (Azure Application Gateway) returns an HTML 403 page for requests missing them, even with an otherwise-valid session. These three values are not secret (every browser sends them in plain text) and are set as static defaults in collector/config.js.",
+    "Two things were explicitly NOT verified live and are documented as such rather than guessed: (1) Arabic content - locale='Ar' on getProductsByCategory returned HTTP 404, so product_name_ar/description_ar/category_name_ar are stored as NULL in v1; (2) a POPULATED getProgressivePromotion response - no progressive promotion was active on the branch at verification time, so only the empty-result shape is confirmed.",
+    "Do not assume this schema is permanently fixed. If a future run's schema-validation warnings persist, re-run the verification steps in this note's method and update lastVerificationDate.",
+    "Branch selection update (2026-08-06): the fixed branch was changed from SITEEN/storeId=251 to RABWAH/storeId=223 (still Riyadh). Reason: at this verification time SITEEN was closed for Pickup (getNewStore no longer resolved it as nearest - a normal operating-hours state, see channel-collector.js's verifyBranchExists note), so getStoreList's full Riyadh directory was queried and every store with services.tak=1 AND services.del=1 AND active=1 AND cmsStatus=1 was live-checked via getNewStore (Pickup) and validateLocation (Delivery); 8 of 98 Riyadh stores qualified (RABWAH/223, DAAERY/128, EUROMARCHE/143, HAMZA/165, SOLY/253, OM ELHAMAM/210, NOZHA/206, INDUSTRIAL/171). RABWAH/223 was confirmed end-to-end for both channels (getMenuConfig -> getMenu -> getProductsByCategory returned 12 categories and real priced products - e.g. \"Double Up Deal\" originalPrice=63/specialPrice=42 - identically on both PICKUP and DELIVERY) and selected. The endpoint shapes documented below are branch-independent and were not re-verified per-field against RABWAH (no schema change was expected or observed); the storeId/branchName values quoted in individual verificationNote entries below are historical (dated 2026-08-05, against SITEEN/251) and are left as-is rather than rewritten, since they describe what was literally observed at that time."
+  ],
+  "endpoints": [
+    {
+      "name": "guestLogin",
+      "method": "POST",
+      "path": "/api/guestLogin",
+      "purpose": "Bootstraps an anonymous guest session (deviceid + cart id). This is the site's own automatic behavior for every anonymous visitor - it happens on every page load regardless of any user action, requires no credentials, phone number, email, or OTP, and is not a real account login.",
+      "requestPayload": {},
+      "requiredPublicHeaders": ["deviceid", "brand", "country", "language", "version", "devicemodel", "is-dark-mode"],
+      "sensitiveHeadersNotDocumented": ["cookie", "authorization", "refreshtoken"],
+      "responseSchema": {
+        "statusCode": "number",
+        "httpCode": "number",
+        "type": "string",
+        "data": {
+          "isGuest": "number (1 for guest)",
+          "deviceid": "string",
+          "cartId": "string",
+          "_id": "string"
+        },
+        "message": "string"
+      },
+      "channelDependency": "none",
+      "branchDependency": "none",
+      "fieldsUsed": [],
+      "lastVerified": "2026-08-05"
+    },
+    {
+      "name": "getAppConfig",
+      "method": "GET",
+      "path": "/api/getAppConfig",
+      "purpose": "Global app configuration, notably the blob-storage SAS token (blobBaseUrl.SASToken / .jsonBase) that several other endpoints require as their 'subPath' / 'path' payload fields.",
+      "requestPayload": null,
+      "requiredPublicHeaders": ["brand", "country", "language", "version"],
+      "responseSchema": {
+        "statusCode": "number",
+        "data": {
+          "blobBaseUrl": { "SASToken": "string (query-string SAS token)", "jsonBase": "string (blob container base URL)", "product": "string", "home": "string" }
+        }
+      },
+      "channelDependency": "none",
+      "branchDependency": "none",
+      "fieldsUsed": ["data.blobBaseUrl.SASToken", "data.blobBaseUrl.jsonBase"],
+      "lastVerified": "2026-08-05"
+    },
+    {
+      "name": "getStoreList",
+      "method": "POST",
+      "path": "/api/getStoreList",
+      "purpose": "Full city/branch directory for Saudi Arabia. Used every run to verify the configured branch (KFC_STORE_ID) still exists and is active before any other collection happens.",
+      "requestPayload": { "payload": { "path": "<blobBaseUrl.jsonBase>", "country": "ksa", "subPath": "<blobBaseUrl.SASToken>" } },
+      "requiredPublicHeaders": ["brand", "country", "language", "version", "deviceid"],
+      "responseSchema": {
+        "statusCode": "number",
+        "data": [
+          {
+            "cityId": "number",
+            "cityName": "string",
+            "name_en": "string",
+            "store": [
+              {
+                "storeId": "number",
+                "name_en": "string",
+                "name_ar": "string",
+                "active": "number (1/0)",
+                "cmsStatus": "number (1/0)",
+                "services": { "del": "0|1", "tak": "0|1", "din": "0|1", "driveThru": "0|1", "carHop": "0|1" },
+                "location": { "latitude": "number", "longitude": "number", "description": "string" },
+                "address_en": "string",
+                "address_ar": "string",
+                "menuTempId": "number"
+              }
+            ]
+          }
+        ]
+      },
+      "channelDependency": "none (directory covers all channels; per-store 'services' flags indicate which channels a given store supports)",
+      "branchDependency": "none (this IS the branch directory)",
+      "fieldsUsed": ["data[].cityName", "data[].store[].storeId", "data[].store[].name_en", "data[].store[].active", "data[].store[].services", "data[].store[].location"],
+      "lastVerified": "2026-08-05"
+    },
+    {
+      "name": "validateLocation",
+      "method": "POST",
+      "path": "/api/validateLocation",
+      "purpose": "Resolves DELIVERY serviceability + branch for a given lat/lng. Used once per DELIVERY run to (re)confirm the fixed branch is still the branch that serves the configured coordinates.",
+      "requestPayload": { "lat": "number", "lng": "number", "screen": "LOCATION", "addressSubType": "DELIVERY" },
+      "requiredPublicHeaders": ["brand", "country", "language", "version", "deviceid"],
+      "responseSchema": {
+        "statusCode": "200 on success, 400/409 when the coordinates are not deliverable",
+        "data": {
+          "store": { "storeId": "number", "name_en": "string", "location": "object" }
+        },
+        "message": "string (human-readable reason when not deliverable)"
+      },
+      "channelDependency": "DELIVERY",
+      "branchDependency": "resolves the branch from coordinates",
+      "fieldsUsed": ["data.store.storeId", "data.store.name_en"],
+      "lastVerified": "2026-08-05"
+    },
+    {
+      "name": "getNewStore",
+      "method": "POST",
+      "path": "/api/getNewStore",
+      "purpose": "Resolves the nearest PICKUP-capable branch for a given lat/lng (the 'USE MY LOCATION' action in the Self-Pickup branch picker). Used once per PICKUP run to (re)confirm the fixed branch is still the nearest branch to the configured coordinates.",
+      "requestPayload": { "lat": "number", "lng": "number" },
+      "requiredPublicHeaders": ["brand", "country", "language", "version", "deviceid"],
+      "responseSchema": {
+        "statusCode": "number",
+        "data": { "cityId": "number", "areaId": "number", "storeId": "number" }
+      },
+      "channelDependency": "PICKUP",
+      "branchDependency": "resolves the branch from coordinates",
+      "fieldsUsed": ["data.storeId", "data.cityId"],
+      "lastVerified": "2026-08-05",
+      "verificationNote": "Discovered live (not previously documented anywhere) while bootstrapping the Self-Pickup flow for KFC_STORE_ID=251 - confirmed request payload {lat:24.6866,lng:46.724} -> response {cityId:11,areaId:8157,storeId:251}."
+    },
+    {
+      "name": "getMenuConfig",
+      "method": "POST",
+      "path": "/api/getMenuConfig",
+      "purpose": "Given an order channel (and, for PICKUP, a resolved storeId), returns the menuConfigId + clusterId that scope every subsequent menu/category/product call to this exact branch+channel's live catalog.",
+      "requestPayload": { "orderType": "PICKUP | DELIVERY", "storeId": "number (required for PICKUP once a branch is resolved; omitted for DELIVERY, which resolves its store server-side from the session's validated address)" },
+      "requiredPublicHeaders": ["brand", "country", "language", "version", "deviceid"],
+      "responseSchema": {
+        "statusCode": "number",
+        "data": { "expiryTime": "number (unix seconds)", "menuConfigId": "string, e.g. KFC_SA_76", "clusterId": "string, e.g. 14_5" }
+      },
+      "channelDependency": "PICKUP or DELIVERY (mutually exclusive per call - this is how the collector determines which channel a downstream getMenu/getProductsByCategory call belongs to, per the spec: 'the channel must be determined by the getMenuConfig flow that started the collection')",
+      "branchDependency": "PICKUP: explicit via storeId. DELIVERY: implicit via the session's last-validated address/store.",
+      "fieldsUsed": ["data.menuConfigId", "data.clusterId"],
+      "lastVerified": "2026-08-05",
+      "verificationNote": "Live-confirmed request/response pairs: {\"orderType\":\"PICKUP\"} and {\"orderType\":\"PICKUP\",\"storeId\":251} both -> {\"menuConfigId\":\"KFC_SA_76\",\"clusterId\":\"14_5\"}."
+    },
+    {
+      "name": "getMenu",
+      "method": "POST",
+      "path": "/api/getMenu",
+      "purpose": "Returns the full category tree (id, name_en/name_ar, productCount) for the menuConfigId resolved above. Category objects do NOT include their products - use getProductsByCategory per category id for that.",
+      "requestPayload": {
+        "payload": {
+          "path": "",
+          "brand": "kfc",
+          "country": "ksa",
+          "defMenu": 1,
+          "menu": "<menuTempId, e.g. 5>",
+          "locale": "En",
+          "service": "DELIVERY | PICKUP",
+          "menuConfigId": "<from getMenuConfig>",
+          "subPath": "<blobBaseUrl.SASToken>"
+        }
+      },
+      "requiredPublicHeaders": ["brand", "country", "language", "version", "deviceid"],
+      "responseSchema": {
+        "statusCode": "number",
+        "data": {
+          "categories": [
+            {
+              "id": "number (category id - the primary key used by getProductsByCategory)",
+              "name": "string (category display name, English)",
+              "parentId": "number",
+              "level": "number",
+              "productCount": "number",
+              "assets": [{ "src": "string (category icon URL)" }]
+            }
+          ],
+          "tags": "array"
+        }
+      },
+      "channelDependency": "inherited from the menuConfigId used to call it (spec: do not rely only on the 'service' field inside getMenu - the channel is whatever getMenuConfig flow produced this menuConfigId)",
+      "branchDependency": "inherited from the menuConfigId used to call it",
+      "fieldsUsed": ["data.categories[].id", "data.categories[].name", "data.categories[].productCount"],
+      "lastVerified": "2026-08-05",
+      "verificationNote": "Live-confirmed: 12 categories returned for menuConfigId KFC_SA_76 / clusterId 14_5 (Exclusive, Baloot Limited Edition, New! Hot Honey, Matchday Boxes, Deal of the Day, Chicken Meals, Wraps, Burgers, Chicken Buckets, Sides, Dips, Drinks). Category objects do not carry name_ar in the payload actually observed (name_ar was expected but not present) - the normalizer treats it as optional and falls back to null, never guessing a translation."
+    },
+    {
+      "name": "getProductsByCategory",
+      "method": "POST",
+      "path": "/api/getProductsByCategory",
+      "purpose": "Returns every product in one category, including price, discount, promo id, bundle/build-step structure, and size/flavor variants. Called once per category id returned by getMenu - this is the main product/price/offer data source for the whole system.",
+      "requestPayload": {
+        "id": "<categoryId, from getMenu>",
+        "cluster": "<clusterId, from getMenuConfig>",
+        "configId": "<menuConfigId, from getMenuConfig>",
+        "path": "",
+        "brand": "kfc",
+        "country": "ksa",
+        "locale": "En",
+        "service": "DELIVERY | PICKUP",
+        "menu": "<menuTempId>",
+        "subPath": "<blobBaseUrl.SASToken>"
+      },
+      "requestPayloadConfidence": "LIVE-CONFIRMED on 2026-08-05 - this exact payload shape returned 200 with real product data for all 12 categories of the fixed branch (Riyadh/SITEEN/251) under PICKUP.",
+      "requiredPublicHeaders": ["brand", "country", "language", "version", "deviceid", "user-agent", "origin", "referer"],
+      "responseSchema": {
+        "statusCode": "number",
+        "data": {
+          "id": "number (the category id requested - the response re-returns full category metadata, not just products)",
+          "name": "string (category name, English - locale is fixed to 'En'; see localeNote)",
+          "promoId": "number (0 when the category itself has no promo)",
+          "services": "object (per-category channel flags: carhop/delevery/dine_in/drivethru/take_away, each 0|1)",
+          "products": [
+            {
+              "id": "number (product id, PRIMARY IDENTITY KEY)",
+              "sku": "number|string",
+              "name": "string (English name)",
+              "description": "string",
+              "longDesc": "string",
+              "shortDesc": "string",
+              "currency": "string, e.g. SAR",
+              "originalPrice": "number (regular price)",
+              "specialPrice": "number, present only when an offer/discount is active. SENTINEL VALUE 0 (not absent) on ~28/106 sampled products - all build-your-own 'Combo'/'Box' bundle upsells that DO carry a real positive promoId but an EMPTY disPercentage; a genuine $0 price for a $19+ combo is not plausible, so this is 'not a simple fixed-discount price', not a free item. backend/normalizer.py's normalize_special_price() treats <=0 (and >=originalPrice) as 'no special price'.",
+              "disPercentage": "string, e.g. '33% OFF', present only when an offer is active",
+              "promoId": "number, SENTINEL VALUE -1 (not 0) when no offer is active - live-confirmed: 37/106 sampled products carried promoId=-1 with no discount, every product with a genuine active discount carried a distinct positive integer. backend/normalizer.py's normalize_promo_id() treats <=0 as 'no promo'.",
+              "limited_offer": "number (0|1)",
+              "typeId": "string, e.g. 'bundle' | other product-type markers",
+              "bundleTypeId": "string, e.g. 'bundle'",
+              "productType": "number",
+              "categories": "array of category ids this product belongs to",
+              "assets": "array of { src: string (image URL), resolution, type }",
+              "variants": "array of { id, title (e.g. 'Size'), options: [{ id, title (e.g. 'Regular'|'Medium'|'Large'), isSelected }] } - THIS is where size is identified with confidence; absent entirely for products with no size choice",
+              "steps": "array of bundle build-steps: { id, title, subtitle, type ('radio'|'checkbox'|'stepper'), minimum, maximum, isAddon, isModifier, isDependent, ingredient, isHidden, compId }",
+              "subOptionStr": "string, human-readable comma-joined summary of the bundle's default build (English) - e.g. 'Zinger Sandwich,Lettuce,...'",
+              "subOptionStrAr": "string, same summary in Arabic",
+              "subOptionStrFr": "string, same summary in French",
+              "tags": "array", "tagName": "string", "metaKeyword": "array of string (often carries the human offer/bundle name, e.g. 'Double Up Deal')",
+              "allergen_tags": "array", "nutrition_facts": "array, EMPTY on every product sampled live - calories are NOT available from this endpoint, see calorieNote",
+              "p_position": "number (display order within the category)"
+            }
+          ]
+        }
+      },
+      "channelDependency": "inherited from the menuConfigId/cluster/configId used to call it",
+      "branchDependency": "inherited from the menuConfigId/cluster/configId used to call it",
+      "fieldsUsed": [
+        "data.products[].id", "data.products[].name", "data.products[].description", "data.products[].longDesc",
+        "data.products[].originalPrice", "data.products[].specialPrice", "data.products[].disPercentage",
+        "data.products[].promoId", "data.products[].limited_offer", "data.products[].typeId", "data.products[].bundleTypeId",
+        "data.products[].assets[].src", "data.products[].variants", "data.products[].steps", "data.products[].subOptionStr",
+        "data.products[].subOptionStrAr", "data.products[].metaKeyword", "data.products[].sku", "data.products[].p_position",
+        "data.products[].services", "data.promoId", "data.name"
+      ],
+      "lastVerified": "2026-08-05",
+      "verificationNote": "Live request/response pair captured for all 12 categories of the fixed branch under PICKUP. IMPORTANT CORRECTION vs. the bundle's own optional-chaining code: the response's `data` field IS the category object itself with `products` as a direct inline array (`response.data.products`) - NOT a further-nested `{data:{products}}` wrapper as the minified bundle's `u?.data?.data?.products` chain suggested (that chain is almost certainly unwrapping an axios response envelope one level higher up, before `u` is even this JSON body). collector/api-client.js and channel-collector.js both use the corrected single-nesting path.",
+      "calorieNote": "No calorie/kcal field was present on any of the ~120 products sampled live across all 12 categories (nutrition_facts was an empty array on every one). backend/normalizer.py stores `calories` as NULL rather than guessing - if a future response ever does carry it, the normalizer's defensive multi-key lookup (calories/kcal/energy) will pick it up automatically without a code change.",
+      "localeNote": "locale is fixed to 'En' for all collection - a live test of locale='Ar' on this endpoint returned HTTP 404 'Upstream returned 404', meaning Arabic content requires more than swapping this one field (likely a locale-specific menuConfigId/clusterId, based on getHome's groupId containing an 'En' segment that getMenuConfig's response does not expose a way to request). product_name_ar / description_ar / category_name_ar are therefore always stored as NULL in v1 - see api-map.md 'What was not verified'."
+    },
+    {
+      "name": "getHome",
+      "method": "POST",
+      "path": "/api/getHome",
+      "purpose": "Homepage banner/deal-rail content. The collector calls this ONLY to read the numeric data.menuId field (not present anywhere in getMenu's response), which getProgressivePromotion's request payload needs. Not used for any product/price/offer data - collecting products always goes through getProductsByCategory.",
+      "requestPayload": { "path": "", "country": "ksa", "defMenu": 1, "defTemp": "<menuTempId>", "cluster": "<clusterId>", "locale": "En", "subPath": "<blobBaseUrl.SASToken>", "menuConfigId": "<menuConfigId>" },
+      "requiredPublicHeaders": ["brand", "country", "language", "version", "deviceid"],
+      "responseSchema": { "statusCode": "number", "data": { "menuId": "number", "menuTempId": "number", "data": "array (banner rail content, unused)" } },
+      "channelDependency": "inherited from the menuConfigId/cluster used to call it",
+      "branchDependency": "inherited from the menuConfigId/cluster used to call it",
+      "fieldsUsed": ["data.menuId"],
+      "lastVerified": "2026-08-05",
+      "verificationNote": "Live-confirmed request/response shape and presence of data.menuId. A failure here is logged and getProgressivePromotion is skipped for that run - it never fails the channel's crawl_runs status, since product/offer data comes from getProductsByCategory regardless."
+    },
+    {
+      "name": "getProgressivePromotion",
+      "method": "POST",
+      "path": "/api/getProgressivePromotion",
+      "purpose": "Returns active progressive/tiered promotions for the current menu context (e.g. 'spend X get Y', multi-tier bundle deals not tied to one specific product/category). Called once per channel per run; results are matched to products by promoId.",
+      "requestPayload": {
+        "orderType": "PICKUP | DELIVERY",
+        "menuId": "<from getHome/getMenu context>",
+        "menuTempId": "<menuTempId>",
+        "curMenuId": "<menuId>",
+        "curMenuTemplateId": "<menuTempId>",
+        "cluster": "<clusterId>",
+        "configId": "<menuConfigId>"
+      },
+      "requestPayloadConfidence": "LIVE-CONFIRMED on 2026-08-05 - returned HTTP 200 with this exact payload for the fixed branch under PICKUP (no progressive promotion was active at verification time, which is itself a valid, common response).",
+      "requiredPublicHeaders": ["brand", "country", "language", "version", "deviceid", "user-agent", "origin", "referer"],
+      "responseSchema": {
+        "statusCode": "number",
+        "data": {
+          "parentPromo": "object, empty {} when no parent-level progressive promotion is active",
+          "promolist": "object keyed by promoId (NOT an array) - empty {} when none are active; expected to map to promotion-detail objects when active",
+          "headerText": "string, e.g. 'Special offers for you'"
+        }
+      },
+      "channelDependency": "PICKUP or DELIVERY",
+      "branchDependency": "inherited from the menuConfigId/cluster/configId used to call it",
+      "fieldsUsed": ["data.promolist"],
+      "lastVerified": "2026-08-05",
+      "verificationNote": "Live request/response pair captured for the fixed branch under PICKUP: {\"data\":{\"parentPromo\":{},\"promolist\":{},\"headerText\":\"Special offers for you\"}}. CORRECTION vs. the initial reconstruction: `data` is an OBJECT with a `promolist` map keyed by promoId, not a bare array - collector/channel-collector.js extracts `Object.values(data.promolist)` defensively (falls back to [] for any other shape). The shape of a POPULATED promolist entry was not observed live (no progressive promotion was running for this branch at verification time) - backend/offer_parser.py treats this endpoint as supplementary only; the primary, always-required offer fields (specialPrice, promoId, disPercentage, limited_offer, subOptionStr) come from getProductsByCategory regardless of whether this endpoint returns anything."
+    }
+  ],
+  "notUsedButObservedLive": [
+    { "name": "profile", "method": "GET", "path": "/api/profile", "reason": "Guest profile echo (device id, cart id). No product/price data." },
+    { "name": "kfcloyalty/auth, kfcloyalty/loyalty-config, amr-loyalty/config", "method": "POST/GET", "path": "/api/kfcloyalty/*, /api/amr-loyalty/config", "reason": "Walaa loyalty program surface - requires no data from us, we call none of it, it just fires automatically from the homepage. Out of scope: no login, no loyalty points." }
+  ],
+  "schemaValidation": {
+    "strategy": "Every response is checked against the minimal shape it must have (HTTP 200, expected top-level keys present, expected array fields are arrays) before any data from it is used. See backend/schema_validator.py for the Python-side mirror used when validating a Node-collected snapshot before it is loaded into SQLite.",
+    "onMismatch": "Log the endpoint, HTTP status, and raw response body to data/raw/<run_id>/schema-errors.json; mark the affected category as failed; if any category in a channel run failed, that channel's crawl_runs row is PARTIAL (some categories collected) or FAILED (zero categories collected); PARTIAL/FAILED runs are excluded from change detection entirely (see backend/change_detector.py)."
+  }
+}

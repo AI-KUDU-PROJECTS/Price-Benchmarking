@@ -1,0 +1,182 @@
+{
+  "channel": "delivery",
+  "coords": {
+    "latitude": 21.51462262,
+    "longitude": 39.16611246
+  },
+  "resolvedStore": {
+    "statusCode": 200,
+    "httpCode": 200,
+    "type": "DEFAULT_SUCCESS",
+    "data": {
+      "menuId": 1,
+      "menuTempId": 8,
+      "store": {
+        "storeId": 7,
+        "countryId": 2,
+        "areaId": 8952,
+        "cityId": 31,
+        "location": {
+          "description": "6934 Al Andalus, AR Ruwais District, Jeddah 23211 3421, Saudi Arabia",
+          "latitude": 21.51462262,
+          "longitude": 39.16611246,
+          "radius": 0
+        },
+        "address_en": "Rweyes district andalous street King road",
+        "address_ar": "حي الرويس شارع الاندلس",
+        "name_en": "ANDALOS-WH",
+        "name_ar": "هارديز الاندلس الجديد",
+        "isOnline": true,
+        "services": {
+          "carHop": 1,
+          "del": 1,
+          "din": 1,
+          "driveThru": 1,
+          "tak": 1
+        },
+        "advanceOrder": {
+          "carHop": 1,
+          "del": 1,
+          "din": 1,
+          "driveThru": 1,
+          "tak": 1
+        },
+        "startTime": "2017-07-15T11:00:00Z",
+        "endTime": "2017-07-15T04:00:59Z",
+        "nextday": 1,
+        "promTimDelElig": 0,
+        "promiseTime": 45,
+        "displayTableNo": {
+          "editable": 0,
+          "enabled": 0,
+          "mandatory": 0
+        },
+        "prepTimeBuf": 0
+      }
+    },
+    "message": "Success",
+    "attributes": [],
+    "heading": {
+      "Ar": "",
+      "En": ""
+    },
+    "note": {
+      "En": "",
+      "Ar": ""
+    },
+    "identifier": []
+  },
+  "sampledCategoryIds": [
+    "666",
+    "667",
+    "664",
+    "669",
+    "670",
+    "1480",
+    "662"
+  ],
+  "capturedAt": "2026-08-06T12-19-01-376Z",
+  "stepLog": [
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "name": "console-error",
+      "text": "Creating a worker from 'blob:https://saudi.hardees.me/bbc81c72-279c-4a4a-a69b-65d9ac89916c' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' 'unsafe-eval' *.noonpayments.com  *.facebook.net *.googletagmanager.com wzrkt.com *.azureedge.net *.googleapis.com "
+    },
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "name": "console-error",
+      "text": "null"
+    },
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: the server responded with a status of 500 ()"
+    },
+    {
+      "name": "goto-home",
+      "ok": true
+    },
+    {
+      "name": "dismiss-cookie-banner",
+      "ok": true
+    },
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: the server responded with a status of 500 ()"
+    },
+    {
+      "name": "console-error",
+      "text": "💡 use-places-autocomplete: Google Maps Places API library must be loaded. See: https://github.com/wellyshen/use-places-autocomplete#load-the-library"
+    },
+    {
+      "name": "console-error",
+      "text": "💡 use-places-autocomplete: Google Maps Places API library must be loaded. See: https://github.com/wellyshen/use-places-autocomplete#load-the-library"
+    },
+    {
+      "name": "console-error",
+      "text": "💡 use-places-autocomplete: Google Maps Places API library must be loaded. See: https://github.com/wellyshen/use-places-autocomplete#load-the-library"
+    },
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: the server responded with a status of 500 ()"
+    },
+    {
+      "name": "console-error",
+      "text": "💡 use-places-autocomplete: Google Maps Places API library must be loaded. See: https://github.com/wellyshen/use-places-autocomplete#load-the-library"
+    },
+    {
+      "name": "console-error",
+      "text": "💡 use-places-autocomplete: Google Maps Places API library must be loaded. See: https://github.com/wellyshen/use-places-autocomplete#load-the-library"
+    },
+    {
+      "name": "console-error",
+      "text": "💡 use-places-autocomplete: Google Maps Places API library must be loaded. See: https://github.com/wellyshen/use-places-autocomplete#load-the-library"
+    },
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "name": "open-delivery-address-modal",
+      "ok": true
+    },
+    {
+      "name": "confirm-location",
+      "ok": true
+    },
+    {
+      "name": "console-error",
+      "text": "Failed to load resource: the server responded with a status of 500 ()"
+    },
+    {
+      "name": "sample-categories",
+      "ok": true
+    }
+  ],
+  "apiCallCount": 31
+}

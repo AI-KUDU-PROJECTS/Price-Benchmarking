@@ -1,0 +1,410 @@
+{
+  "channel": "PICKUP",
+  "status": "SUCCESS",
+  "startedAt": "2026-08-01T06:00:00.000Z",
+  "finishedAt": "2026-08-01T06:05:00.000Z",
+  "branchId": 29696,
+  "branchName": "RUH - Al Mogarazat - Eirad Plaza Mall 1073",
+  "city": "Riyadh",
+  "apiConfigId": "12303",
+  "clusterId": "6285",
+  "categories": [
+    {
+      "id": 193160,
+      "name": {
+        "en-us": "The Tortilla Masters",
+        "ar-sa": "! في التورتيلا حنّا فنّانين"
+      }
+    },
+    {
+      "id": 169347,
+      "name": {
+        "en-us": "Offers",
+        "ar-sa": "عروض حصرية"
+      }
+    },
+    {
+      "id": 169225,
+      "name": {
+        "en-us": "Side Orders",
+        "ar-sa": "الطلبات الجانبية"
+      }
+    }
+  ],
+  "categoryResults": [
+    {
+      "categoryId": 193160,
+      "name": "The Tortilla Masters",
+      "status": "SUCCESS",
+      "productCount": 2,
+      "error": null
+    },
+    {
+      "categoryId": 169347,
+      "name": "Offers",
+      "status": "SUCCESS",
+      "productCount": 2,
+      "error": null
+    },
+    {
+      "categoryId": 169225,
+      "name": "Side Orders",
+      "status": "SUCCESS",
+      "productCount": 1,
+      "error": null
+    }
+  ],
+  "expectedCategoryCount": 3,
+  "categoryCount": 3,
+  "completionPercentage": 100,
+  "products": [
+    {
+      "id": 2996553,
+      "code": "beef-tortilla-meal",
+      "name": {
+        "en-us": "Beef Tortilla Meal",
+        "ar-sa": "وجبة تورتيلا اللحم"
+      },
+      "description": {
+        "en-us": "The Tortilla Masters are here! Enjoy our new Beef Tortilla with our amazing tahini sauce, fresh lettuce, tomatoes, and onions wrapped in our signature tortilla bread, served with fries and a drink",
+        "ar-sa": "بالتورتيلا حنّا فنانين! تلذذ بـ تورتيلا اللحم الجديدة"
+      },
+      "image-uri": "https://cdn.getsolo.io/17855316536a6d0d05d5d5e_App-512x512-Beef-Tortilla-Meal.jpg",
+      "price": 29,
+      "list-price": 0,
+      "original-price": 29,
+      "calorie-count": 0,
+      "calories": "860",
+      "enabled": 1,
+      "disable-for-pickup": 0,
+      "disable-for-delivery": 0,
+      "is-combo": true,
+      "is-customizable": true,
+      "has-timed-event": false,
+      "modifier-groups": [
+        {
+          "id": 533763,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": 11775731
+            },
+            {
+              "id": 11775733
+            },
+            {
+              "id": 11775729
+            }
+          ]
+        }
+      ],
+      "__optionGroups": [
+        {
+          "id": 533763,
+          "name": "Sizes",
+          "nameAr": "Sizes",
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": 11775731,
+              "name": "Regular",
+              "nameAr": "Regular",
+              "price": 29
+            },
+            {
+              "id": 11775733,
+              "name": "Medium",
+              "nameAr": "Medium",
+              "price": 32
+            },
+            {
+              "id": 11775729,
+              "name": "Large",
+              "nameAr": "Large",
+              "price": 34
+            }
+          ]
+        }
+      ],
+      "__categoryId": 193160,
+      "__categoryName": "The Tortilla Masters",
+      "__categoryNameAr": "! في التورتيلا حنّا فنّانين",
+      "__sourceEndpoint": "menu-ref"
+    },
+    {
+      "id": 1614203,
+      "code": "5dd10936712f5b622a66aac0",
+      "name": {
+        "en-us": "Chicken Tortilla",
+        "ar-sa": "تورتيلا الدجاج"
+      },
+      "description": {
+        "en-us": "Nicely wrapped golden strips of fried chicken, fresh tomato, and crispy lettuce, in the warm embrace of our special tortilla bread",
+        "ar-sa": "طعم دجاج هرفي الاصيل المقلي مع شرائح الخس والطماطم الطازجة"
+      },
+      "image-uri": "https://cdn.getsolo.io/172349760966ba7c89601e5_CT.jpg",
+      "price": 24,
+      "list-price": 0,
+      "original-price": 24,
+      "calorie-count": 0,
+      "calories": "906",
+      "enabled": 1,
+      "disable-for-pickup": 0,
+      "disable-for-delivery": 0,
+      "is-combo": false,
+      "is-customizable": true,
+      "has-timed-event": false,
+      "modifier-groups": [
+        {
+          "id": 295531,
+          "min": 1,
+          "max": 5,
+          "modifiers": [
+            {
+              "id": 3673519
+            },
+            {
+              "id": 3673524
+            },
+            {
+              "id": 3673518
+            }
+          ]
+        },
+        {
+          "id": 330782,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": 3770680
+            }
+          ]
+        },
+        {
+          "id": 295533,
+          "min": 0,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": 3673600
+            }
+          ]
+        }
+      ],
+      "__optionGroups": [
+        {
+          "id": 295531,
+          "name": "Extra",
+          "nameAr": "إضافات",
+          "min": 1,
+          "max": 5,
+          "modifiers": [
+            {
+              "id": 3673519,
+              "name": "Extra Lettuce",
+              "nameAr": "إضافة كمية الخس",
+              "price": 0
+            },
+            {
+              "id": 3673524,
+              "name": "Extra Sauce",
+              "nameAr": "إضافة كمية الصوص",
+              "price": 0
+            },
+            {
+              "id": 3673518,
+              "name": "Extra Tomato",
+              "nameAr": "إضافة كمية الطماطم",
+              "price": 0
+            }
+          ]
+        },
+        {
+          "id": 330782,
+          "name": "Sizes",
+          "nameAr": "Sizes",
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": 3770680,
+              "name": "Chicken Tortilla",
+              "nameAr": "Chicken Tortilla",
+              "price": 24
+            }
+          ]
+        },
+        {
+          "id": 295533,
+          "name": "Extra Cheese",
+          "nameAr": "اضافة جبن",
+          "min": 0,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": 3673600,
+              "name": "Add Cheese",
+              "nameAr": "اضافة جبن",
+              "price": 1
+            }
+          ]
+        }
+      ],
+      "__categoryId": 193160,
+      "__categoryName": "The Tortilla Masters",
+      "__categoryNameAr": "! في التورتيلا حنّا فنّانين",
+      "__sourceEndpoint": "menu-ref"
+    },
+    {
+      "id": 2971976,
+      "code": "6a5e2b1bfe29c6eeaf2b8c45",
+      "name": {
+        "en-us": "Double Offer",
+        "ar-sa": "عرض الدبل"
+      },
+      "description": {
+        "en-us": "Treat yourself to a Double Max Burger regular, 4 pcs nuggets, fries, and a drink all in one satisfying meal",
+        "ar-sa": "عيش المتعة مع عرض الدبل"
+      },
+      "image-uri": "https://cdn.getsolo.io/17847083846a607d20592c0_double%20offer.jpg",
+      "price": 17,
+      "list-price": 0,
+      "original-price": 17,
+      "calorie-count": 0,
+      "calories": "1094",
+      "enabled": 1,
+      "disable-for-pickup": 0,
+      "disable-for-delivery": 0,
+      "is-combo": true,
+      "is-customizable": true,
+      "has-timed-event": false,
+      "modifier-groups": [
+        {
+          "id": 530917,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": 11564624
+            }
+          ]
+        }
+      ],
+      "__optionGroups": [
+        {
+          "id": 530917,
+          "name": "Sizes",
+          "nameAr": "Sizes",
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": 11564624,
+              "name": "Double Offer",
+              "nameAr": "Double Offer",
+              "price": 17
+            }
+          ]
+        }
+      ],
+      "__categoryId": 169347,
+      "__categoryName": "Offers",
+      "__categoryNameAr": "عروض حصرية",
+      "__sourceEndpoint": "menu-ref"
+    },
+    {
+      "id": 2971977,
+      "code": "6a5e2b968788a85b19d2a29b",
+      "name": {
+        "en-us": "Offer you'll love",
+        "ar-sa": "عرض يرضيك"
+      },
+      "description": {
+        "en-us": "Offer You’ll Love Enjoy a Chicken Burger, 6 pcs chicken nuggets, fries, and a drink",
+        "ar-sa": "عرض يرضيك ويفهمك"
+      },
+      "image-uri": "https://cdn.getsolo.io/17847083926a607d285b7a1_offer.jpg",
+      "price": 15,
+      "list-price": 0,
+      "original-price": 15,
+      "calorie-count": 0,
+      "calories": "878",
+      "enabled": 1,
+      "disable-for-pickup": 0,
+      "disable-for-delivery": 0,
+      "is-combo": true,
+      "is-customizable": true,
+      "has-timed-event": false,
+      "modifier-groups": [
+        {
+          "id": 530918,
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": 11564625
+            }
+          ]
+        }
+      ],
+      "__optionGroups": [
+        {
+          "id": 530918,
+          "name": "Sizes",
+          "nameAr": "Sizes",
+          "min": 1,
+          "max": 1,
+          "modifiers": [
+            {
+              "id": 11564625,
+              "name": "Offer you'll love",
+              "nameAr": "Offer you'll love",
+              "price": 15
+            }
+          ]
+        }
+      ],
+      "__categoryId": 169347,
+      "__categoryName": "Offers",
+      "__categoryNameAr": "عروض حصرية",
+      "__sourceEndpoint": "menu-ref"
+    },
+    {
+      "id": 2784707,
+      "code": "6a10a4ea8d11a366a84a9f44",
+      "name": {
+        "en-us": "4 pcs. Jalapeno Bites with Cheese",
+        "ar-sa": "٤ قطع هالبينو بايتس بالجبن"
+      },
+      "description": {
+        "en-us": "Turn Up the heat with Jalapeno Cheese Bites.. Crispy,Cheesy and spicy in every bite",
+        "ar-sa": "ولعها مع هالابينو بايتس"
+      },
+      "image-uri": "https://cdn.getsolo.io/17795131646a11374c5389b_App-512x512-4Pcs-Jalapeno.jpg",
+      "price": 8,
+      "list-price": 0,
+      "original-price": 8,
+      "calorie-count": 0,
+      "calories": "157",
+      "enabled": 1,
+      "disable-for-pickup": 0,
+      "disable-for-delivery": 0,
+      "is-combo": false,
+      "is-customizable": false,
+      "has-timed-event": false,
+      "modifier-groups": [],
+      "__optionGroups": [],
+      "__categoryId": 169225,
+      "__categoryName": "Side Orders",
+      "__categoryNameAr": "الطلبات الجانبية",
+      "__sourceEndpoint": "menu-ref"
+    }
+  ],
+  "promotions": [],
+  "productCount": 5,
+  "branchCurrentlyClosed": false,
+  "errorMessage": null
+}

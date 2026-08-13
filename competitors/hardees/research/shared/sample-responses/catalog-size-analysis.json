@@ -1,0 +1,279 @@
+{
+  "note": "Catalog-size / request-volume analysis, computed 2026-08-07 (Streamlit-integration session) from the already-captured research/shared/sample-responses/all-12-categories-pickup-default.json - see unresolved-items.md item #12 and api-map.md \"Request volume & rate-pacing strategy\".",
+  "totalCategoryListingRows": 110,
+  "uniqueProductIds": 110,
+  "productIdsInMultipleCategories": 0,
+  "bundleGroupWrapperCount": 53,
+  "wrappersWithMultipleVariantOptions": 53,
+  "sumOfVariantOptionsAcrossAllWrappers": 137,
+  "simpleOrConfigurableProductCount": 57,
+  "fullVariantCoverageCallCount": 194,
+  "defaultVariantOnlyCallCount": 110,
+  "wrapperDetails": [
+    {
+      "id": 77772593,
+      "name": "Double Hardee SantaFe Chicken Combo",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77772592,
+      "name": "Double Hardee Chicken Combo",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77772594,
+      "name": "Double Hardee Beef Combo",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77772595,
+      "name": "Curly Chicken Combo",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77772596,
+      "name": "Curly Santa Fe Chicken Combo",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77772597,
+      "name": "Curly Cheeseburger Combo",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77772554,
+      "name": "Double Treat Meal",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77772960,
+      "name": "Roast Beef Box",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77772601,
+      "name": "Steak Loader Box",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77772577,
+      "name": "Super Star Mushroom Box",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77772600,
+      "name": "Cheese steak Box",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77772572,
+      "name": "Chicken SantaFe Box",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77772573,
+      "name": "Chicken Fillet Box",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77772574,
+      "name": "Big Deluxe Box",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77772570,
+      "name": "Super Star Chicken Spicy Box",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77772569,
+      "name": "Super Star Chicken Box",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77772568,
+      "name": "Super Star Box",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77772542,
+      "name": "Super Star Burger Combo",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77772576,
+      "name": "Super Star Mushroom Combo",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77772545,
+      "name": "Cheese Steak Burger Combo",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77772551,
+      "name": "Mushroom N Swiss Burger Combo",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77772550,
+      "name": "Big Deluxe Burger Combo",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77772562,
+      "name": "Double Cheeseburger Combo",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77772950,
+      "name": "Roast Beef Combo",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77773066,
+      "name": "Mighty Tenders Combo",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77772556,
+      "name": "Super Star Chicken Spicy Combo",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77772546,
+      "name": "Super Star Chicken Combo Orignal",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77772552,
+      "name": "Jalapeno Chicken Combo",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77772555,
+      "name": "Santa Fe Chicken Spicy Combo",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77772553,
+      "name": "Chicken Fillet Combo",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77772548,
+      "name": "Mighty tenders combo Original",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77772547,
+      "name": "Mighty Tenders Combo Spicy",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77772566,
+      "name": "Solo Wraptor",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77772564,
+      "name": "Wraptor Combo",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77772565,
+      "name": "Spicy Wraptor",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77772558,
+      "name": "Kids Meal Chicken Nuggets",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77772557,
+      "name": "Kids Meal Cheese Burger",
+      "variantOptionCount": 4
+    },
+    {
+      "id": 77772549,
+      "name": "Kids Meal Chicken Tender Sandwich",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77773058,
+      "name": "One Piece Fillet Box",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77773056,
+      "name": "One Piece Deluxe Box",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77773057,
+      "name": "One Piece Mushroom Box",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77773059,
+      "name": "One Piece SantaFe Box",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77773067,
+      "name": "Foodie Mix",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77773070,
+      "name": "Monday Double",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77773071,
+      "name": "Sunday Duo",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77773069,
+      "name": "The Taster Mix",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77773068,
+      "name": "Super Night Deal",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77773099,
+      "name": "Overloader Beef Combo",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77773098,
+      "name": "Overloader Chicken Combo",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77773097,
+      "name": "Overloader Spicy Chicken Combo",
+      "variantOptionCount": 2
+    },
+    {
+      "id": 77773119,
+      "name": "The Goat Box",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77773127,
+      "name": "Tornado Spicy Combo",
+      "variantOptionCount": 3
+    },
+    {
+      "id": 77773061,
+      "name": "Tornado Ranch Blaze Combo",
+      "variantOptionCount": 3
+    }
+  ]
+}

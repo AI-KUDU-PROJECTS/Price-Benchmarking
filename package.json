@@ -1,0 +1,35 @@
+{
+  "name": "price-intelligence-collectors",
+  "version": "3.0.0",
+  "description": "Node.js collector code for the multi-competitor Price Intelligence repo. KFC (competitors/kfc/collector/ - Playwright session bootstrap, direct public-API collection for Pickup + Delivery kept fully separate, and Playwright screenshot capture for new products/offers), Burger King (competitors/burger_king/collector/ - fully public/unauthenticated API collection, no session bootstrap needed, plus a Playwright DOM price-scrape fallback and screenshot capture for new products), Herfy (competitors/herfy/collector/ - a minimal, non-interactive Playwright app-bootstrap step plus fully public REST/CDN collection, real prices with no DOM-scrape fallback needed, and Playwright screenshot capture for new products/offers), and Hardee's (competitors/hardees/collector/ - Playwright guest-session bootstrap and direct public-API collection, same shared Americana platform as KFC, plus Playwright screenshot capture for new products/offers) are implemented. McDonald's and Albaik are scaffolded only - see their competitors/<name>/collector/README.md. This package.json and node_modules/ are shared at the repo root; each competitor's collector code stays isolated inside its own competitors/<name>/collector/ folder. See root README.md.",
+  "main": "competitors/kfc/collector/collect.js",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "collect": "node competitors/kfc/collector/collect.js",
+    "collect:pickup": "node competitors/kfc/collector/collect.js --channel=PICKUP",
+    "collect:delivery": "node competitors/kfc/collector/collect.js --channel=DELIVERY",
+    "screenshot": "node competitors/kfc/collector/screenshot-capture.js",
+    "sanitize": "node competitors/kfc/collector/sanitize-har.js",
+    "legacy:crawl": "node competitors/kfc/legacy/crawl-kfc.js",
+    "collect:bk": "node competitors/burger_king/collector/collect.js",
+    "collect:bk:pickup": "node competitors/burger_king/collector/collect.js --channel=PICKUP",
+    "collect:bk:delivery": "node competitors/burger_king/collector/collect.js --channel=DELIVERY",
+    "screenshot:bk": "node competitors/burger_king/collector/screenshot-capture.js",
+    "collect:herfy": "node competitors/herfy/collector/collect.js",
+    "collect:herfy:pickup": "node competitors/herfy/collector/collect.js --channel=PICKUP",
+    "collect:herfy:delivery": "node competitors/herfy/collector/collect.js --channel=DELIVERY",
+    "screenshot:herfy": "node competitors/herfy/collector/screenshot-capture.js",
+    "collect:hardees": "node competitors/hardees/collector/collect.js",
+    "collect:hardees:pickup": "node competitors/hardees/collector/collect.js --channel=PICKUP",
+    "collect:hardees:delivery": "node competitors/hardees/collector/collect.js --channel=DELIVERY",
+    "screenshot:hardees": "node competitors/hardees/collector/screenshot-capture.js",
+    "postinstall": "echo \"Now run: npx playwright install chromium\""
+  },
+  "dependencies": {
+    "playwright": "1.61.0"
+  },
+  "license": "UNLICENSED"
+}

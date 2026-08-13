@@ -1,0 +1,267 @@
+{
+  "channel": "DELIVERY",
+  "status": "PARTIAL",
+  "startedAt": "2026-08-02T06:00:00.000Z",
+  "finishedAt": "2026-08-02T06:05:00.000Z",
+  "branchId": 11474,
+  "branchName": "Dabab Street",
+  "city": "Riyadh",
+  "apiConfigId": "9670fe1e-0342-41b7-9f92-a8fb1907120f",
+  "clusterId": null,
+  "categories": [
+    {
+      "_id": "c0e92480-0bc4-4821-9760-28d18dd8fc89",
+      "name": {
+        "locale": "KING DAILY DEALS",
+        "_locFb": "عروض كنج اليومية",
+        "__typename": "LocaleString"
+      }
+    },
+    {
+      "_id": "4e51d826-c0f0-465e-83e9-db0e3c9b5c6f",
+      "name": {
+        "locale": "KING SNACKS",
+        "_locFb": "وجبات كنج",
+        "__typename": "LocaleString"
+      }
+    },
+    {
+      "_id": "b896128c-9345-44fe-a3f6-72b32679005d",
+      "name": {
+        "locale": "FLAME-GRILLED BURGERS",
+        "_locFb": "برجر مشوي",
+        "__typename": "LocaleString"
+      }
+    },
+    {
+      "_id": "a9b236a6-3898-4070-9c3b-d5396dd96590",
+      "name": {
+        "locale": "KING SAVERS",
+        "_locFb": "موفرات كنج",
+        "__typename": "LocaleString"
+      }
+    }
+  ],
+  "categoryResults": [
+    {
+      "categoryId": "c0e92480-0bc4-4821-9760-28d18dd8fc89",
+      "name": "KING DAILY DEALS",
+      "status": "SUCCESS",
+      "productCount": 2,
+      "error": null
+    },
+    {
+      "categoryId": "4e51d826-c0f0-465e-83e9-db0e3c9b5c6f",
+      "name": "KING SNACKS",
+      "status": "SUCCESS",
+      "productCount": 1,
+      "error": null
+    },
+    {
+      "categoryId": "b896128c-9345-44fe-a3f6-72b32679005d",
+      "name": "FLAME-GRILLED BURGERS",
+      "status": "SUCCESS",
+      "productCount": 1,
+      "error": null
+    },
+    {
+      "categoryId": "a9b236a6-3898-4070-9c3b-d5396dd96590",
+      "name": "KING SAVERS",
+      "status": "FAILED",
+      "productCount": 0,
+      "error": "GetMenuSections timed out for this category"
+    }
+  ],
+  "expectedCategoryCount": 4,
+  "categoryCount": 3,
+  "completionPercentage": 75.0,
+  "products": [
+    {
+      "_id": "b10d5e39-7a05-4207-b078-dd1ea35e0c08",
+      "_type": "combo",
+      "name": {
+        "locale": "CHEESEBURGER LOVERS",
+        "_locFb": "عشّاق التشيز برجر",
+        "__typename": "LocaleString"
+      },
+      "image": {
+        "hotspot": null,
+        "crop": null,
+        "asset": {
+          "_id": "image-00c75a180b270f76a6b61597a564403092ba164a-400x400.png",
+          "url": "https://cdn.sanity.io/images/czqk28jt/prod_bk_sa/00c75a180b270f76a6b61597a564403092ba164a-400x400.png",
+          "__typename": "SanityImageAsset"
+        },
+        "__typename": "Image"
+      },
+      "imagesByChannels": null,
+      "uiPattern": "parallel",
+      "showInStaticMenu": true,
+      "channelExclusions": null,
+      "depositInfoText": null,
+      "__typename": "Combo",
+      "discountPlu": null,
+      "__categoryId": "c0e92480-0bc4-4821-9760-28d18dd8fc89",
+      "__categoryName": "KING DAILY DEALS",
+      "__sourceEndpoint": "GetMenuSections",
+      "__price": 39
+    },
+    {
+      "_id": "929610c8-4931-44f3-a455-9b7822e00e0d",
+      "_type": "combo",
+      "name": {
+        "locale": "KING WRAP BOX",
+        "_locFb": "كنج راب بوكس",
+        "__typename": "LocaleString"
+      },
+      "image": {
+        "hotspot": null,
+        "crop": null,
+        "asset": {
+          "_id": "image-de5de13d8ffdbee2c6a48b0f42631adef69b853d-590x393.png",
+          "url": "https://cdn.sanity.io/images/czqk28jt/prod_bk_sa/de5de13d8ffdbee2c6a48b0f42631adef69b853d-590x393.png",
+          "__typename": "SanityImageAsset"
+        },
+        "__typename": "Image"
+      },
+      "imagesByChannels": null,
+      "uiPattern": "parallel",
+      "showInStaticMenu": true,
+      "channelExclusions": null,
+      "depositInfoText": null,
+      "__typename": "Combo",
+      "discountPlu": null,
+      "__categoryId": "c0e92480-0bc4-4821-9760-28d18dd8fc89",
+      "__categoryName": "KING DAILY DEALS",
+      "__sourceEndpoint": "GetMenuSections",
+      "__price": 49
+    },
+    {
+      "_id": "96d6bee7-a93a-41db-b870-2b1bf497016e",
+      "_type": "item",
+      "name": {
+        "locale": "CRISPY NACHO BITES - 3 PCS",
+        "_locFb": "ناتشو بايتس مقرمشة - 3 قطع",
+        "__typename": "LocaleString"
+      },
+      "image": {
+        "hotspot": null,
+        "crop": null,
+        "asset": {
+          "_id": "image-14f41629eda739605d33ad813b9ebcacc13cdeaa-400x300.png",
+          "url": "https://cdn.sanity.io/images/czqk28jt/prod_bk_sa/14f41629eda739605d33ad813b9ebcacc13cdeaa-400x300.png",
+          "__typename": "SanityImageAsset"
+        },
+        "__typename": "Image"
+      },
+      "imagesByChannels": null,
+      "showInStaticMenu": true,
+      "hideCalories": null,
+      "channelExclusions": null,
+      "options": null,
+      "itemSize": null,
+      "itemUnit": null,
+      "__typename": "Item",
+      "discountPlu": null,
+      "__categoryId": "4e51d826-c0f0-465e-83e9-db0e3c9b5c6f",
+      "__categoryName": "KING SNACKS",
+      "__sourceEndpoint": "GetMenuSections",
+      "__price": 13
+    },
+    {
+      "_id": "b9bd3a45-b4eb-45c5-a1d0-65267b9dcc32",
+      "_type": "picker",
+      "name": {
+        "locale": "CHEESE STORM BURGER",
+        "_locFb": "تشيز ستورم بيف",
+        "__typename": "LocaleString"
+      },
+      "description": {
+        "localeRaw": [
+          {
+            "_key": "k1",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "c1",
+                "_type": "span",
+                "marks": [],
+                "text": "A flame-grilled Whopper patty layered with Swiss cheese, American cheese, creamy cheese sauce, pickles, and mayonnaise, all served on soft cheese-topped buns for a rich experience for cheese lovers. Enjoy it today with Fries and Coca-Cola!"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          }
+        ],
+        "_locFbRaw": [
+          {
+            "_key": "k1",
+            "_type": "block",
+            "children": [
+              {
+                "_key": "c1",
+                "_type": "span",
+                "marks": [],
+                "text": "قطعة وابر مشوية على اللهب"
+              }
+            ],
+            "markDefs": [],
+            "style": "normal"
+          }
+        ],
+        "__typename": "LocaleBlockContent"
+      },
+      "image": {
+        "hotspot": null,
+        "crop": null,
+        "asset": {
+          "_id": "image-1f78cfc5ad698d764456000be7f1fe6b06849936-400x300.png",
+          "url": "https://cdn.sanity.io/images/czqk28jt/prod_bk_sa/1f78cfc5ad698d764456000be7f1fe6b06849936-400x300.png",
+          "__typename": "SanityImageAsset"
+        },
+        "__typename": "Image"
+      },
+      "imagesByChannels": null,
+      "uiPattern": null,
+      "showInStaticMenu": true,
+      "channelExclusions": null,
+      "depositInfoText": null,
+      "options": [
+        {
+          "option": {
+            "__typename": "Item"
+          },
+          "__typename": "PickerOption"
+        },
+        {
+          "option": {
+            "__typename": "Combo"
+          },
+          "__typename": "PickerOption"
+        },
+        {
+          "option": {
+            "__typename": "Combo"
+          },
+          "__typename": "PickerOption"
+        },
+        {
+          "option": {
+            "__typename": "Combo"
+          },
+          "__typename": "PickerOption"
+        }
+      ],
+      "__typename": "Picker",
+      "discountPlu": null,
+      "__categoryId": "b896128c-9345-44fe-a3f6-72b32679005d",
+      "__categoryName": "FLAME-GRILLED BURGERS",
+      "__sourceEndpoint": "GetMenuSections",
+      "__price": 34.99
+    }
+  ],
+  "promotions": [],
+  "productCount": 4,
+  "branchCurrentlyClosed": false,
+  "errorMessage": null
+}

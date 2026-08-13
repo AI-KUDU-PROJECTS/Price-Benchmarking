@@ -1,0 +1,91 @@
+{
+  "cluster": "1_8",
+  "configId": "HRD_SA_23",
+  "productInfo": {
+    "status": 200,
+    "body": {
+      "statusCode": 200,
+      "httpCode": 200,
+      "type": "DEFAULT_SUCCESS",
+      "data": {},
+      "message": "Success",
+      "attributes": [],
+      "heading": {
+        "Ar": "",
+        "En": ""
+      },
+      "note": {
+        "En": "",
+        "Ar": ""
+      },
+      "identifier": [],
+      "etag": "1786013163541"
+    }
+  },
+  "bundleStep": {
+    "status": 500,
+    "body": {
+      "statusCode": 422,
+      "httpCode": 422,
+      "type": "DEFAULT_VALIDATION_ERROR",
+      "message": "Invalid info provided",
+      "attributes": [],
+      "heading": {
+        "Ar": "",
+        "En": ""
+      },
+      "note": {
+        "En": "",
+        "Ar": ""
+      },
+      "identifier": []
+    }
+  },
+  "prepTime": {
+    "status": 200,
+    "body": {
+      "statusCode": 200,
+      "httpCode": 200,
+      "type": "DEFAULT_SUCCESS",
+      "data": {
+        "prepTime": 3
+      },
+      "message": "Success",
+      "attributes": [],
+      "heading": {
+        "Ar": "",
+        "En": ""
+      },
+      "note": {
+        "En": "",
+        "Ar": ""
+      },
+      "identifier": []
+    }
+  },
+  "nutrition": {
+    "status": 200,
+    "body": {
+      "location": "https://devmtstorage.blob.core.windows.net/hrdimageblob/hrd/ksa/Nutiritional_Info_HRD_updated.pdf"
+    }
+  },
+  "offers": {
+    "status": 500,
+    "body": {
+      "statusCode": 422,
+      "httpCode": 422,
+      "type": "DEFAULT_VALIDATION_ERROR",
+      "message": "Invalid info provided",
+      "attributes": [],
+      "heading": {
+        "Ar": "",
+        "En": ""
+      },
+      "note": {
+        "En": "",
+        "Ar": ""
+      },
+      "identifier": []
+    }
+  }
+}

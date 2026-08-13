@@ -1,0 +1,128 @@
+'use strict';
+
+/**
+ * collector/http-client.js
+ * ---------------------------------------------------------------------
+ * Minimal, dependency-free HTTPS JSON client used for every DIRECT API
+ * call made after api-bootstrap.js has established a session (the "API
+ * First / continue using direct API calls" half of the architecture - see
+ * README "Collection architecture"). No third-party HTTP library is used,
+ * matching the original project's zero-dependency policy.
+ *
+ * This module is intentionally dumb: it does not know anything about
+ * Hardee's endpoint shapes. api-client.js builds on top of it. Identical
+ * to competitors/kfc's http-client.js - both brands run on the same
+ * Americana-operated platform (see research/api-map/api-map.md).
+ * ---------------------------------------------------------------------
+ */
+
+const https = require('https');
+const { URL } = require('url');
+const CONFIG = require('./config');
+
+/**
+ * Serializes a cookie jar (array of {name, value}) into a single Cookie
+ * header value.
+ */
+function serializeCookies(cookies) {
+  if (!cookies || !cookies.length) return '';
+  return cookies.map((c) => `${c.name}=${c.value}`).join('; ');
+}
+
+/**
+ * Performs one HTTPS request and resolves with { status, headers, body,
+ * json }. Never rejects on a non-2xx status - callers decide what a bad
+ * status means (schema validation, retry, etc.) so a 4xx/5xx never crashes
+ * the collector outright.
+ */
+function request({ method = 'GET', url, headers = {}, body = null, timeoutMs }) {
+  return new Promise((resolve, reject) => {
+    let parsed;
+    try {
+      parsed = new URL(url);
+    } catch (e) {
+      reject(new Error(`Invalid URL: ${url}`));
+      return;
+    }
+    const payload = body ? JSON.stringify(body) : null;
+    const reqHeaders = { ...headers };
+    if (payload) {
+      reqHeaders['content-type'] = reqHeaders['content-type'] || 'application/json';
+      reqHeaders['content-length'] = Buffer.byteLength(payload);
+    }
+
+    const req = https.request(
+      {
+        method,
+        hostname: parsed.hostname,
+        port: parsed.port || 443,
+        path: parsed.pathname + (parsed.search || ''),
+        headers: reqHeaders,
+        timeout: timeoutMs || CONFIG.API_TIMEOUT,
+        // See config.js module docstring "Known quirk" - saudi.hardees.me's
+        // own TLS certificate was found expired at verification time (a
+        // real issue on the target site's infrastructure, not ours). Only
+        // disabled when CONFIG.IGNORE_TLS_ERRORS is explicitly true (default
+        // for this brand), and only affects cert validation, never which
+        // data is requested/sent.
+        rejectUnauthorized: !CONFIG.IGNORE_TLS_ERRORS,
+      },
+      (res) => {
+        const chunks = [];
+        res.on('data', (c) => chunks.push(c));
+        res.on('end', () => {
+          let bodyText = Buffer.concat(chunks).toString('utf8');
+          // Real quirk confirmed live: getStoreList's response (served
+          // straight from Azure Blob Storage, not the app's own API layer)
+          // carries a leading UTF-8 BOM (U+FEFF), which JSON.parse()
+          // rejects outright. Strip it if present - never silently swallow
+          // a genuine parse error otherwise.
+          if (bodyText.charCodeAt(0) === 0xfeff) bodyText = bodyText.slice(1);
+          let json = null;
+          let parseError = null;
+          if (bodyText) {
+            try {
+              json = JSON.parse(bodyText);
+            } catch (e) {
+              parseError = e.message;
+            }
+          }
+          resolve({
+            status: res.statusCode,
+            headers: res.headers,
+            body: bodyText,
+            json,
+            parseError,
+          });
+        });
+      }
+    );
+    req.on('timeout', () => {
+      req.destroy(new Error(`Request timed out after ${timeoutMs || CONFIG.API_TIMEOUT}ms: ${method} ${url}`));
+    });
+    req.on('error', (e) => reject(e));
+    if (payload) req.write(payload);
+    req.end();
+  });
+}
+
+/** Retries `fn` up to `retries` extra times with linear backoff. Never retries a SafetyBlockedError-shaped rejection. */
+async function withRetry(fn, retries, logger, label) {
+  let lastErr;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await fn(attempt);
+    } catch (e) {
+      lastErr = e;
+      if (logger) logger.tag('RETRY', `Attempt ${attempt + 1}/${retries + 1} failed for ${label}: ${e.message}`);
+      if (attempt < retries) await new Promise((r) => setTimeout(r, 600 * (attempt + 1)));
+    }
+  }
+  throw lastErr;
+}
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+module.exports = { request, serializeCookies, withRetry, wait };

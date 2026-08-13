@@ -1,0 +1,144 @@
+{
+  "note": "getPromotion payload-testing evidence and Great Offers DOM dump, gathered 2026-08-07 (Streamlit-integration session) while investigating unresolved-items.md item #5. No cookies/deviceid/session values are present - these are request/response bodies and a public DOM snippet only.",
+  "getPromotionAttempts": {
+    "clusterConfigServiceCategory": {
+      "status": 500,
+      "body": {
+        "statusCode": 422,
+        "httpCode": 422,
+        "type": "DEFAULT_VALIDATION_ERROR",
+        "message": "Invalid info provided",
+        "attributes": [],
+        "heading": {
+          "Ar": "",
+          "En": ""
+        },
+        "note": {
+          "En": "",
+          "Ar": ""
+        },
+        "identifier": []
+      }
+    },
+    "withStoreIdCityId": {
+      "status": 500,
+      "body": {
+        "statusCode": 422,
+        "httpCode": 422,
+        "type": "DEFAULT_VALIDATION_ERROR",
+        "message": "Invalid info provided",
+        "attributes": [],
+        "heading": {
+          "Ar": "",
+          "En": ""
+        },
+        "note": {
+          "En": "",
+          "Ar": ""
+        },
+        "identifier": []
+      }
+    },
+    "withPromoIdProductId": {
+      "status": 500,
+      "body": {
+        "statusCode": 422,
+        "httpCode": 422,
+        "type": "DEFAULT_VALIDATION_ERROR",
+        "message": "Invalid info provided",
+        "attributes": [],
+        "heading": {
+          "Ar": "",
+          "En": ""
+        },
+        "note": {
+          "En": "",
+          "Ar": ""
+        },
+        "identifier": []
+      }
+    },
+    "withOrderTypeInsteadOfService": {
+      "status": 500,
+      "body": {
+        "statusCode": 422,
+        "httpCode": 422,
+        "type": "DEFAULT_VALIDATION_ERROR",
+        "message": "Invalid info provided",
+        "attributes": [],
+        "heading": {
+          "Ar": "",
+          "En": ""
+        },
+        "note": {
+          "En": "",
+          "Ar": ""
+        },
+        "identifier": []
+      }
+    },
+    "deliveryVariant": {
+      "status": 500,
+      "body": {
+        "statusCode": 422,
+        "httpCode": 422,
+        "type": "DEFAULT_VALIDATION_ERROR",
+        "message": "Invalid info provided",
+        "attributes": [],
+        "heading": {
+          "Ar": "",
+          "En": ""
+        },
+        "note": {
+          "En": "",
+          "Ar": ""
+        },
+        "identifier": []
+      }
+    },
+    "emptyBody": {
+      "status": 500,
+      "body": {
+        "statusCode": 422,
+        "httpCode": 422,
+        "type": "DEFAULT_VALIDATION_ERROR",
+        "message": "Invalid info provided",
+        "attributes": [],
+        "heading": {
+          "Ar": "",
+          "En": ""
+        },
+        "note": {
+          "En": "",
+          "Ar": ""
+        },
+        "identifier": []
+      }
+    },
+    "onlyId": {
+      "status": 500,
+      "body": {
+        "statusCode": 422,
+        "httpCode": 422,
+        "type": "DEFAULT_VALIDATION_ERROR",
+        "message": "Invalid info provided",
+        "attributes": [],
+        "heading": {
+          "Ar": "",
+          "En": ""
+        },
+        "note": {
+          "En": "",
+          "Ar": ""
+        },
+        "identifier": []
+      }
+    }
+  },
+  "greatOffersSectionDom": {
+    "found": true,
+    "containerHTML": "<section class=\"_root_2npdl_11 GREAT_OFFER\"><div style=\"display: flex; justify-content: space-between;\"><div class=\"_cardSlide_2npdl_103 \"><div class=\"_titleArea_2npdl_30\"><div class=\"_heading_2npdl_61\"><h2 class=\"_title_2npdl_30\">Great Offers</h2><img src=\"/assets/top-deals-b9351756.png\" alt=\"Great Offers\" width=\"18\"></div></div><div class=\"_root_1tvnq_11\"><div class=\"_productTile_1tvnq_37\"><img src=\"https://phprodcmsimages.blob.core.windows.net/hrdprodcmsimages/hrd/imagestemp/desktop/dbltrt-ksa-en.png\" alt=\"\"></div></div></div></div></section>",
+    "links": []
+  },
+  "conclusion": "Every payload attempt returned the byte-identical DEFAULT_VALIDATION_ERROR. The Great Offers section is a bare static <img> with no href/onClick/role - no live UI trigger exists for this endpoint on the homepage."
+}

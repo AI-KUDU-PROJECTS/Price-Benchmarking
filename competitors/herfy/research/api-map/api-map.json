@@ -1,0 +1,80 @@
+{
+  "brand": "Herfy",
+  "baseSite": "https://order.herfy.com/menu/-193160",
+  "platform": "Solo (getsolo.io / api.solo.skylinedynamics.com) - a third-party online-ordering SaaS platform (Nuxt.js SSR storefront + REST API + static CDN menu files), not built by Herfy itself.",
+  "lastVerifiedAt": "2026-08-11",
+  "robotsTxt": {
+    "url": "https://order.herfy.com/robots.txt",
+    "disallow": ["/checkout/", "/payment/", "/user/", "/payment-failed"],
+    "note": "Sitemap: https://lorenzo.foodics.online/sitemap.xml (a different, unrelated Solo-platform tenant's stale/vestigial sitemap reference - Herfy's own storefront is order.herfy.com, served by api.solo.skylinedynamics.com, not Foodics). This collector never requests /checkout/, /payment/, /user/, or /payment-failed."
+  },
+  "endpoints": {
+    "menuPageSSR": {
+      "method": "GET",
+      "url": "https://order.herfy.com/menu/-193160",
+      "authRequired": false,
+      "verifiedStandaloneNoBrowser": "partial - the page's raw HTML is fetchable with a plain GET (confirmed via curl, 200 OK), but window.__NUXT__ is embedded as a minified IIFE with webpack-style string deduplication (`(function(a,b,c,...){...})(...)`), not plain JSON - a JS engine must evaluate it to get the real object. This collector uses a one-time-per-run Playwright bootstrap step to do that (see api-bootstrap.js), matching KFC's api-bootstrap.js pattern.",
+      "purpose": "Server-side-rendered app bootstrap. Its embedded window.__NUXT__.state.app.settings.attributes carries the two non-sensitive, per-app-not-per-session values every subsequent direct API call needs: `key` (the 'solo-app' header value) and `menu-ref` (a direct CDN URL to the full, current menu JSON). Re-read fresh each run rather than hardcoded, in case Herfy republishes either value.",
+      "notes": "The URL's '-193160' segment is NOT a branch/location id - it happens to equal the id of one category ('The Tortilla Masters') that is anchored/promoted by default. The menu shown is NOT scoped to any branch or order type at this point ('لا يوجد نوع طلب محدد' / 'No order type selected' banner) - see menuRefCdn below for why this doesn't matter for pricing."
+    },
+    "menuRefCdn": {
+      "method": "GET",
+      "url": "https://cdn.getsolo.io/apps/production/<hash>-menu-<default-menu-id>.json (read fresh from menuPageSSR's state.app.settings.attributes['menu-ref'] each run - e.g. https://cdn.getsolo.io/apps/production/PM6OEiBo83O-menu-12303.json at verification time)",
+      "authRequired": false,
+      "verifiedStandaloneNoBrowser": true,
+      "purpose": "The full, authoritative menu: every category, every item (with REAL price/list-price/original-price/calories/bilingual name+description fields directly in the response - no DOM-scrape workaround needed, unlike Burger King), and every modifier-group/modifier (including real per-modifier price deltas, e.g. 'Add Cheese' +1 SAR) as an `included` side-table. A single static JSON file on a CDN - not store-scoped, not order-type-scoped, no request parameters at all.",
+      "responseShape": {
+        "data[]": "{type:'category-items', id, attributes:{category:{id, name{ar-sa,en-us}, description, image-uri, enabled, display-order}, items:[{id, code, name{ar-sa,en-us}, description{ar-sa,en-us}, price, list-price, original-price, calorie-count, calories, is-combo, is-customizable, enabled, disable-for-pickup, disable-for-delivery, modifier-groups:[{id, min, max, modifiers:[{id}]}]}]}}",
+        "included.modifierGroups[]": "{type:'modifier-group', id, attributes:{name{ar-sa,en-us}, minimum, maximum, enabled, modifiers:[], exclude-modifiers:[ids]}}",
+        "included.modifiers[]": "{type:'modifier', id, attributes:{name{ar-sa,en-us}, price, calorie-count, enabled}}",
+        "included.allergens[]": "empty at verification time",
+        "included.ingredients[]": "empty at verification time"
+      },
+      "notes": "Confirmed live: 14 categories / 144 items / 340 modifier-groups / 445 modifiers. 260 of 445 modifiers carry a real nonzero price. `list-price` was 0 and `price == original-price` for every one of the 144 items with no exception - see 'Known limitation: no before/after discount signal'."
+    },
+    "locationsNearby": {
+      "method": "GET",
+      "url": "https://api.solo.skylinedynamics.com/locations?_lat={lat}&_long={long}&limit=999",
+      "authRequired": "requires the 'solo-app' header (see clientRequiredHeaders) - otherwise returns 400 'Concept Key and App Key are missing'",
+      "verifiedStandaloneNoBrowser": true,
+      "purpose": "Finds every branch near a coordinate, sorted by distance. Used for branch-exists-nearby verification (equivalent of KFC's getStoreList / Burger King's GetRestaurants).",
+      "responseShape": "JSON:API {data:[{type:'location', id, attributes:{name, name-translations{ar-sa,en-us}, lat, long, distance, status, is-open, is-open-pickup, is-open-deliver, pickup-enabled, delivery-enabled, opening-hours-pickup[], opening-hours-deliver[], delivery-charge, code}}], meta:{pagination}}",
+      "notes": "Confirmed live: 361 real branches nationwide for a Riyadh-centered search. `is-open`/`is-open-pickup`/`is-open-deliver` reflect real-time open/closed state against the branch's own hours; `pickup-enabled`/`delivery-enabled` are separate structural flags for whether the branch supports the channel at all (some branches are pickup-only)."
+    },
+    "locationById": {
+      "method": "GET",
+      "url": "https://api.solo.skylinedynamics.com/locations/{locationId}",
+      "authRequired": "requires the 'solo-app' header",
+      "verifiedStandaloneNoBrowser": true,
+      "purpose": "Single-branch lookup by id - the branch-existence/hours/channel-availability check for the one fixed configured branch (equivalent of Burger King's GetRestaurant).",
+      "responseShape": "JSON:API {data:{type:'location', id, attributes:{...same shape as locationsNearby...}}}",
+      "notes": "Confirmed live for branch 29696 (RUH - Al Mogarazat - Eirad Plaza Mall 1073) - real status='active', is-open=true, pickup-enabled=1, delivery-enabled=1."
+    },
+    "applicationById": {
+      "method": "GET",
+      "url": "https://api.solo.skylinedynamics.com/applications/{applicationId}",
+      "authRequired": "requires session/auth beyond the 'solo-app' header - returned 401 when tried standalone with only that header",
+      "verifiedStandaloneNoBrowser": false,
+      "purpose": "NOT used by this collector - would have been a shortcut to re-fetch app settings (key/menu-ref) without a browser, but is not actually accessible without additional auth this session could not obtain. api-bootstrap.js re-reads app settings from the SSR page instead (see menuPageSSR).",
+      "notes": "Documented as a negative result to save a future session from re-attempting this exact path."
+    }
+  },
+  "clientRequiredHeaders": {
+    "solo-app": "The 'App Key' (e.g. 'jRKV7Ol8nV3O9hmp' at verification time) - a static, non-sensitive, per-application identifier embedded directly in every page's SSR HTML (window.__NUXT__.state.app.settings.attributes.key), not a per-session or per-user token. Read fresh each run by api-bootstrap.js rather than hardcoded, in case Herfy's Solo app key ever rotates."
+  },
+  "channelModel": {
+    "orderTypes": "to-go (= PICKUP), deliver (= DELIVERY) - from state.app.settings.attributes['allowed-order-types']",
+    "menuScoping": "The menu-ref CDN JSON is identical regardless of order type or branch - confirmed by it being a single static file with no request parameters. Per-item disable-for-pickup/disable-for-delivery flags (present on every item, both 0 for every item sampled) are the only channel-specific signal at the item level; channel availability at the BRANCH level is entirely carried by locationsNearby/locationById's pickup-enabled/delivery-enabled and is-open-pickup/is-open-deliver fields."
+  },
+  "dealCategory": {
+    "name": "Offers (English) / عروض حصرية (Arabic, literally 'Exclusive Offers')",
+    "categoryId": 169347,
+    "itemCountAtVerification": 10,
+    "note": "Unlike Burger King's 'KING DAILY DEALS' (which required investigating and naming by inference), Herfy's own CMS category is literally named 'Offers' in English - the most direct and confident category-based offer signal found across any competitor in this repo so far. Every one of its 10 items is a combo (is-combo=true) with list-price=0/price==original-price - i.e. the SAME 'no confirmed before/after price' limitation as every other item on the menu (see 'Known limitation' below) - only the category membership signal is used, never a guessed discount amount."
+  },
+  "whatIsNeverRecorded": [
+    "No login/account credentials - this brand's storefront does not require login to browse the menu or check branch availability.",
+    "No real phone number, payment detail, or delivery address is ever submitted - this collector never requests /checkout/, /payment/, or /user/ (see robotsTxt) and never adds anything to a cart.",
+    "No cookies or session tokens are saved to disk or git - the 'solo-app' header value is re-read fresh into memory each run, never persisted."
+  ]
+}

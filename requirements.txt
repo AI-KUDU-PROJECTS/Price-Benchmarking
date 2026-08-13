@@ -1,0 +1,19 @@
+# Shared Python dependencies for the multi-competitor Price Intelligence
+# repo (installed once at the repo root - see root README.md). Only KFC
+# (competitors/kfc/) currently uses these: SQLite (stdlib sqlite3), change
+# detection, Streamlit dashboard, Excel export, daily scheduler. Node.js
+# (see package.json) handles API bootstrap, public API collection, and
+# Playwright screenshots for KFC - see competitors/kfc/README.md
+# "Architecture". The other competitors are scaffolded only and add no
+# dependencies yet.
+
+streamlit==1.38.0
+pandas==2.2.2
+openpyxl==3.1.5
+APScheduler==3.10.4
+python-dotenv==1.0.1
+pytz==2024.1
+plotly==5.24.1
+
+# Dev/test only
+pytest==8.3.3

@@ -1,0 +1,945 @@
+{
+  "channel": "PICKUP",
+  "status": "SUCCESS",
+  "startedAt": "2026-08-01T06:00:00.000Z",
+  "finishedAt": "2026-08-01T06:05:00.000Z",
+  "branchId": 251,
+  "branchName": "SITEEN",
+  "city": "Riyadh",
+  "apiConfigId": "KFC_SA_76",
+  "clusterId": "14_5",
+  "categories": [
+    {
+      "groupId": "KFC_SA_v20_KFC_SA_27",
+      "aKey": "KFC_SA_v20_KFC_SA_27_794",
+      "position": 1,
+      "id": 794,
+      "name": "Exclusive",
+      "isHidden": 0,
+      "code": "imagestemp/cat-exclusive-deals-new_10032026.png",
+      "parentId": 0,
+      "assets": [
+        {
+          "alt": "alt text",
+          "resolution": "40x40",
+          "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/imagestemp/cat-exclusive-deals-new_10032026.png.png",
+          "type": "image"
+        }
+      ],
+      "slug": "",
+      "qrcode": "",
+      "createdAt": 1721379693000,
+      "updatedAt": 1784032628000,
+      "breadcrumb": "",
+      "metaTitle": "Exclusive",
+      "metaKeyword": [],
+      "description": "",
+      "custom": {},
+      "bannerImages": "",
+      "catImages": [],
+      "promoId": 0,
+      "is_toggle": 0,
+      "flashCategory": 0,
+      "tag": "",
+      "services": {
+        "carhop": 0,
+        "delevery": 0,
+        "dine_in": 0,
+        "drivethru": 0,
+        "take_away": 0
+      },
+      "level": 3,
+      "productCount": 8
+    },
+    {
+      "groupId": "KFC_SA_v20_KFC_SA_27",
+      "aKey": "KFC_SA_v20_KFC_SA_27_2720",
+      "position": 2,
+      "id": 2720,
+      "name": "New! Hot Honey",
+      "isHidden": 0,
+      "code": "imagestemp/cap_hothoney.png",
+      "parentId": 0,
+      "assets": [
+        {
+          "alt": "alt text",
+          "resolution": "40x40",
+          "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/imagestemp/cap_hothoney.png.png",
+          "type": "image"
+        }
+      ],
+      "slug": "",
+      "qrcode": "",
+      "createdAt": 1779437705000,
+      "updatedAt": 1784190113000,
+      "breadcrumb": "",
+      "metaTitle": "New! Hot Honey",
+      "metaKeyword": [],
+      "description": "",
+      "custom": {},
+      "bannerImages": "",
+      "catImages": [],
+      "promoId": 0,
+      "is_toggle": 0,
+      "flashCategory": 0,
+      "tag": "",
+      "services": {
+        "carhop": 0,
+        "delevery": 0,
+        "dine_in": 0,
+        "drivethru": 0,
+        "take_away": 0
+      },
+      "level": 3,
+      "productCount": 14
+    }
+  ],
+  "categoryResults": [
+    {
+      "categoryId": 794,
+      "name": "Exclusive",
+      "status": "SUCCESS",
+      "productCount": 8,
+      "error": null
+    },
+    {
+      "categoryId": 2720,
+      "name": "New! Hot Honey",
+      "status": "SUCCESS",
+      "productCount": 14,
+      "error": null
+    }
+  ],
+  "expectedCategoryCount": 2,
+  "categoryCount": 2,
+  "completionPercentage": 100,
+  "products": [
+    {
+      "aKey": "KFC_SA_v20_KFC_SA_27_794_18182_micro",
+      "allergen_tags": [],
+      "assets": [
+        {
+          "alt": "alt text",
+          "resolution": "40x40",
+          "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/1319-combo.png",
+          "type": "image"
+        }
+      ],
+      "associate_flids": [],
+      "associateid": "",
+      "breadcrumb": "",
+      "bundleTypeId": "bundle",
+      "categories": [
+        794
+      ],
+      "clusterKey": "KFC_SA_v20_KFC_SA_27_micro",
+      "createdAt": 1783947087000,
+      "currency": "SAR",
+      "description": "Zinger+ twister + 2 Fries +2 pc Strips",
+      "disPercentage": "33% OFF",
+      "displayDay": {},
+      "enableNewAddon": 0,
+      "groupId": "KFC_SA_v20_KFC_SA_27_794_micro",
+      "id": 18182,
+      "inSide": 1,
+      "item_tag": [],
+      "item_tag_ar": [],
+      "items": [],
+      "lastWkMonthly": "",
+      "limited_offer": 0,
+      "longDesc": "Zinger+ twister + 2 Fries +2 pc Strips",
+      "luckyDtMonthly": "",
+      "lucky_day": "",
+      "lucky_type": "",
+      "menuKey": "",
+      "metaDesc": "Zinger+ twister + 2 Fries +2 pc Strips",
+      "metaKeyword": [
+        "Double Up Deal"
+      ],
+      "metaTitle": "Double Up Deal",
+      "ministeps": [],
+      "name": "Double Up Deal",
+      "nutrition_facts": [],
+      "originalPrice": 63,
+      "p_position": 1,
+      "productKey": "KFC_SA_v20_KFC_SA_27_18182_micro",
+      "productType": 3,
+      "promoId": 9583,
+      "qrcode": "",
+      "ribbonUrl": [],
+      "ribbonUrlIntoto": "",
+      "ribbonUrl_ar": [],
+      "ribbon_urltwo": "",
+      "selectedItem": 0,
+      "services": {
+        "carhop": 1,
+        "delevery": 1,
+        "dine_in": 1,
+        "drivethru": 1,
+        "take_away": 1
+      },
+      "shortDesc": "",
+      "sku": 1319,
+      "slug": "double_up_deal",
+      "specialPrice": 42,
+      "stepsRemoved": 1,
+      "subOptionStr": "Zinger Sandwich,Lettuce,Twister Sandwich  Original,Lettuce,Tomato,2 Strips Pcs  Spicy,Regular Fries,Regular Fries",
+      "subOptionStrAr": "\u0632\u0646\u062c\u0631 \u0633\u0627\u0646\u062f\u0648\u064a\u062a\u0634,\u062e\u0635,\u062a\u0648\u064a\u0633\u062a\u0631 \u0633\u0627\u0646\u062f\u0648\u064a\u062a\u0634 - \u0639\u0627\u062f\u064a,\u062e\u0635,\u0637\u0645\u0627\u0637\u0645,\u0642\u0637\u0639\u062a\u064a\u0646 \u0627\u0633\u062a\u0631\u064a\u0628\u0633 - \u062d\u0627\u0631,\u0628\u0637\u0627\u0637\u0627 \u062d\u062c\u0645 \u0639\u0627\u062f\u064a,\u0628\u0637\u0627\u0637\u0627 \u062d\u062c\u0645 \u0639\u0627\u062f\u064a",
+      "subOptionStrFr": "",
+      "tagBgColor": "",
+      "tagColor": "",
+      "tagName": "",
+      "tags": [],
+      "typeId": "bundle",
+      "updatedAt": 1784032468000,
+      "variants": [],
+      "virtualGroup": 0,
+      "custom": {},
+      "steps": [
+        {
+          "aKey": "KFC_SA_v20_KFC_SA_27_794_18182_1",
+          "assets": [
+            {
+              "alt": "alt text",
+              "resolution": "40x40",
+              "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+              "type": "image"
+            }
+          ],
+          "clusterKey": "KFC_SA_v20_KFC_SA_27",
+          "compId": 1,
+          "groupId": "KFC_SA_v20_KFC_SA_27_794_18182",
+          "id": 1,
+          "ingredient": 0,
+          "isAddon": 0,
+          "isDependent": 0,
+          "isHidden": 1,
+          "isModifier": 0,
+          "maximum": 1,
+          "minimum": 1,
+          "sCustomize": 1,
+          "subtitle": "Choice of Sandwich",
+          "title": "Choice of Sandwich",
+          "type": "radio"
+        },
+        {
+          "aKey": "KFC_SA_v20_KFC_SA_27_794_18182_2",
+          "assets": [
+            {
+              "alt": "alt text",
+              "resolution": "40x40",
+              "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+              "type": "image"
+            }
+          ],
+          "clusterKey": "KFC_SA_v20_KFC_SA_27",
+          "compId": 1,
+          "groupId": "KFC_SA_v20_KFC_SA_27_794_18182",
+          "id": 2,
+          "ingredient": 1,
+          "isAddon": 0,
+          "isDependent": 1,
+          "isHidden": 0,
+          "isModifier": 1,
+          "maximum": 1,
+          "minimum": 1,
+          "sCustomize": 1,
+          "subtitle": "Choose your condiments",
+          "title": "Choose your condiments",
+          "type": "checkbox"
+        },
+        {
+          "aKey": "KFC_SA_v20_KFC_SA_27_794_18182_3",
+          "assets": [
+            {
+              "alt": "alt text",
+              "resolution": "40x40",
+              "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+              "type": "image"
+            }
+          ],
+          "clusterKey": "KFC_SA_v20_KFC_SA_27",
+          "compId": 1,
+          "groupId": "KFC_SA_v20_KFC_SA_27_794_18182",
+          "id": 3,
+          "ingredient": 0,
+          "isAddon": 1,
+          "isDependent": 1,
+          "isHidden": 0,
+          "isModifier": 1,
+          "maximum": 1,
+          "minimum": 1,
+          "sCustomize": 1,
+          "subtitle": "Add On",
+          "title": "Add On",
+          "type": "stepper"
+        },
+        {
+          "aKey": "KFC_SA_v20_KFC_SA_27_794_18182_4",
+          "assets": [
+            {
+              "alt": "alt text",
+              "resolution": "40x40",
+              "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+              "type": "image"
+            }
+          ],
+          "clusterKey": "KFC_SA_v20_KFC_SA_27",
+          "compId": 2,
+          "groupId": "KFC_SA_v20_KFC_SA_27_794_18182",
+          "id": 4,
+          "ingredient": 0,
+          "isAddon": 0,
+          "isDependent": 0,
+          "isHidden": 1,
+          "isModifier": 0,
+          "maximum": 1,
+          "minimum": 1,
+          "sCustomize": 1,
+          "subtitle": "Choice of Sandwich",
+          "title": "Choice of Sandwich",
+          "type": "radio"
+        },
+        {
+          "aKey": "KFC_SA_v20_KFC_SA_27_794_18182_5",
+          "assets": [
+            {
+              "alt": "alt text",
+              "resolution": "40x40",
+              "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+              "type": "image"
+            }
+          ],
+          "clusterKey": "KFC_SA_v20_KFC_SA_27",
+          "compId": 2,
+          "groupId": "KFC_SA_v20_KFC_SA_27_794_18182",
+          "id": 5,
+          "ingredient": 1,
+          "isAddon": 0,
+          "isDependent": 1,
+          "isHidden": 0,
+          "isModifier": 1,
+          "maximum": 1,
+          "minimum": 1,
+          "sCustomize": 1,
+          "subtitle": "Choose your condiments",
+          "title": "Choose your condiments",
+          "type": "checkbox"
+        },
+        {
+          "aKey": "KFC_SA_v20_KFC_SA_27_794_18182_6",
+          "assets": [
+            {
+              "alt": "alt text",
+              "resolution": "40x40",
+              "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+              "type": "image"
+            }
+          ],
+          "clusterKey": "KFC_SA_v20_KFC_SA_27",
+          "compId": 3,
+          "groupId": "KFC_SA_v20_KFC_SA_27_794_18182",
+          "id": 6,
+          "ingredient": 0,
+          "isAddon": 0,
+          "isDependent": 0,
+          "isHidden": 0,
+          "isModifier": 0,
+          "maximum": 1,
+          "minimum": 1,
+          "sCustomize": 1,
+          "subtitle": "Choice of Strips",
+          "title": "Choice of Strips",
+          "type": "radio"
+        },
+        {
+          "aKey": "KFC_SA_v20_KFC_SA_27_794_18182_7",
+          "assets": [
+            {
+              "alt": "alt text",
+              "resolution": "40x40",
+              "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+              "type": "image"
+            }
+          ],
+          "clusterKey": "KFC_SA_v20_KFC_SA_27",
+          "compId": 4,
+          "groupId": "KFC_SA_v20_KFC_SA_27_794_18182",
+          "id": 7,
+          "ingredient": 0,
+          "isAddon": 0,
+          "isDependent": 0,
+          "isHidden": 0,
+          "isModifier": 0,
+          "maximum": 1,
+          "minimum": 1,
+          "sCustomize": 1,
+          "subtitle": "Choice of Side Item",
+          "title": "Choice of Side Item",
+          "type": "radio"
+        },
+        {
+          "aKey": "KFC_SA_v20_KFC_SA_27_794_18182_8",
+          "assets": [
+            {
+              "alt": "alt text",
+              "resolution": "40x40",
+              "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+              "type": "image"
+            }
+          ],
+          "clusterKey": "KFC_SA_v20_KFC_SA_27",
+          "compId": 5,
+          "groupId": "KFC_SA_v20_KFC_SA_27_794_18182",
+          "id": 8,
+          "ingredient": 0,
+          "isAddon": 0,
+          "isDependent": 0,
+          "isHidden": 0,
+          "isModifier": 0,
+          "maximum": 1,
+          "minimum": 1,
+          "sCustomize": 1,
+          "subtitle": "Choice of Side Item",
+          "title": "Choice of Side Item",
+          "type": "radio"
+        }
+      ],
+      "__categoryId": 794,
+      "__categoryName": "Exclusive",
+      "__sourceEndpoint": "/api/getProductsByCategory"
+    },
+    {
+      "clusterKey": "KFC_SA_v20_KFC_SA_27_micro",
+      "groupId": "KFC_SA_v20_KFC_SA_27_2720_micro",
+      "aKey": "KFC_SA_v20_KFC_SA_27_2720_18187_micro",
+      "productKey": "KFC_SA_v20_KFC_SA_27_18187_micro",
+      "id": 18187,
+      "services": {
+        "carhop": 1,
+        "delevery": 1,
+        "dine_in": 1,
+        "drivethru": 1,
+        "take_away": 1
+      },
+      "originalPrice": 8,
+      "specialPrice": 8,
+      "enableNewAddon": 0,
+      "promoId": -1,
+      "steps": [],
+      "ministeps": [],
+      "selectedItem": 0,
+      "variants": [],
+      "typeId": "simple",
+      "bundleTypeId": "simple",
+      "items": [],
+      "sku": 510232,
+      "assets": [
+        {
+          "alt": "alt text",
+          "resolution": "40x40",
+          "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/510232.png",
+          "type": "image"
+        }
+      ],
+      "virtualGroup": 0,
+      "categories": [
+        2720
+      ],
+      "slug": "5_pcs_spicy_bitez",
+      "qrcode": "",
+      "createdAt": 1784100587000,
+      "updatedAt": 1784191871000,
+      "breadcrumb": "",
+      "p_position": 10,
+      "tags": [],
+      "item_tag": [],
+      "item_tag_ar": [],
+      "disPercentage": "",
+      "tagName": "",
+      "tagColor": "",
+      "tagBgColor": "",
+      "productType": 3,
+      "ribbonUrl": [],
+      "ribbonUrl_ar": [],
+      "ribbonUrlIntoto": "",
+      "associateid": "",
+      "associate_flids": [],
+      "ribbon_urltwo": "",
+      "limited_offer": 0,
+      "displayDay": {},
+      "lucky_day": "",
+      "luckyDtMonthly": "",
+      "lastWkMonthly": "",
+      "lucky_type": "",
+      "subOptionStr": "",
+      "subOptionStrAr": "",
+      "subOptionStrFr": "",
+      "inSide": 0,
+      "allergen_tags": [],
+      "nutrition_facts": [],
+      "menuKey": "",
+      "name": "5 Pcs Spicy Bitez",
+      "longDesc": "5 Pcs Spicy Bitez + Hot Honey Sauce + Cheese Sauce",
+      "description": "5 Pcs Spicy Bitez + Hot Honey Sauce + Cheese Sauce",
+      "shortDesc": "",
+      "metaTitle": "5 Pcs Spicy Bitez",
+      "metaKeyword": [
+        "5 Pcs Spicy Bitez"
+      ],
+      "metaDesc": "",
+      "currency": "SAR",
+      "custom": {},
+      "__categoryId": 2720,
+      "__categoryName": "New! Hot Honey",
+      "__sourceEndpoint": "/api/getProductsByCategory"
+    },
+    {
+      "clusterKey": "KFC_SA_v20_KFC_SA_27_micro",
+      "groupId": "KFC_SA_v20_KFC_SA_27_2720_micro",
+      "aKey": "KFC_SA_v20_KFC_SA_27_2720_77773062_micro",
+      "productKey": "KFC_SA_v20_KFC_SA_27_77773062_micro",
+      "id": 77773062,
+      "services": {
+        "carhop": 1,
+        "delevery": 1,
+        "dine_in": 1,
+        "drivethru": 1,
+        "take_away": 1
+      },
+      "originalPrice": 19,
+      "specialPrice": 0,
+      "enableNewAddon": 0,
+      "promoId": 9585,
+      "steps": [],
+      "ministeps": [],
+      "selectedItem": 1323,
+      "variants": [
+        {
+          "assets": [
+            {
+              "alt": "alt text",
+              "resolution": "40x40",
+              "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/size.png",
+              "type": "image"
+            }
+          ],
+          "id": 192,
+          "options": [
+            {
+              "id": 16313,
+              "isSelected": 1,
+              "title": "Medium"
+            },
+            {
+              "id": 16314,
+              "isSelected": 0,
+              "title": "Large"
+            }
+          ],
+          "orientation": "vertical",
+          "position": 1,
+          "selIndex": 1,
+          "subtitle": "Choose your Size",
+          "title": "Size"
+        }
+      ],
+      "typeId": "bundle_group",
+      "bundleTypeId": "bundle_group",
+      "items": [
+        {
+          "allergen_tags": [],
+          "assets": [
+            {
+              "alt": "alt text",
+              "resolution": "40x40",
+              "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/1323-combo.png",
+              "type": "image"
+            }
+          ],
+          "associate_flids": [],
+          "associateid": "",
+          "associative": 0,
+          "breadcrumb": "",
+          "categories": [
+            2720
+          ],
+          "createdAt": 1784100728000,
+          "custom": "",
+          "description": "5 Pcs Spicy Bitez + Hot Honey Sauce + Cheese Sauce + Fries + Drink",
+          "disPercentage": "",
+          "displayDay": "",
+          "enableNewAddon": 0,
+          "id": 18191,
+          "inSide": 1,
+          "item_tag": [],
+          "item_tag_ar": [],
+          "items": [],
+          "lastWkMonthly": "",
+          "limited_offer": 0,
+          "longDesc": "5 Pcs Spicy Bitez + Hot Honey Sauce + Cheese Sauce + Fries + Drink",
+          "luckyDtMonthly": "",
+          "lucky_day": "",
+          "lucky_type": "",
+          "menuKey": "",
+          "metaDesc": "5 Pcs Spicy Bitez + Hot Honey Sauce + Cheese Sauce + Fries + Drink",
+          "metaKeyword": [
+            "5 Pcs Spicy Bitez Combo - Medium"
+          ],
+          "metaTitle": "5 Pcs Spicy Bitez Combo - Medium",
+          "ministeps": [],
+          "name": "5 Pcs Spicy Bitez Combo - Medium",
+          "nutrition_facts": [],
+          "originalPrice": 19,
+          "p_position": 1,
+          "parent_id": 77773062,
+          "productType": 3,
+          "promoId": 9585,
+          "qrcode": "",
+          "ribbonUrl": [],
+          "ribbonUrlInto_ar": "",
+          "ribbonUrlIntoto": "",
+          "ribbonUrl_ar": [],
+          "ribbon_urltwo": "",
+          "sel1Val": -1,
+          "sel1Value": 16313,
+          "sel2Val": -1,
+          "sel2Value": -1,
+          "sel3Val": -1,
+          "sel3Value": -1,
+          "selectedItem": 0,
+          "services": {
+            "carhop": 1,
+            "delevery": 1,
+            "dine_in": 1,
+            "drivethru": 1,
+            "take_away": 1
+          },
+          "shortDesc": "",
+          "sku": 1323,
+          "slug": "5_pcs_spicy_bitez_combo_medium",
+          "specialPrice": 19,
+          "steps": [
+            {
+              "aKey": "KFC_SA_v20_KFC_SA_27_2720_18191_1",
+              "assets": [
+                {
+                  "alt": "alt text",
+                  "resolution": "40x40",
+                  "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+                  "type": "image"
+                }
+              ],
+              "clusterKey": "KFC_SA_v20_KFC_SA_27",
+              "compId": 1,
+              "groupId": "KFC_SA_v20_KFC_SA_27_2720_18191",
+              "id": 1,
+              "ingredient": 0,
+              "isAddon": 0,
+              "isDependent": 0,
+              "isHidden": 0,
+              "isModifier": 0,
+              "maximum": 1,
+              "minimum": 1,
+              "sCustomize": 1,
+              "subtitle": "5 Pc Spicy Bitez",
+              "title": "5 Pc Spicy Bitez",
+              "type": "radio"
+            },
+            {
+              "aKey": "KFC_SA_v20_KFC_SA_27_2720_18191_2",
+              "assets": [
+                {
+                  "alt": "alt text",
+                  "resolution": "40x40",
+                  "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+                  "type": "image"
+                }
+              ],
+              "clusterKey": "KFC_SA_v20_KFC_SA_27",
+              "compId": 2,
+              "groupId": "KFC_SA_v20_KFC_SA_27_2720_18191",
+              "id": 2,
+              "ingredient": 0,
+              "isAddon": 0,
+              "isDependent": 0,
+              "isHidden": 0,
+              "isModifier": 0,
+              "maximum": 1,
+              "minimum": 1,
+              "sCustomize": 1,
+              "subtitle": "Choice of Side Item",
+              "title": "Choice of Side Item",
+              "type": "radio"
+            },
+            {
+              "aKey": "KFC_SA_v20_KFC_SA_27_2720_18191_3",
+              "assets": [
+                {
+                  "alt": "alt text",
+                  "resolution": "40x40",
+                  "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+                  "type": "image"
+                }
+              ],
+              "clusterKey": "KFC_SA_v20_KFC_SA_27",
+              "compId": 3,
+              "groupId": "KFC_SA_v20_KFC_SA_27_2720_18191",
+              "id": 3,
+              "ingredient": 0,
+              "isAddon": 0,
+              "isDependent": 0,
+              "isHidden": 0,
+              "isModifier": 0,
+              "maximum": 1,
+              "minimum": 1,
+              "sCustomize": 1,
+              "subtitle": "Choice of Beverages",
+              "title": "Choice of Beverages",
+              "type": "radio"
+            }
+          ],
+          "subOptionStr": "5 Pcs Spicy Bitez,Medium Fries,Diet Pepsi",
+          "subOptionStrAr": "5\u0642\u0637\u0639 \u0633\u0628\u0627\u064a\u0633\u064a \u0628\u0627\u064a\u062a\u0633,\u0628\u0637\u0627\u0637\u0627 \u062d\u062c\u0645 \u0648\u0633\u0637,\u062f\u0627\u064a\u062a \u0628\u064a\u0628\u0633\u064a",
+          "subOptionStrFr": "",
+          "tagBgColor": "",
+          "tagColor": "",
+          "tagName": "",
+          "tags": [],
+          "typeId": "bundle",
+          "updatedAt": 1784280536000,
+          "variants": [],
+          "virtualGroup": 0
+        },
+        {
+          "allergen_tags": [],
+          "assets": [
+            {
+              "alt": "alt text",
+              "resolution": "40x40",
+              "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/1324-combo.png",
+              "type": "image"
+            }
+          ],
+          "associate_flids": [],
+          "associateid": "",
+          "associative": 0,
+          "breadcrumb": "",
+          "categories": [
+            2720
+          ],
+          "createdAt": 1784100731000,
+          "custom": "",
+          "description": "5 Pcs Spicy Bitez + Hot Honey Sauce + Cheese Sauce + Fries + Drink",
+          "disPercentage": "",
+          "displayDay": "",
+          "enableNewAddon": 0,
+          "id": 18192,
+          "inSide": 1,
+          "item_tag": [],
+          "item_tag_ar": [],
+          "items": [],
+          "lastWkMonthly": "",
+          "limited_offer": 0,
+          "longDesc": "5 Pcs Spicy Bitez + Hot Honey Sauce + Cheese Sauce + Fries + Drink",
+          "luckyDtMonthly": "",
+          "lucky_day": "",
+          "lucky_type": "",
+          "menuKey": "",
+          "metaDesc": "5 Pcs Spicy Bitez + Hot Honey Sauce + Cheese Sauce + Fries + Drink",
+          "metaKeyword": [
+            "5 Pcs Spicy Bitez Combo - Large"
+          ],
+          "metaTitle": "5 Pcs Spicy Bitez Combo - Large",
+          "ministeps": [],
+          "name": "5 Pcs Spicy Bitez Combo - Large",
+          "nutrition_facts": [],
+          "originalPrice": 22,
+          "p_position": 1,
+          "parent_id": 77773062,
+          "productType": 3,
+          "promoId": 9585,
+          "qrcode": "",
+          "ribbonUrl": [],
+          "ribbonUrlInto_ar": "",
+          "ribbonUrlIntoto": "",
+          "ribbonUrl_ar": [],
+          "ribbon_urltwo": "",
+          "sel1Val": -1,
+          "sel1Value": 16314,
+          "sel2Val": -1,
+          "sel2Value": -1,
+          "sel3Val": -1,
+          "sel3Value": -1,
+          "selectedItem": 0,
+          "services": {
+            "carhop": 1,
+            "delevery": 1,
+            "dine_in": 1,
+            "drivethru": 1,
+            "take_away": 1
+          },
+          "shortDesc": "",
+          "sku": 1324,
+          "slug": "5_pcs_spicy_bitez_combo_large",
+          "specialPrice": 22,
+          "steps": [
+            {
+              "aKey": "KFC_SA_v20_KFC_SA_27_2720_18192_1",
+              "assets": [
+                {
+                  "alt": "alt text",
+                  "resolution": "40x40",
+                  "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+                  "type": "image"
+                }
+              ],
+              "clusterKey": "KFC_SA_v20_KFC_SA_27",
+              "compId": 1,
+              "groupId": "KFC_SA_v20_KFC_SA_27_2720_18192",
+              "id": 1,
+              "ingredient": 0,
+              "isAddon": 0,
+              "isDependent": 0,
+              "isHidden": 0,
+              "isModifier": 0,
+              "maximum": 1,
+              "minimum": 1,
+              "sCustomize": 1,
+              "subtitle": "5 Pc Spicy Bitez",
+              "title": "5 Pc Spicy Bitez",
+              "type": "radio"
+            },
+            {
+              "aKey": "KFC_SA_v20_KFC_SA_27_2720_18192_2",
+              "assets": [
+                {
+                  "alt": "alt text",
+                  "resolution": "40x40",
+                  "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+                  "type": "image"
+                }
+              ],
+              "clusterKey": "KFC_SA_v20_KFC_SA_27",
+              "compId": 2,
+              "groupId": "KFC_SA_v20_KFC_SA_27_2720_18192",
+              "id": 2,
+              "ingredient": 0,
+              "isAddon": 0,
+              "isDependent": 0,
+              "isHidden": 0,
+              "isModifier": 0,
+              "maximum": 1,
+              "minimum": 1,
+              "sCustomize": 1,
+              "subtitle": "Choice of Side Item",
+              "title": "Choice of Side Item",
+              "type": "radio"
+            },
+            {
+              "aKey": "KFC_SA_v20_KFC_SA_27_2720_18192_3",
+              "assets": [
+                {
+                  "alt": "alt text",
+                  "resolution": "40x40",
+                  "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/default.png",
+                  "type": "image"
+                }
+              ],
+              "clusterKey": "KFC_SA_v20_KFC_SA_27",
+              "compId": 3,
+              "groupId": "KFC_SA_v20_KFC_SA_27_2720_18192",
+              "id": 3,
+              "ingredient": 0,
+              "isAddon": 0,
+              "isDependent": 0,
+              "isHidden": 0,
+              "isModifier": 0,
+              "maximum": 1,
+              "minimum": 1,
+              "sCustomize": 1,
+              "subtitle": "Choice of Beverages",
+              "title": "Choice of Beverages",
+              "type": "radio"
+            }
+          ],
+          "subOptionStr": "5 Pcs Spicy Bitez,Large Fries,Pepsi",
+          "subOptionStrAr": "5\u0642\u0637\u0639 \u0633\u0628\u0627\u064a\u0633\u064a \u0628\u0627\u064a\u062a\u0633,\u0628\u0637\u0627\u0637\u0627 \u062d\u062c\u0645 \u0643\u0628\u064a\u0631,\u0628\u064a\u0628\u0633\u064a \u0643\u0628\u064a\u0631",
+          "subOptionStrFr": "",
+          "tagBgColor": "",
+          "tagColor": "",
+          "tagName": "",
+          "tags": [],
+          "typeId": "bundle",
+          "updatedAt": 1784280538000,
+          "variants": [],
+          "virtualGroup": 0
+        }
+      ],
+      "sku": 1323,
+      "assets": [
+        {
+          "alt": "alt text",
+          "resolution": "40x40",
+          "src": "https://kfcprodnecmsimage.blob.core.windows.net/cmsimages/kfc/ksa/imagestemp/1323-combo.png",
+          "type": "image"
+        }
+      ],
+      "virtualGroup": 0,
+      "categories": [
+        2720
+      ],
+      "slug": "5_pcs_spicy_bitez_combo_medium",
+      "qrcode": "",
+      "createdAt": 1784100728000,
+      "updatedAt": 1784280536000,
+      "breadcrumb": "",
+      "p_position": 12,
+      "tags": [],
+      "item_tag": [],
+      "item_tag_ar": [],
+      "disPercentage": "",
+      "tagName": "",
+      "tagColor": "",
+      "tagBgColor": "",
+      "productType": 3,
+      "ribbonUrl": [],
+      "ribbonUrl_ar": [],
+      "ribbonUrlIntoto": "",
+      "associateid": "",
+      "associate_flids": [],
+      "ribbon_urltwo": "",
+      "limited_offer": 0,
+      "displayDay": {},
+      "lucky_day": "",
+      "luckyDtMonthly": "",
+      "lastWkMonthly": "",
+      "lucky_type": "",
+      "subOptionStr": "",
+      "subOptionStrAr": "",
+      "subOptionStrFr": "",
+      "inSide": 1,
+      "allergen_tags": [],
+      "nutrition_facts": [],
+      "menuKey": "",
+      "name": "5 Pcs Spicy Bitez Combo",
+      "longDesc": "5 Pcs Spicy Bitez + Hot Honey Sauce + Cheese Sauce + Fries + Drink",
+      "description": "5 Pcs Spicy Bitez + Hot Honey Sauce + Cheese Sauce + Fries + Drink",
+      "shortDesc": "",
+      "metaTitle": "5 Pcs Spicy Bitez Combo - Medium",
+      "metaKeyword": [
+        "5 Pcs Spicy Bitez Combo - Medium"
+      ],
+      "metaDesc": "5 Pcs Spicy Bitez + Hot Honey Sauce + Cheese Sauce + Fries + Drink",
+      "currency": "SAR",
+      "custom": {},
+      "__categoryId": 2720,
+      "__categoryName": "New! Hot Honey",
+      "__sourceEndpoint": "/api/getProductsByCategory"
+    }
+  ],
+  "promotions": [],
+  "productCount": 3,
+  "branchCurrentlyClosed": true,
+  "errorMessage": null
+}
