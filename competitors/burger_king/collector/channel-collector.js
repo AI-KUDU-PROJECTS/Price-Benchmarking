@@ -8,14 +8,16 @@
  * King's GetMenuSections call returns the ENTIRE category+product tree
  * in one request (no per-category follow-up calls, and the menu content
  * is not channel-scoped - see research/api-map/api-map.md), so this
- * collector fetches the menu once and reuses it for both channels,
- * re-scraping only the (channel-specific) prices per channel.
+ * collector fetches the menu once and reuses it for both channels.
+ * Per-channel prices come from the storeMenu GraphQL API (primary), with
+ * a DOM scrape fallback for any product storeMenu leaves unpriced.
  * ---------------------------------------------------------------------
  */
 
 const CONFIG = require('./config');
 const apiClient = require('./api-client');
 const priceScraper = require('./price-scraper');
+const priceResolver = require('./price-resolver');
 const http = require('./http-client');
 
 /**
@@ -185,16 +187,47 @@ async function collectChannel(channel, logger, { onRawResponse } = {}) {
 
   await http.wait(CONFIG.DELAY_BETWEEN_REQUESTS);
 
-  // Price scraping is the one Playwright-driven step - see price-scraper.js.
-  const priceMap = await priceScraper.scrapePricesForChannel(channel, logger);
-  let pricedCount = 0;
-  for (const product of products) {
-    const name = (product.name && product.name.locale) || null;
-    const price = name ? priceScraper.lookupPrice(priceMap, name) : null;
-    product.__price = price;
-    if (price !== null) pricedCount += 1;
+  // Primary prices: store-scoped storeMenu API (Sanity _id → cents).
+  const serviceMode = channel === 'DELIVERY' ? 'delivery' : 'pickup';
+  const storeMenuRes = await apiClient.storeMenu({
+    storeId: CONFIG.BRANCH.storeId,
+    serviceMode,
+  }, logger);
+  record('storeMenu', storeMenuRes);
+  let apiPriced = 0;
+  if (storeMenuRes.ok && storeMenuRes.schema.valid) {
+    const stats = priceResolver.applyStoreMenuPrices(products, storeMenuRes.data.storeMenu);
+    apiPriced = stats.priced;
+    logger.tag('STORE-MENU', `Priced ${stats.priced}/${products.length} products via storeMenu (${stats.matched} id matches, ${stats.storeEntityCount} entities, serviceMode=${serviceMode})`);
+  } else {
+    logger.tag('STORE-MENU', `storeMenu failed (status=${storeMenuRes.status}, schema=${storeMenuRes.schema && storeMenuRes.schema.reason || 'n/a'}) - falling back to DOM scrape for all prices`);
   }
-  logger.tag('PRICE-SCRAPER', `Matched a price for ${pricedCount}/${products.length} products in channel ${channel}`);
+
+  // Optional PLU map kept for audit / future zero-price fill (not required for the common path).
+  const plusRes = await apiClient.plusData({ storeId: CONFIG.BRANCH.storeId, serviceMode }, logger);
+  record('plusData', plusRes);
+
+  // DOM scrape only for products still missing __price after storeMenu.
+  const needScrape = products.filter((p) => p.__price == null || p.__price === undefined);
+  let scrapePriced = 0;
+  if (needScrape.length > 0) {
+    await http.wait(CONFIG.DELAY_BETWEEN_REQUESTS);
+    const priceMap = await priceScraper.scrapePricesForChannel(channel, logger);
+    for (const product of needScrape) {
+      const name = (product.name && product.name.locale) || null;
+      const price = name ? priceScraper.lookupPrice(priceMap, name) : null;
+      if (price !== null) {
+        product.__price = price;
+        product.__price_source = 'dom-scrape';
+        scrapePriced += 1;
+      }
+    }
+    logger.tag('PRICE-SCRAPER', `DOM fallback filled ${scrapePriced}/${needScrape.length} remaining products in channel ${channel}`);
+  } else {
+    logger.tag('PRICE-SCRAPER', `Skipped DOM scrape - storeMenu priced every product in channel ${channel}`);
+  }
+  const pricedCount = products.filter((p) => p.__price != null).length;
+  logger.tag('PRICE', `Total priced ${pricedCount}/${products.length} (storeMenu=${apiPriced}, dom-fallback=${scrapePriced})`);
 
   const categoryResults = categories.map((c) => ({
     categoryId: c.id,

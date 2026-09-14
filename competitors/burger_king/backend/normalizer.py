@@ -14,14 +14,12 @@ Product identity (see README "Product Identity"):
   - canonical_product_key = f"{branch_id}|{channel}|{identity}" is what
     change_detector.py joins across runs.
 
-KNOWN LIMITATION (see api-map.md "Known limitation: live prices" and the
-root of this file's docstring): Burger King's GetMenuSections API carries
-NO price field of any kind and no discount/promoId/limited-offer
-signal - regular_price here comes entirely from
-collector/price-scraper.js's DOM-text extraction (a single current price
-per product), and special_price is always None because no second
-("was X, now Y") price signal exists anywhere in the collected data.
-This is a deliberate, documented gap - see offer_parser.py.
+KNOWN LIMITATION (historical - partially closed): GetMenuSections still
+carries NO price field. Live prices now come primarily from the
+store-scoped `storeMenu` GraphQL API (joined by Sanity `_id`), with
+optional per-size rows on pickers (`__sizes`) and a DOM-scrape fallback
+when storeMenu leaves a product at 0/missing. special_price stays None
+because no confirmed "was X, now Y" signal exists - see offer_parser.py.
 ---------------------------------------------------------------------
 """
 from __future__ import annotations
@@ -141,6 +139,34 @@ def extract_option_groups(node: Any, depth: int = 0, seen: Optional[set] = None)
     return groups
 
 
+def extract_sizes(product: dict[str, Any]) -> list[dict[str, Any]]:
+    """Per-size rows from collector price-resolver (`__sizes`), built from
+    picker meal-size / piece-count aspects joined to storeMenu prices.
+    Falls back to a title-only itemSize when no priced sizes exist."""
+    raw = product.get("__sizes")
+    if isinstance(raw, list) and raw:
+        sizes: list[dict[str, Any]] = []
+        for entry in raw:
+            if not isinstance(entry, dict) or not entry.get("title"):
+                continue
+            row: dict[str, Any] = {"title": entry.get("title")}
+            if entry.get("label"):
+                row["label"] = entry["label"]
+            if entry.get("optionId") is not None:
+                row["optionId"] = entry["optionId"]
+            if "isDefault" in entry:
+                row["isDefault"] = bool(entry.get("isDefault"))
+            price = to_float(entry.get("price"))
+            if price is not None:
+                row["price"] = price
+            sizes.append(row)
+        if sizes:
+            return sizes
+    if product.get("itemSize"):
+        return [{"title": product.get("itemSize")}]
+    return []
+
+
 def canonical_product_identity(product_id: Any, product_name: Optional[str], category_name: Optional[str]) -> str:
     pid = str(product_id).strip() if product_id not in (None, "") else ""
     if pid:
@@ -176,9 +202,8 @@ def normalize_product(
     name_en = name_obj.get("locale") if isinstance(name_obj, dict) else None
     name_ar = name_obj.get("_locFb") if isinstance(name_obj, dict) else None
 
-    # See module docstring / api-map.md "Known limitation: live prices" -
-    # regular_price is the collector's scraped current price; there is no
-    # second ("special") price signal anywhere in the collected data.
+    # regular_price from collector: storeMenu (preferred) or DOM scrape
+    # fallback. No confirmed "special"/before price signal exists.
     regular_price = to_float(product.get("__price"))
     special_price = None
     effective_price = regular_price
@@ -189,6 +214,14 @@ def normalize_product(
     canonical_key = canonical_product_key(branch_id, channel, product_id, name_en, category_name_en)
 
     raw_copy = {k: v for k, v in product.items() if not k.startswith("__")}
+
+    price_source = product.get("__price_source")
+    if price_source in ("storeMenu", "storeMenu.size"):
+        resolved_source = "storeMenu"
+    elif price_source == "dom-scrape":
+        resolved_source = "dom-scrape"
+    else:
+        resolved_source = source_endpoint
 
     return {
         "run_id": run_id,
@@ -225,7 +258,7 @@ def normalize_product(
         "product_url": None,  # SPA, no confirmed per-product deep link - see api-map.md
         "calories": None,  # not present anywhere in the collected data this session
         "variants": json.dumps([], ensure_ascii=False),
-        "sizes": json.dumps([{"title": product.get("itemSize")}] if product.get("itemSize") else [], ensure_ascii=False),
+        "sizes": json.dumps(extract_sizes(product), ensure_ascii=False),
         "option_groups": json.dumps(option_groups, ensure_ascii=False),
         "included_items": json.dumps([], ensure_ascii=False),
         "sides": json.dumps([], ensure_ascii=False),
@@ -233,5 +266,5 @@ def normalize_product(
         "sauces": json.dumps([], ensure_ascii=False),
         "add_ons": json.dumps([], ensure_ascii=False),
         "raw_api_json": json.dumps(raw_copy, ensure_ascii=False),
-        "source_endpoint": source_endpoint,
+        "source_endpoint": resolved_source,
     }

@@ -45,8 +45,9 @@ ever placed - see [Security & compliance](#security--compliance).
 ```
 API First (fully public, no auth, no session bootstrap needed at all)
   -> direct HTTPS GraphQL calls                 (collector/api-client.js)
+  -> storeMenu pricing (+ plusData audit)       (collector/price-resolver.js)
   -> Playwright DOM price-scrape fallback        (collector/price-scraper.js,
-                                                    see "Known limitation: live prices")
+                                                    only for products still unpriced)
   -> Playwright Screenshot Capture               (collector/screenshot-capture.js,
                                                     only for NEW_PRODUCT events)
   -> SQLite                                       (backend/database.py)
@@ -56,8 +57,8 @@ API First (fully public, no auth, no session bootstrap needed at all)
   -> Excel Export                                 (backend/excel_exporter.py)
 ```
 
-**Node.js** owns public API collection, the DOM price-scrape fallback, and
-Playwright screenshots. **Python** owns SQLite, change detection, the
+**Node.js** owns public API collection, storeMenu pricing, the DOM
+price-scrape fallback, and Playwright screenshots. **Python** owns SQLite, change detection, the
 dashboard, Excel export, and the scheduler. `backend/run_service.py` is
 the only bridge between them - it invokes `collector/collect.js` and
 `collector/screenshot-capture.js` as subprocesses and reads back the JSON
@@ -80,8 +81,9 @@ GetRestaurants(coords) -> confirms the configured branch is nearby and live
   -> featureMenu()                              -> current Menu document id
   -> GetMenuSections(menuId)                    -> full category/product tree (Sanity CMS,
                                                      NOT store-scoped - same for every branch/channel)
-  -> price-scraper.js DOM scrape of /en/menu    -> per-product current price
-                                                    (see "Known limitation: live prices")
+  -> storeMenu(storeId, serviceMode)            -> per-product (+ picker size) prices in cents
+  -> price-scraper.js DOM scrape (fallback)     -> only products still missing a price
+                                                    (see research/api-map.md "Live prices")
   -> save with channel=PICKUP or channel=DELIVERY
 ```
 
@@ -109,7 +111,8 @@ competitors/burger_king/
 │   ├── channel-collector.js     Shared PICKUP/DELIVERY collection logic
 │   ├── pickup-collector.js
 │   ├── delivery-collector.js
-│   ├── price-scraper.js         Playwright: DOM price-scrape fallback (no price API exists)
+│   ├── price-scraper.js         Playwright: DOM price fallback when storeMenu leaves gaps
+│   ├── price-resolver.js        Joins storeMenu (+ picker sizes) onto catalog products
 │   ├── screenshot-capture.js    Playwright: NEW_PRODUCT screenshots only
 │   ├── collect.js               CLI entry point (invoked by backend/run_service.py)
 │   ├── safe-actions.js          Fail-closed click guard (same pattern as KFC's)
@@ -476,27 +479,14 @@ inside a browser) to confirm they truly need no session.
 
 ## Known limitations / what could not be verified
 
-- **No confirmed live-pricing API endpoint.** `GetMenuSections` (the full
-  menu/category/product structure) carries **zero price fields of any
-  kind** - confirmed by exhaustively grepping the full response for
-  `price`, `cost`, `amount`, `Cents`, and the literal SAR values rendered
-  on the page; none matched. Prices are clearly fetched and rendered
-  client-side once a store is selected, and grepping the site's own
-  compiled JS found the responsible client-side state
-  (`isPricesLoading`/`.prices`/`price.default`/`price.min`), but the exact
-  network request that populates it was not captured during this
-  session's research window despite multiple full page-load-through-
-  store-selection recording passes. `collector/price-scraper.js`
-  therefore extracts prices directly from the rendered `/en/menu` page's
-  visible text as a pragmatic, transparently-documented deviation from
-  the pure-API approach used for menu structure - live-verified to match
-  86/88 Pickup and 78/88 Delivery products correctly (see "Testing"
-  above for the Delivery-side timing fix this required). A future session
-  with manual browser DevTools (Network tab, "Preserve log", slowly
-  scrolling through every category while watching for the request that
-  fires as prices populate) would likely be able to close this gap
-  properly. See `research/api-map/api-map.md` "Known limitation: live
-  prices".
+- **Live prices come from `storeMenu`, not from GetMenuSections.** The
+  Sanity menu tree still has **zero price fields**. Store-scoped
+  `storeMenu` / `plusData` on the RBI gateway supply cents by entity id /
+  PLU; the collector joins them in `price-resolver.js`. DOM scrape is
+  only a fallback for SKUs still at 0/missing (some promo items). Picker
+  meal sizes (SANDWICH ONLY / GO REGULAR / GO MEDIUM / GO LARGE) and
+  piece counts are stored in `sizes` when option ids price successfully.
+  See `research/api-map/api-map.md` "Live prices: storeMenu".
 - **No confirmed price-discount ("before/after") signal exists anywhere in
   the collected data**, and offers here are NOT identified from a
   product's own name/description text (that rule, established for KFC,

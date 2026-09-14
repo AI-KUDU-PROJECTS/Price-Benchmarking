@@ -35,7 +35,9 @@ from shared_ui import (
     DASHBOARD_TAB_NAMES,
     OFFER_PRICE_COLUMNS,
     PRODUCT_PRICE_COLUMNS,
-    format_sizes,
+    expand_size_price_columns,
+    format_run_timestamp,
+    localize_timestamp_columns,
     order_columns,
 )
 
@@ -101,9 +103,9 @@ def products_df(channel: str) -> pd.DataFrame:
         (channel, config.BRANCH_STORE_ID),
     )
     if not df.empty and "sizes" in df.columns:
-        # Show "Regular: .. | Medium: .. | Large: .." instead of the raw
-        # JSON text a dataframe cell would otherwise display verbatim.
-        df["sizes"] = df["sizes"].apply(format_sizes)
+        # Expand Small/Regular/Medium/Large price columns, then keep a
+        # compact "Regular: .. | Medium: .." summary in `sizes`.
+        df = expand_size_price_columns(df)
     return df
 
 
@@ -124,7 +126,7 @@ def offers_df(channel: str) -> pd.DataFrame:
         (channel, config.BRANCH_STORE_ID),
     )
     if not df.empty and "sizes" in df.columns:
-        df["sizes"] = df["sizes"].apply(format_sizes)
+        df = expand_size_price_columns(df)
     return df
 
 
@@ -147,7 +149,11 @@ def today_change_summary() -> dict[str, int]:
     if events.empty:
         return {k: 0 for k in ("new_products", "new_offers", "price_increases", "price_decreases", "offers_ended", "not_observed")}
     today_str = datetime.now(TZ).strftime("%Y-%m-%d")
-    todays = events[events["detected_at"].str.startswith(today_str)]
+    # detected_at is stored in UTC - compare against the dashboard timezone's date.
+    local_dates = events["detected_at"].apply(
+        lambda v: format_run_timestamp(v, config.TIMEZONE)[:10] if pd.notna(v) else ""
+    )
+    todays = events[local_dates == today_str]
     subset = todays if not todays.empty else events  # fall back to most recent events if no run happened today yet
     counts = subset["event_type"].value_counts()
     return {
@@ -253,7 +259,7 @@ def render() -> None:
         st.metric("Branch", f"{config.BRANCH_NAME}", config.BRANCH_CITY)
     with top_cols[1]:
         last_ok = max((r["started_at"] for r in (pickup_success, delivery_success) if r is not None), default=None)
-        st.metric("Last Successful Run", last_ok[:16].replace("T", " ") if last_ok else "Never")
+        st.metric("Last Successful Run", format_run_timestamp(last_ok, config.TIMEZONE))
     with top_cols[2]:
         st.metric("Next Scheduled Run", next_scheduled_run().strftime("%Y-%m-%d %H:%M") if config.ENABLE_SCHEDULER else "Scheduler disabled")
     with top_cols[3]:
@@ -490,6 +496,7 @@ def render() -> None:
             logs = run_logs_df()
             if f_channel != "All":
                 logs = logs[logs["channel"] == f_channel]
+            logs = localize_timestamp_columns(logs, ("started_at", "finished_at"), config.TIMEZONE)
             st.dataframe(logs, use_container_width=True, hide_index=True)
         else:
             today = date.today()

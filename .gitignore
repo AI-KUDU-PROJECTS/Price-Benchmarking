@@ -1,6 +1,7 @@
 # Dependencies (shared at repo root - see root README.md "Installation")
 node_modules/
 .venv/
+.playwright-browsers/
 __pycache__/
 *.pyc
 
@@ -77,3 +78,4 @@ competitors/hardees/research/**/*-session.json
 npm-debug.log*
 .pytest_cache/
 .coverage
+frontend/dist/

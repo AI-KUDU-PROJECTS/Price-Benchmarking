@@ -66,15 +66,19 @@ def test_current_catalog_generates_all_required_worksheets(conn, tmp_path, monke
     assert header == ["Category", "Item", "Sandwich", "Regular", "Medium", "Large", "Source Link"]
 
     # Regression: the Normalized sheet's "Sizes" column must render each
-    # variant option as plain title text ("Medium, Large"), never Python's
-    # raw dict repr (e.g. "{'title': 'Medium', 'isSelected': 1}") - the
-    # same _format_join_item() fix found live on Herfy/KFC/Burger King
-    # applies here too, even though Hardee's/KFC's variants[].options[]
-    # shape carries no per-size price (only a title) - see normalizer.py's
-    # extract_sizes().
+    # variant option with its joined items[] price when present
+    # ("Medium: 32, Large: 37"), never Python's raw dict repr.
     normalized_ws = wb["Delivery Normalized"]
     norm_header = [c.value for c in normalized_ws[1]]
     norm_rows = {row[norm_header.index("Product")]: row for row in normalized_ws.iter_rows(min_row=2, values_only=True)}
     sizes_cell = norm_rows["Low Mein Thickburger Combo"][norm_header.index("Sizes")]
-    assert sizes_cell == "Medium, Large"
+    assert sizes_cell == "Medium: 32.0, Large: 37.0"
     assert "{" not in sizes_cell and "'" not in sizes_cell
+
+    # Legacy View fills EVERY size column from items[].sel1Value prices,
+    # not only the selected size.
+    legacy_rows = {row[1]: row for row in legacy_ws.iter_rows(min_row=2, values_only=True)}
+    low_mein = legacy_rows["Low Mein Thickburger Combo"]
+    assert low_mein[header.index("Medium")] == 32.0
+    assert low_mein[header.index("Large")] == 37.0
+    assert low_mein[header.index("Regular")] is None
