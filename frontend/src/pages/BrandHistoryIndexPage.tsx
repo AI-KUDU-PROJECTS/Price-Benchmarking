@@ -2,9 +2,13 @@ import { Link, useSearchParams } from "react-router-dom";
 import { api } from "../api/client";
 import { useApi } from "../api/useApi";
 import { BrandTabs } from "../components/BrandTabs";
+import { DataTable } from "../components/DataTable";
 import { PageHeader } from "../components/PageHeader";
+import { SearchField } from "../components/SearchField";
 import { EmptyState, ErrorState, LoadingState } from "../components/States";
 import { productHref } from "../lib/links";
+import { formatRiyadhDateTime } from "../lib/dateTime";
+import { setSearchParam } from "../lib/params";
 
 export function BrandHistoryIndexPage({ brandId }: { brandId: string }) {
   const [params, setParams] = useSearchParams();
@@ -22,45 +26,39 @@ export function BrandHistoryIndexPage({ brandId }: { brandId: string }) {
         subtitle="Pick a product to open its observation history. The canonical view is the product page."
       />
       <BrandTabs brandId={brandId} />
-      <div className="filters">
-        <input
+      <div className="filter-bar">
+        <SearchField
+          label="Filter products"
           placeholder="Filter products"
           defaultValue={q}
-          onBlur={(e) => {
-            const next = new URLSearchParams(params);
-            if (e.target.value) next.set("q", e.target.value);
-            else next.delete("q");
-            setParams(next);
-          }}
+          onCommit={(value) => setSearchParam(setParams, params, "q", value)}
         />
       </div>
       {!data?.items.length ? (
         <EmptyState message="No products to show history for." />
       ) : (
-        <div className="card table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Channel</th>
-                <th>Last seen</th>
+        <DataTable caption={`${brandId} products with observation history`}>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Channel</th>
+              <th>Last seen</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.items.map((product) => (
+              <tr key={product.id}>
+                <td>
+                  <Link className="linkish" to={productHref(brandId, product.id)}>
+                    {product.nameEn || product.id}
+                  </Link>
+                </td>
+                <td className="nowrap">{product.channel}</td>
+                <td className="nowrap">{formatRiyadhDateTime(product.lastSeenAt)}</td>
               </tr>
-            </thead>
-            <tbody>
-              {data.items.map((product) => (
-                <tr key={product.id}>
-                  <td>
-                    <Link className="linkish" to={productHref(brandId, product.id)}>
-                      {product.nameEn || product.id}
-                    </Link>
-                  </td>
-                  <td>{product.channel}</td>
-                  <td>{product.lastSeenAt || "—"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </DataTable>
       )}
     </>
   );

@@ -9,6 +9,8 @@ import { Price } from "../components/Price";
 import { ProductImage } from "../components/ProductImage";
 import { EmptyState, ErrorState, LoadingState } from "../components/States";
 import { promotionHref } from "../lib/links";
+import { formatRiyadhDateTime } from "../lib/dateTime";
+import { setSearchParam } from "../lib/params";
 
 export function BrandPromotionsPage({ brandId }: { brandId: string }) {
   const [params, setParams] = useSearchParams();
@@ -20,7 +22,7 @@ export function BrandPromotionsPage({ brandId }: { brandId: string }) {
   const suffix = query.toString() ? `?${query}` : "";
   const { data, error, loading } = useApi(() => api.promotions(brandId, suffix), [brandId, suffix]);
 
-  if (loading) return <LoadingState />;
+  if (loading) return <LoadingState variant="cards" />;
   if (error) return <ErrorState error={error} />;
   if (!data) return <EmptyState message="No promotions." />;
 
@@ -29,13 +31,15 @@ export function BrandPromotionsPage({ brandId }: { brandId: string }) {
       <PageHeader title="Promotions" subtitle="Observed offers. Discount shown only when the source provides it." />
       <BrandTabs brandId={brandId} />
       <DataBanner freshness={data.meta.freshness} />
-      <div className="filters">
-        <select value={channel} onChange={(e) => setParam(setParams, params, "channel", e.target.value)}>
+      <div className="filter-bar">
+        <label className="visually-hidden" htmlFor="filter-channel">Channel</label>
+        <select id="filter-channel" className="control" value={channel} onChange={(e) => setSearchParam(setParams, params, "channel", e.target.value)}>
           <option value="">All channels</option>
           <option value="pickup">Pickup</option>
           <option value="delivery">Delivery</option>
         </select>
-        <select value={status} onChange={(e) => setParam(setParams, params, "status", e.target.value)}>
+        <label className="visually-hidden" htmlFor="filter-status">Status</label>
+        <select id="filter-status" className="control" value={status} onChange={(e) => setSearchParam(setParams, params, "status", e.target.value)}>
           <option value="">All statuses</option>
           <option value="active">Active</option>
           <option value="new">New</option>
@@ -52,7 +56,7 @@ export function BrandPromotionsPage({ brandId }: { brandId: string }) {
             <Link key={promo.id} className="card promo-card" to={promotionHref(brandId, promo.id)}>
               <ProductImage src={promo.imageUrl} alt={promo.title || ""} large />
               <div className="body">
-                <div style={{ display: "flex", gap: 6 }}>
+                <div className="promo-meta">
                   <Badge value={promo.isNew ? "new" : promo.status} />
                   <span className="meta-text">{promo.channel}</span>
                 </div>
@@ -64,11 +68,11 @@ export function BrandPromotionsPage({ brandId }: { brandId: string }) {
                     previous={promo.regularPrice}
                   />
                 </div>
-                <div className="subnav-note">
+                <div className="meta-text">
                   Discount: {promo.discountPercent === null ? "—" : `${promo.discountPercent}%`}
                 </div>
-                <div className="subnav-note">
-                  First {promo.firstSeenAt || "—"} · Last {promo.lastSeenAt || "—"}
+                <div className="meta-text">
+                  First {formatRiyadhDateTime(promo.firstSeenAt)} · Last {formatRiyadhDateTime(promo.lastSeenAt)}
                 </div>
               </div>
             </Link>
@@ -77,16 +81,4 @@ export function BrandPromotionsPage({ brandId }: { brandId: string }) {
       )}
     </>
   );
-}
-
-function setParam(
-  setParams: (p: URLSearchParams) => void,
-  params: URLSearchParams,
-  key: string,
-  value: string,
-) {
-  const next = new URLSearchParams(params);
-  if (value) next.set(key, value);
-  else next.delete(key);
-  setParams(next);
 }

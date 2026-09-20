@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
-from datetime import timedelta, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -25,6 +25,7 @@ from bff.contract import (
     ProductHistory,
     ProductSize,
     Promotion,
+    RIYADH,
     RUN_STATUS_TO_CONTRACT,
     SOURCE_EVENT_TO_CONTRACT,
     as_money,
@@ -746,10 +747,8 @@ def _filter_changes(
     if category:
         needle = category.lower()
         out = [e for e in out if (e.category or "").lower() == needle]
-    start = parse_utc(date_from) if date_from else None
-    end = parse_utc(date_to) if date_to else None
-    if date_to and len(date_to) <= 10:
-        end = parse_utc(f"{date_to}T23:59:59Z")
+    start = _parse_riyadh_boundary(date_from, end_of_day=False)
+    end = _parse_riyadh_boundary(date_to, end_of_day=True)
     if start or end:
         filtered: list[ChangeEvent] = []
         for event in out:
@@ -763,6 +762,22 @@ def _filter_changes(
             filtered.append(event)
         out = filtered
     return out
+
+
+def _parse_riyadh_boundary(value: str | None, *, end_of_day: bool) -> datetime | None:
+    """Interpret date-only filters as a calendar date in Riyadh, not UTC."""
+    if not value:
+        return None
+    text = value.strip()
+    if len(text) == 10:
+        try:
+            local = datetime.fromisoformat(
+                f"{text}T23:59:59.999999" if end_of_day else f"{text}T00:00:00"
+            ).replace(tzinfo=RIYADH)
+            return local.astimezone(timezone.utc)
+        except ValueError:
+            return None
+    return parse_utc(text)
 
 
 def _recent_window(events: list[ChangeEvent], days: int = 7) -> list[ChangeEvent]:

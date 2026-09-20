@@ -5,8 +5,9 @@ from pathlib import Path
 import pytest
 
 from adapters.kfc import KfcAdapter
+from adapters.kfc.adapter import _filter_changes
 from adapters.kfc.tests.seed import seed_kfc_db
-from bff.contract import HIGHLIGHT_RANK, select_highlights
+from bff.contract import ChangeEvent, HIGHLIGHT_RANK, select_highlights
 
 
 @pytest.fixture()
@@ -91,3 +92,31 @@ def test_history_has_observations(adapter: KfcAdapter) -> None:
     assert len(history.observations) == 2
     assert history.observations[0].regular_price == 21.0
     assert history.observations[1].regular_price == 19.0
+
+
+def test_date_filters_use_riyadh_calendar_day() -> None:
+    early_riyadh = ChangeEvent(
+        id="early",
+        brand_id="kfc",
+        type="price_decreased",
+        detected_at="2026-09-08T01:30:00+03:00",
+        channel="pickup",
+    )
+    next_riyadh_day = ChangeEvent(
+        id="next",
+        brand_id="kfc",
+        type="price_increased",
+        detected_at="2026-09-09T00:30:00+03:00",
+        channel="pickup",
+    )
+
+    filtered = _filter_changes(
+        [early_riyadh, next_riyadh_day],
+        channel=None,
+        event_type=None,
+        category=None,
+        date_from="2026-09-08",
+        date_to="2026-09-08",
+    )
+
+    assert [event.id for event in filtered] == ["early"]

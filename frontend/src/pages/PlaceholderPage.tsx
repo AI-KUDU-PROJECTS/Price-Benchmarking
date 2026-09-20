@@ -1,4 +1,5 @@
 import { PageHeader } from "../components/PageHeader";
+import { EmptyState } from "../components/States";
 
 export function PlaceholderPage({
   title,
@@ -10,7 +11,7 @@ export function PlaceholderPage({
   return (
     <>
       <PageHeader title={title} subtitle="Placeholder for a later phase." />
-      <div className="card empty">{message}</div>
+      <EmptyState message={message} />
     </>
   );
 }

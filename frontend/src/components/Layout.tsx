@@ -1,7 +1,9 @@
+import { Activity, Gauge, Store, Tag } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useApi } from "../api/useApi";
 import { api } from "../api/client";
 import type { Brand } from "../api/types";
+import kuduLogo from "../assets/kudu-logo-horizontal.png";
 
 const COMPETITORS = [
   { id: "kfc", name: "KFC", to: "/competitors/kfc" },
@@ -17,24 +19,27 @@ export function Layout() {
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <div className="brand-mark" aria-label="Kudu Price Intelligence">
-          <strong>KUDU</strong>
-          PRICE INTELLIGENCE
+        <div className="sidebar-brand">
+          <img src={kuduLogo} alt="KUDU" className="sidebar-logo" />
+          <span>Price Intelligence</span>
         </div>
-        <nav className="nav-section">
-          <div className="nav-label">OVERVIEW</div>
+        <nav className="nav-group" aria-label="Market">
+          <div className="nav-group-label">Overview</div>
           <NavLink to="/overview" className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}>
+            <Gauge size={18} aria-hidden="true" />
             Market Overview
           </NavLink>
           <NavLink to="/changes" className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}>
+            <Activity size={18} aria-hidden="true" />
             Market Changes
           </NavLink>
           <NavLink to="/promotions" className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}>
+            <Tag size={18} aria-hidden="true" />
             Promotions
           </NavLink>
         </nav>
-        <nav className="nav-section">
-          <div className="nav-label">COMPETITORS</div>
+        <nav className="nav-group" aria-label="Competitors">
+          <div className="nav-group-label">Competitors</div>
           {COMPETITORS.map((item) => {
             const brand = brands.get(item.id);
             const connected = brand ? brand.health !== "disconnected" : item.id === "kfc";
@@ -44,8 +49,9 @@ export function Layout() {
                 to={item.to}
                 className={({ isActive }) => `nav-link${isActive ? " active" : ""}${connected ? "" : " dim"}`}
               >
+                <Store size={18} aria-hidden="true" />
                 <span>{item.name}</span>
-                {!connected && <span className="nav-status">Not connected</span>}
+                {!connected && <span className="nav-link-status">Not connected</span>}
               </NavLink>
             );
           })}

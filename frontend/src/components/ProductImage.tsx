@@ -1,3 +1,4 @@
+import { ImageOff } from "lucide-react";
 import { useState } from "react";
 
 export function ProductImage({
@@ -11,7 +12,12 @@ export function ProductImage({
 }) {
   const [failed, setFailed] = useState(false);
   if (!src || failed) {
-    return <div className={large ? "thumb-lg-missing" : "thumb-missing"}>No image</div>;
+    return (
+      <div className={large ? "thumb-lg-missing" : "thumb-missing"}>
+        <ImageOff size={large ? 20 : 16} aria-hidden="true" />
+        {large ? "No image" : null}
+      </div>
+    );
   }
   return (
     <img

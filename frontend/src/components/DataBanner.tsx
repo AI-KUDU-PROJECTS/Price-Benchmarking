@@ -1,4 +1,25 @@
+import { AlertTriangle, Clock, WifiOff } from "lucide-react";
+import type { ReactNode } from "react";
 import type { Freshness, Health } from "../api/types";
+import { formatRiyadhDateTime } from "../lib/dateTime";
+import type { Tone } from "../lib/status";
+
+function Alert({
+  tone,
+  icon,
+  children,
+}: {
+  tone: Tone;
+  icon: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <div className="alert" data-tone={tone} role="status">
+      <span className="alert-icon">{icon}</span>
+      <p className="alert-text">{children}</p>
+    </div>
+  );
+}
 
 export function DataBanner({
   freshness,
@@ -9,32 +30,37 @@ export function DataBanner({
   health?: Health;
   lastUpdatedAt?: string | null;
 }) {
+  const lastUpdated = formatRiyadhDateTime(lastUpdatedAt, "never");
+
   if (health === "disconnected") {
     return (
-      <div className="banner disconnected">
+      <Alert tone="neutral" icon={<WifiOff size={18} aria-hidden="true" />}>
         This competitor is not connected yet. The first slice covers KFC only.
-      </div>
+      </Alert>
     );
   }
   if (health === "error" || freshness === "unavailable") {
     return (
-      <div className="banner error">
-        No successful collection is available. Last update: {lastUpdatedAt || "never"}.
-      </div>
+      <Alert tone="error" icon={<AlertTriangle size={18} aria-hidden="true" />}>
+        No successful collection is available. Last update: <strong>{lastUpdated}</strong>.
+      </Alert>
     );
   }
   if (health === "partial") {
     return (
-      <div className="banner stale">
-        Partial data: one channel failed or is incomplete. Last successful update {lastUpdatedAt || "unknown"}.
-      </div>
+      <Alert tone="warning" icon={<Clock size={18} aria-hidden="true" />}>
+        Partial data: one channel failed or is incomplete. Last successful update{" "}
+        <strong>{formatRiyadhDateTime(lastUpdatedAt, "unknown")}</strong>.
+      </Alert>
     );
   }
   if (freshness === "stale" || health === "stale") {
     return (
-      <div className="banner stale">
-        Data is stale. Last successful update {lastUpdatedAt || "unknown"} (Asia/Riyadh). This page is not fully current.
-      </div>
+      <Alert tone="warning" icon={<Clock size={18} aria-hidden="true" />}>
+        Data is stale. Last successful update{" "}
+        <strong>{formatRiyadhDateTime(lastUpdatedAt, "unknown")}</strong> Riyadh time. This page is
+        not fully current.
+      </Alert>
     );
   }
   return null;

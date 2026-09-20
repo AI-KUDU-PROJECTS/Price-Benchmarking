@@ -1,0 +1,179 @@
+/*
+ * KUDU Product UI tokens for this project.
+ * Primitive/semantic values are taken verbatim from the kudu-product-ui skill
+ * (0.1.0-draft.1) at ~/.claude/skills/kudu-product-ui/assets/tokens/.
+ *
+ * A few roles are marked "unresolved" in that skill (pending.json, O01-O04,
+ * O21): semantic success/warning/error/info colors, the destructive button
+ * pair, and a readable replacement for the draft muted text. This file
+ * proposes concrete values for those gaps so the app can ship; they are
+ * documented as proposals (not ratified brand values) in the rebuild report.
+ *
+ * Font: the approved faces (Config Rounded / DIN Next Arabic) are licensed
+ * assets not distributed anywhere in this environment (see skill O06). This
+ * file declares a disclosed fallback stack instead - see --kudu-font-en below.
+ */
+:root {
+  /* -- Brand primitives (verbatim, KUDU-FV02BGuideline_LR.pdf p.18) -- */
+  --kudu-brand-blue: #27468b;
+  --kudu-brand-yellow: #fdb515;
+  --kudu-brand-turquoise: #4db8b6;
+  --kudu-brand-coral: #ff7354;
+  --kudu-brand-peach: #ffd4b3;
+  --kudu-brand-grey: #d8d7d6;
+
+  /* -- Neutral scale (verbatim) -- */
+  --kudu-neutral-0: #ffffff;
+  --kudu-neutral-25: #fcfbf8;
+  --kudu-neutral-50: #f7f6f2;
+  --kudu-neutral-100: #f2f1ed;
+  --kudu-neutral-200: #e2e1dc;
+  --kudu-neutral-300: #cfcec8;
+  --kudu-neutral-500: #8a9099;
+  --kudu-neutral-600: #667085;
+  --kudu-neutral-800: #34383e;
+  --kudu-neutral-900: #20242a;
+
+  /* -- Surfaces (verbatim) -- */
+  --kudu-surface-app: var(--kudu-neutral-50);
+  --kudu-surface-primary: var(--kudu-neutral-0);
+  --kudu-surface-subtle: var(--kudu-neutral-100);
+  --kudu-surface-hover: #eeedea;
+  --kudu-surface-selected: #eef2f9;
+  --kudu-surface-disabled: var(--kudu-neutral-100);
+
+  /* -- Text --
+     Proposal for O01/O21: the draft --kudu-neutral-500/600 pair is kept for
+     traceability but is not used for readable text below. Replacement values
+     are picked to clear 4.5:1 on both --kudu-surface-primary and
+     --kudu-surface-subtle (checked against #FFFFFF and #F2F1ED). */
+  --kudu-text-primary: var(--kudu-neutral-900);
+  --kudu-text-secondary: #4b5563; /* proposal, replaces draft #667085 (O21: 4.40:1 on subtle surface) */
+  --kudu-text-muted: #6b7280; /* proposal, replaces draft #8A9099 (O01: contrast risk) */
+  --kudu-text-brand: var(--kudu-brand-blue);
+  --kudu-text-on-brand: var(--kudu-neutral-0);
+  --kudu-text-disabled: var(--kudu-neutral-500);
+
+  /* -- Borders (verbatim + one added focus role) -- */
+  --kudu-border-subtle: var(--kudu-neutral-200);
+  --kudu-border-default: var(--kudu-neutral-300);
+  --kudu-border-brand: var(--kudu-brand-blue);
+  --kudu-border-focus: var(--kudu-brand-blue);
+
+  /* -- Actions (verbatim) -- */
+  --kudu-action-primary: var(--kudu-brand-blue);
+  --kudu-action-primary-hover: #203e7a;
+  --kudu-action-primary-soft: #eef2f9;
+  --kudu-action-secondary: var(--kudu-neutral-100);
+  --kudu-action-secondary-hover: #e8e7e2;
+  --kudu-action-disabled: var(--kudu-neutral-300);
+  --kudu-accent-brand: var(--kudu-brand-yellow);
+
+  /* -- Destructive button (proposal for O04) --
+     A red distinct from brand coral, dark enough for white text at AA. */
+  --kudu-action-destructive: #c0291b;
+  --kudu-action-destructive-hover: #9e2115;
+  --kudu-action-destructive-soft: #fdeceb;
+
+  /* -- Semantic status (proposal for O03) --
+     Brand turquoise/coral/yellow are intentionally NOT reused as status
+     colors (skill 05-tokens-and-architecture.md - "do not equate brand
+     coral/turquoise with error/success"). These are separate, accessible
+     status hues. */
+  --kudu-status-success-text: #1a7f4b;
+  --kudu-status-success-surface: #e9f7ef;
+  --kudu-status-success-border: #bfe6ce;
+
+  --kudu-status-warning-text: #8a5a00;
+  --kudu-status-warning-surface: #fff4e0;
+  --kudu-status-warning-border: #f4dda6;
+
+  --kudu-status-error-text: #b42318;
+  --kudu-status-error-surface: #fdeceb;
+  --kudu-status-error-border: #f5c6c0;
+
+  --kudu-status-info-text: var(--kudu-brand-blue);
+  --kudu-status-info-surface: #eef2f9;
+  --kudu-status-info-border: #c9d6ec;
+
+  --kudu-status-neutral-text: #475467;
+  --kudu-status-neutral-surface: var(--kudu-neutral-100);
+  --kudu-status-neutral-border: var(--kudu-neutral-200);
+
+  /* -- Typography --
+     Font names: approved faces first (loaded only if licensed files are
+     ever provisioned locally), then a disclosed fallback. See rebuild
+     report for why Nunito was chosen. */
+  --kudu-font-en: "Config Rounded", "Nunito", "Segoe UI", system-ui, sans-serif;
+  --kudu-font-ar: "DIN Next Arabic", "Nunito", "Segoe UI", Tahoma, sans-serif;
+  --kudu-font-weight-regular: 400;
+  --kudu-font-weight-medium: 600;
+  --kudu-font-weight-bold: 700;
+  --kudu-text-page-title-size: 28px;
+  --kudu-text-section-title-size: 20px;
+  --kudu-text-component-title-size: 16px;
+  --kudu-text-body-size: 14px;
+  --kudu-text-reading-size: 16px;
+  --kudu-text-small-size: 12px;
+  --kudu-line-height-tight: 1.25;
+  --kudu-line-height-default: 1.5;
+  --kudu-line-height-relaxed: 1.65;
+
+  /* -- Spacing (verbatim, 4px base) -- */
+  --kudu-space-1: 4px;
+  --kudu-space-2: 8px;
+  --kudu-space-3: 12px;
+  --kudu-space-4: 16px;
+  --kudu-space-5: 20px;
+  --kudu-space-6: 24px;
+  --kudu-space-8: 32px;
+  --kudu-space-10: 40px;
+  --kudu-space-12: 48px;
+  --kudu-space-16: 64px;
+
+  /* -- Radius (verbatim) -- */
+  --kudu-radius-sm: 6px;
+  --kudu-radius-control: 10px;
+  --kudu-radius-panel: 12px;
+  --kudu-radius-modal: 14px;
+  --kudu-radius-pill: 999px;
+
+  /* -- Controls / icons / content widths (verbatim) -- */
+  --kudu-control-sm: 32px;
+  --kudu-control-md: 40px;
+  --kudu-control-lg: 44px;
+  --kudu-icon-sm: 16px;
+  --kudu-icon-md: 20px;
+  --kudu-icon-lg: 24px;
+  --kudu-content-reading: 760px;
+  --kudu-content-form: 840px;
+  --kudu-content-standard: 1200px;
+  --kudu-content-wide: 1440px;
+  --kudu-border-width-default: 1px;
+  --kudu-border-width-focus: 2px;
+
+  /* -- Motion (verbatim) -- */
+  --kudu-duration-fast: 120ms;
+  --kudu-duration-normal: 180ms;
+  --kudu-duration-slow: 240ms;
+  --kudu-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* -- Layers (verbatim) -- */
+  --kudu-z-base: 0;
+  --kudu-z-sticky: 100;
+  --kudu-z-dropdown: 200;
+  --kudu-z-overlay: 300;
+  --kudu-z-modal: 400;
+  --kudu-z-toast: 500;
+
+  /* -- Draft breakpoints (verbatim boundaries, used as literal media queries) -- */
+  --kudu-breakpoint-sm: 640px;
+  --kudu-breakpoint-md: 1024px;
+  --kudu-breakpoint-lg: 1440px;
+
+  /* -- Shadow: none by default (D05). One quiet floating-layer shadow for
+     menus/overlays only - exact value unresolved (O09); this is a
+     conservative proposal. -- */
+  --kudu-shadow-none: none;
+  --kudu-shadow-floating: 0 4px 16px rgba(32, 36, 42, 0.12);
+}

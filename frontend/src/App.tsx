@@ -29,10 +29,10 @@ export function App() {
             <Route path={`/competitors/${brandId}`} element={<BrandOverviewPage brandId={brandId} />} />
             <Route path={`/competitors/${brandId}/menu`} element={<BrandMenuPage brandId={brandId} />} />
             <Route path={`/competitors/${brandId}/promotions`} element={<BrandPromotionsPage brandId={brandId} />} />
-            <Route path={`/competitors/${brandId}/promotions/:promotionId`} element={<PromotionDetailPage />} />
+            <Route path={`/competitors/${brandId}/promotions/:promotionId`} element={<PromotionDetailPage brandId={brandId} />} />
             <Route path={`/competitors/${brandId}/changes`} element={<BrandChangesPage brandId={brandId} />} />
             <Route path={`/competitors/${brandId}/history`} element={<BrandHistoryIndexPage brandId={brandId} />} />
-            <Route path={`/competitors/${brandId}/products/:productId`} element={<ProductHistoryPage />} />
+            <Route path={`/competitors/${brandId}/products/:productId`} element={<ProductHistoryPage brandId={brandId} />} />
           </Fragment>
         ))}
       </Route>
