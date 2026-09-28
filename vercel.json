@@ -6,6 +6,7 @@
   "outputDirectory": "frontend/dist",
   "functions": {
     "api/index.py": {
+      "includeFiles": "{bff/**,adapters/**,competitors/**/*.py,competitors/hungerstation/data/hungerstation.db*,competitors/hungerstation/data/images/**,kudu/**}",
       "excludeFiles": "{**/__pycache__/**,**/*.pyc,**/tests/**,**/data/raw/**,**/data/screenshots/**,**/data/logs/**,frontend/**,node_modules/**}"
     }
   },
