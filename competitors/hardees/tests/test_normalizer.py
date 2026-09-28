@@ -7,6 +7,8 @@ research/api-map/api-map.md "Shared platform note").
 """
 from __future__ import annotations
 
+import json
+
 from competitors.hardees.backend import normalizer
 
 
@@ -83,3 +85,31 @@ def test_normalize_product_end_to_end_real_shape(delivery_result):
     assert snap["channel"] == "DELIVERY"
     assert snap["calories"] is None  # never guessed - see api-map.md
     assert snap["product_name_ar"] is None  # Arabic not available from this endpoint - see api-map.md
+
+
+def test_extract_sizes_joins_items_sel1value_prices(delivery_result):
+    """Per-size prices come from items[] joined on sel1Value === option.id
+    (Americana platform) - not from inventing prices or calling /api/product
+    for every size when the catalog already carries them."""
+    product = next(p for p in delivery_result["products"] if p["name"] == "Low Mein Thickburger Combo")
+    sizes = normalizer.extract_sizes(product)
+    assert [(s["title"], s.get("price"), s.get("nestedItemId")) for s in sizes] == [
+        ("Medium", 32.0, 71011),
+        ("Large", 37.0, 71012),
+    ]
+    snap = normalizer.normalize_product(
+        product, channel="DELIVERY", branch_id=24, branch_name="EUROMARCHE-H", city="Riyadh",
+        cluster_id="1_8", config_id="HRD_SA_24", run_id="run-1", captured_at="2026-08-11T06:05:00Z",
+    )
+    stored = json.loads(snap["sizes"])
+    assert stored[0]["price"] == 32.0 and stored[1]["price"] == 37.0
+
+
+def test_extract_sizes_omits_price_when_items_missing():
+    product = {
+        "variants": [{"title": "Size", "options": [{"id": 1, "title": "Regular", "isSelected": 1}]}],
+        "items": [],
+    }
+    sizes = normalizer.extract_sizes(product)
+    assert sizes == [{"id": 1, "title": "Regular", "isSelected": True, "variantTitle": "Size"}]
+    assert "price" not in sizes[0]

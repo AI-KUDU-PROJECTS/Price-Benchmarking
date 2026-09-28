@@ -81,3 +81,12 @@ def test_normalize_product_end_to_end_real_shape(delivery_result):
     assert snap["channel"] == "DELIVERY"
     assert snap["calories"] is None  # never guessed - see api-map.md
     assert snap["product_name_ar"] is None  # Arabic not available from this endpoint - see api-map.md
+
+
+def test_extract_sizes_joins_items_sel1value_prices(pickup_result):
+    product = next(p for p in pickup_result["products"] if p.get("name") == "5 Pcs Spicy Bitez Combo")
+    sizes = normalizer.extract_sizes(product)
+    assert [(s["title"], s.get("price")) for s in sizes] == [
+        ("Medium", 19.0),
+        ("Large", 22.0),
+    ]

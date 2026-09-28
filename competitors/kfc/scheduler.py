@@ -64,6 +64,7 @@ def scheduled_job() -> None:
         logger.error(f"[SCHEDULER] Scheduled run raised an unexpected error: {e}", exc_info=True)
 
 
+
 def main() -> int:
     config.ensure_directories()
     database.init_db()

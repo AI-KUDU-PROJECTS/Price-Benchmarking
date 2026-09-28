@@ -127,22 +127,60 @@ def extract_image_url(product: dict[str, Any]) -> Optional[str]:
     return first_present(product, "mediaUrl", "imageUrl")
 
 
+def _item_price_for_size(item: dict[str, Any]) -> Optional[float]:
+    """Selling price for one nested size SKU from items[]. Uses the same
+    specialPrice sentinel rules as the card-level product price."""
+    regular = to_float(item.get("originalPrice"))
+    special = normalize_special_price(item.get("specialPrice"), regular)
+    return special if special is not None else regular
+
+
+def _items_by_sel1(product: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """Index items[] by sel1Value (stringified) so each variants[].options[].id
+    can be joined to its nested size SKU. Live-confirmed on this Americana
+    platform: option.id === item.sel1Value carries that size's originalPrice.
+    See research/api-map/api-map.md (size switch / nested item ids)."""
+    index: dict[str, dict[str, Any]] = {}
+    for item in product.get("items") or []:
+        if not isinstance(item, dict):
+            continue
+        sel = item.get("sel1Value")
+        if sel is None or sel == "":
+            continue
+        index[str(sel)] = item
+    return index
+
+
 def extract_sizes(product: dict[str, Any]) -> list[dict[str, Any]]:
-    """variants[].options[] is where size is identified WITH CONFIDENCE (see
-    api-map.md) - a plain list of {id, title, isSelected}. Returns [] (never
-    a guess) when the product genuinely has no size variant."""
+    """variants[].options[] identifies size WITH CONFIDENCE (see api-map.md).
+    When items[] is present, join each option.id to items[].sel1Value and
+    attach that nested SKU's selling price so dashboards/Excel can show
+    Regular/Medium/Large prices - not only the selected size's card price.
+    Returns [] (never a guess) when the product has no size variant. Price
+    stays omitted (not invented) when no matching items[] row exists."""
+    items_index = _items_by_sel1(product)
     sizes: list[dict[str, Any]] = []
     for variant in product.get("variants") or []:
         if not isinstance(variant, dict):
             continue
         for option in variant.get("options") or []:
-            if isinstance(option, dict) and option.get("title"):
-                sizes.append({
-                    "id": option.get("id"),
-                    "title": option.get("title"),
-                    "isSelected": bool(option.get("isSelected")),
-                    "variantTitle": variant.get("title"),
-                })
+            if not isinstance(option, dict) or not option.get("title"):
+                continue
+            entry: dict[str, Any] = {
+                "id": option.get("id"),
+                "title": option.get("title"),
+                "isSelected": bool(option.get("isSelected")),
+                "variantTitle": variant.get("title"),
+            }
+            item = items_index.get(str(option.get("id"))) if option.get("id") is not None else None
+            if item is not None:
+                price = _item_price_for_size(item)
+                if price is not None:
+                    entry["price"] = price
+                nested_id = item.get("id")
+                if nested_id is not None:
+                    entry["nestedItemId"] = nested_id
+            sizes.append(entry)
     return sizes
 
 

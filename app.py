@@ -23,7 +23,7 @@ import streamlit as st
 
 from shared_ui import page_header, render_nav_list, spacer
 
-st.set_page_config(page_title="Price Intelligence", layout="wide")
+st.set_page_config(page_title="KUDU Price Intelligence", layout="wide")
 
 # The only place in the repo where the full competitor list is assembled.
 # Each competitor's own page (pages/<n>_<Name>.py) is the only thing that
@@ -45,11 +45,16 @@ COMPETITORS = [
 ]
 
 page_header(
-    "Price Intelligence",
-    subtitle="Competitor menu, price, and offer monitoring - one isolated module per competitor.",
+    "KUDU Price Intelligence",
+    subtitle="KUDU production menu is the baseline for competitor price monitoring.",
     caption="Each competitor below has its own page, its own database, and its own data directory. "
             "None of them import from each other - see README.md.",
 )
+
+spacer(1)
+st.subheader("KUDU baseline")
+st.page_link("pages/0_Kudu.py", label="Open KUDU menu and prices")
+st.caption("Production template 1 · delivery and pickup · item names, prices, and images")
 
 spacer(1)
 st.subheader("Competitors")
@@ -58,8 +63,8 @@ render_nav_list(COMPETITORS)
 spacer(1)
 st.divider()
 st.markdown(
-    "Select a competitor above (or use the sidebar) to open its page. "
-    "KFC is currently the only implemented competitor - see "
+    "Open the KUDU baseline first, then compare it with the competitor pages. "
+    "See "
     "`competitors/kfc/README.md` for its full architecture, and the root "
     "`README.md` for how new competitors get added to this repo."
 )

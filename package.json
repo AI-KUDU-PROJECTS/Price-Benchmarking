@@ -26,7 +26,8 @@
     "collect:hardees:pickup": "node competitors/hardees/collector/collect.js --channel=PICKUP",
     "collect:hardees:delivery": "node competitors/hardees/collector/collect.js --channel=DELIVERY",
     "screenshot:hardees": "node competitors/hardees/collector/screenshot-capture.js",
-    "postinstall": "echo \"Now run: npx playwright install chromium\""
+    "playwright:install": "PLAYWRIGHT_BROWSERS_PATH=./.playwright-browsers npx playwright install chromium",
+    "postinstall": "npm run playwright:install"
   },
   "dependencies": {
     "playwright": "1.61.0"

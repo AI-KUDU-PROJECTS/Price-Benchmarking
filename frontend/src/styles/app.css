@@ -1,0 +1,1087 @@
+@import "./tokens.css";
+
+/* ==========================================================================
+   Reset & base
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background: var(--kudu-surface-app);
+  color: var(--kudu-text-primary);
+  font-family: var(--kudu-font-en);
+  font-size: var(--kudu-text-body-size);
+  font-weight: var(--kudu-font-weight-regular);
+  line-height: var(--kudu-line-height-default);
+  -webkit-font-smoothing: antialiased;
+}
+
+:where([dir="rtl"]) body {
+  font-family: var(--kudu-font-ar);
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Full-perimeter keyboard focus. Not a side strip: X01 only prohibits
+   decorative one-edge accent borders on cards/panels/alerts/nav items. */
+:focus-visible {
+  outline: var(--kudu-border-width-focus) solid var(--kudu-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--kudu-radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   Utilities
+   ========================================================================== */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  white-space: nowrap;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+/* Caps a cell's contribution to table auto-layout so one unusually long
+   value (e.g. a raw source payload string) can't blow out a whole column;
+   the full value stays available as a title tooltip. */
+.cell-clip {
+  display: inline-block;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.meta-text {
+  color: var(--kudu-text-muted);
+  font-size: var(--kudu-text-small-size);
+  line-height: var(--kudu-line-height-relaxed);
+}
+
+.linkish {
+  color: var(--kudu-text-brand);
+  font-weight: var(--kudu-font-weight-medium);
+  text-decoration: none;
+}
+
+.linkish:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ==========================================================================
+   App shell & sidebar
+   D09: light sidebar with restrained blue details - not a solid brand-color
+   fill. X01: no side-strip active state; active items use a soft selected
+   surface + blue text instead.
+   ========================================================================== */
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 248px 1fr;
+  min-height: 100%;
+}
+
+.sidebar {
+  background: var(--kudu-surface-primary);
+  border-inline-end: 1px solid var(--kudu-border-subtle);
+  padding: var(--kudu-space-6) var(--kudu-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--kudu-space-8);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--kudu-space-2);
+  padding: 0 var(--kudu-space-3);
+}
+
+.sidebar-logo {
+  height: 28px;
+  width: auto;
+  display: block;
+}
+
+.sidebar-brand span {
+  font-size: 11px;
+  font-weight: var(--kudu-font-weight-medium);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--kudu-text-muted);
+}
+
+.nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kudu-space-1);
+}
+
+.nav-group-label {
+  font-size: 11px;
+  font-weight: var(--kudu-font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--kudu-text-muted);
+  margin: 0 var(--kudu-space-3) var(--kudu-space-2);
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--kudu-space-2);
+  padding: var(--kudu-space-2) var(--kudu-space-3);
+  border-radius: var(--kudu-radius-control);
+  color: var(--kudu-text-secondary);
+  text-decoration: none;
+  font-size: var(--kudu-text-body-size);
+  font-weight: var(--kudu-font-weight-medium);
+  transition: background var(--kudu-duration-fast) var(--kudu-ease-standard),
+    color var(--kudu-duration-fast) var(--kudu-ease-standard);
+}
+
+.nav-link svg {
+  flex: none;
+  color: var(--kudu-text-muted);
+}
+
+.nav-link:hover {
+  background: var(--kudu-surface-hover);
+  color: var(--kudu-text-primary);
+}
+
+.nav-link.active {
+  background: var(--kudu-surface-selected);
+  color: var(--kudu-text-brand);
+}
+
+.nav-link.active svg {
+  color: var(--kudu-text-brand);
+}
+
+.nav-link.dim {
+  color: var(--kudu-text-muted);
+}
+
+.nav-link-status {
+  margin-inline-start: auto;
+  font-size: 11px;
+  font-weight: var(--kudu-font-weight-medium);
+  color: var(--kudu-text-muted);
+  white-space: nowrap;
+}
+
+.main {
+  padding: var(--kudu-space-8) var(--kudu-space-8) var(--kudu-space-16);
+  min-width: 0;
+  max-width: var(--kudu-content-wide);
+}
+
+/* ==========================================================================
+   Page header
+   D28: simple header - title, optional one-line description, primary action.
+   No side accent on the title block.
+   ========================================================================== */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--kudu-space-4);
+  margin-bottom: var(--kudu-space-6);
+}
+
+.page-header-back {
+  margin-bottom: var(--kudu-space-3);
+}
+
+.page-title {
+  font-size: var(--kudu-text-page-title-size);
+  font-weight: var(--kudu-font-weight-bold);
+  color: var(--kudu-text-primary);
+  line-height: var(--kudu-line-height-tight);
+}
+
+.page-subtitle {
+  margin-top: var(--kudu-space-1);
+  color: var(--kudu-text-secondary);
+  max-width: var(--kudu-content-reading);
+  font-size: var(--kudu-text-body-size);
+}
+
+.page-header-extra {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--kudu-space-2);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--kudu-space-1);
+  color: var(--kudu-text-secondary);
+  text-decoration: none;
+  font-size: var(--kudu-text-small-size);
+  font-weight: var(--kudu-font-weight-medium);
+  background: none;
+  border: none;
+  padding: var(--kudu-space-1) 0;
+  cursor: pointer;
+}
+
+.back-link:hover {
+  color: var(--kudu-text-brand);
+}
+
+/* ==========================================================================
+   Tabs (BrandTabs) - a bottom-border indicator is a workflow connector, not
+   a prohibited side strip (see decisions.md interpretive notes).
+   ========================================================================== */
+
+.tabs {
+  display: flex;
+  gap: var(--kudu-space-4);
+  flex-wrap: wrap;
+  margin: 0 0 var(--kudu-space-5);
+  border-bottom: 1px solid var(--kudu-border-subtle);
+}
+
+.tabs a {
+  text-decoration: none;
+  padding: var(--kudu-space-2) 0 var(--kudu-space-2);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  color: var(--kudu-text-secondary);
+  font-size: var(--kudu-text-body-size);
+  font-weight: var(--kudu-font-weight-medium);
+}
+
+.tabs a:hover {
+  color: var(--kudu-text-primary);
+}
+
+.tabs a.active {
+  color: var(--kudu-text-brand);
+  border-bottom-color: var(--kudu-text-brand);
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--kudu-space-2);
+  height: var(--kudu-control-md);
+  padding: 0 var(--kudu-space-4);
+  border-radius: var(--kudu-radius-control);
+  font-size: var(--kudu-text-body-size);
+  font-weight: var(--kudu-font-weight-medium);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background var(--kudu-duration-fast) var(--kudu-ease-standard),
+    border-color var(--kudu-duration-fast) var(--kudu-ease-standard);
+}
+
+.btn-sm {
+  height: var(--kudu-control-sm);
+  padding: 0 var(--kudu-space-3);
+  font-size: var(--kudu-text-small-size);
+}
+
+.btn-primary {
+  background: transparent;
+  border-color: var(--kudu-action-primary);
+  color: var(--kudu-action-primary);
+}
+
+.btn-primary:hover {
+  background: var(--kudu-action-primary-soft);
+}
+
+.btn:disabled,
+.btn:disabled:hover {
+  background: var(--kudu-surface-disabled);
+  border-color: var(--kudu-border-default);
+  color: var(--kudu-text-secondary);
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: var(--kudu-action-secondary);
+  border-color: transparent;
+  color: var(--kudu-text-primary);
+}
+
+.btn-secondary:hover {
+  background: var(--kudu-action-secondary-hover);
+}
+
+.btn-destructive {
+  background: var(--kudu-action-destructive);
+  border-color: transparent;
+  color: var(--kudu-neutral-0);
+}
+
+.btn-destructive:hover {
+  background: var(--kudu-action-destructive-hover);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--kudu-text-secondary);
+  padding: 0 var(--kudu-space-2);
+  height: auto;
+}
+
+.btn-ghost:hover {
+  color: var(--kudu-text-brand);
+  background: var(--kudu-surface-hover);
+}
+
+/* ==========================================================================
+   Cards & panels
+   D12: minimal cards for a genuine independent unit only.
+   ========================================================================== */
+
+.card {
+  background: var(--kudu-surface-primary);
+  border: 1px solid var(--kudu-border-subtle);
+  border-radius: var(--kudu-radius-panel);
+  padding: var(--kudu-space-4);
+}
+
+.panel-title {
+  font-size: var(--kudu-text-component-title-size);
+  font-weight: var(--kudu-font-weight-bold);
+  color: var(--kudu-text-primary);
+  margin-bottom: var(--kudu-space-3);
+}
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: var(--kudu-space-4);
+  margin-top: var(--kudu-space-5);
+  align-items: start;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: var(--kudu-space-4);
+  align-items: start;
+}
+
+/* Grid items default to a content-based min-width, which lets a wide table
+   force the whole grid (and the page) wider than the viewport. Let the
+   table's own .table-scroll handle overflow instead. */
+.panel-grid > *,
+.detail-grid > *,
+.kpi-row > * {
+  min-width: 0;
+}
+
+.detail-card {
+  max-width: var(--kudu-content-form);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kudu-space-3);
+}
+
+.field-row {
+  display: flex;
+  gap: var(--kudu-space-2);
+}
+
+.field-label {
+  width: 96px;
+  flex: none;
+  color: var(--kudu-text-muted);
+  font-size: var(--kudu-text-small-size);
+}
+
+.field-value {
+  color: var(--kudu-text-primary);
+}
+
+/* ==========================================================================
+   KPI row
+   Quieter than a content card - a subtle-surface tile, not a bordered card,
+   so a strip of numbers does not read as five independent content units.
+   ========================================================================== */
+
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--kudu-space-3);
+}
+
+.kpi {
+  background: var(--kudu-surface-subtle);
+  border-radius: var(--kudu-radius-panel);
+  padding: var(--kudu-space-4);
+}
+
+.kpi-value {
+  font-size: 24px;
+  font-weight: var(--kudu-font-weight-bold);
+  color: var(--kudu-text-primary);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.kpi-label {
+  margin-top: var(--kudu-space-1);
+  font-size: var(--kudu-text-small-size);
+  color: var(--kudu-text-secondary);
+}
+
+.kpi-runs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kudu-space-1);
+  margin-top: var(--kudu-space-2);
+}
+
+/* ==========================================================================
+   Tables
+   D14: structured table - clear header, light dividers, restrained hover,
+   consistent alignment. No default border on every cell.
+   ========================================================================== */
+
+.table-surface {
+  border: 1px solid var(--kudu-border-subtle);
+  border-radius: var(--kudu-radius-panel);
+  overflow: hidden;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--kudu-text-body-size);
+}
+
+th,
+td {
+  text-align: start;
+  padding: var(--kudu-space-3);
+  vertical-align: middle;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  background: var(--kudu-surface-subtle);
+  color: var(--kudu-text-secondary);
+  font-weight: var(--kudu-font-weight-bold);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--kudu-border-subtle);
+}
+
+tbody td {
+  border-bottom: 1px solid var(--kudu-border-subtle);
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+tbody tr:hover {
+  background: var(--kudu-surface-hover);
+}
+
+/* ==========================================================================
+   Status pill, event type, and alert share one tone system so status
+   coloring stays consistent everywhere it appears.
+   ========================================================================== */
+
+[data-tone="success"] {
+  --tone-text: var(--kudu-status-success-text);
+  --tone-surface: var(--kudu-status-success-surface);
+  --tone-border: var(--kudu-status-success-border);
+}
+
+[data-tone="warning"] {
+  --tone-text: var(--kudu-status-warning-text);
+  --tone-surface: var(--kudu-status-warning-surface);
+  --tone-border: var(--kudu-status-warning-border);
+}
+
+[data-tone="error"] {
+  --tone-text: var(--kudu-status-error-text);
+  --tone-surface: var(--kudu-status-error-surface);
+  --tone-border: var(--kudu-status-error-border);
+}
+
+[data-tone="info"] {
+  --tone-text: var(--kudu-status-info-text);
+  --tone-surface: var(--kudu-status-info-surface);
+  --tone-border: var(--kudu-status-info-border);
+}
+
+[data-tone="neutral"] {
+  --tone-text: var(--kudu-status-neutral-text);
+  --tone-surface: var(--kudu-status-neutral-surface);
+  --tone-border: var(--kudu-status-neutral-border);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--kudu-space-1);
+  border-radius: var(--kudu-radius-pill);
+  border: 1px solid var(--tone-border, var(--kudu-border-subtle));
+  background: var(--tone-surface, var(--kudu-surface-subtle));
+  color: var(--tone-text, var(--kudu-text-secondary));
+  padding: 2px var(--kudu-space-2);
+  font-size: 11px;
+  font-weight: var(--kudu-font-weight-bold);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.event-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--kudu-text-small-size);
+  font-weight: var(--kudu-font-weight-medium);
+  color: var(--tone-text, var(--kudu-text-secondary));
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.event-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--tone-text, var(--kudu-text-muted));
+  flex: none;
+}
+
+/* ==========================================================================
+   Alerts (DataBanner and any inline alert)
+   Soft full surface + icon + text. Never a colored side strip (X01).
+   ========================================================================== */
+
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--kudu-space-3);
+  border: 1px solid var(--tone-border, var(--kudu-border-subtle));
+  background: var(--tone-surface, var(--kudu-surface-subtle));
+  border-radius: var(--kudu-radius-panel);
+  padding: var(--kudu-space-3) var(--kudu-space-4);
+  margin-bottom: var(--kudu-space-5);
+}
+
+.alert-icon {
+  flex: none;
+  color: var(--tone-text, var(--kudu-text-secondary));
+  margin-top: 1px;
+}
+
+.alert-text {
+  color: var(--kudu-text-primary);
+  font-size: var(--kudu-text-body-size);
+  line-height: var(--kudu-line-height-default);
+}
+
+.alert-text strong {
+  color: var(--tone-text, var(--kudu-text-primary));
+}
+
+/* ==========================================================================
+   Filters
+   ========================================================================== */
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--kudu-space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--kudu-space-4);
+}
+
+.action-row {
+  display: flex;
+  align-items: center;
+  gap: var(--kudu-space-2);
+  flex-wrap: wrap;
+  margin-top: var(--kudu-space-4);
+}
+
+.control {
+  height: var(--kudu-control-md);
+  border: 1px solid var(--kudu-border-default);
+  background: var(--kudu-surface-subtle);
+  border-radius: var(--kudu-radius-control);
+  padding: 0 var(--kudu-space-3);
+  color: var(--kudu-text-primary);
+  min-width: 0;
+}
+
+.control::placeholder {
+  color: var(--kudu-text-muted);
+}
+
+.control:focus-visible {
+  background: var(--kudu-surface-primary);
+}
+
+select.control {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%234B5563' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--kudu-space-2) center;
+  padding-inline-end: var(--kudu-space-8);
+}
+
+:where([dir="rtl"]) select.control {
+  background-position: left var(--kudu-space-2) center;
+}
+
+.field-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.field-search svg {
+  position: absolute;
+  inset-inline-start: var(--kudu-space-3);
+  color: var(--kudu-text-muted);
+  pointer-events: none;
+}
+
+.field-search .control {
+  padding-inline-start: var(--kudu-space-10);
+  min-width: 220px;
+}
+
+.clear-filters {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--kudu-text-secondary);
+  font-size: var(--kudu-text-small-size);
+  font-weight: var(--kudu-font-weight-medium);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 var(--kudu-space-2);
+}
+
+.clear-filters:hover {
+  color: var(--kudu-text-brand);
+}
+
+/* ==========================================================================
+   Empty / error / loading states
+   D26: minimal - icon, title, one short sentence, optional action.
+   ========================================================================== */
+
+.state-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--kudu-space-2);
+  padding: var(--kudu-space-12) var(--kudu-space-4);
+  color: var(--kudu-text-secondary);
+}
+
+.state-block svg {
+  color: var(--kudu-text-muted);
+}
+
+.state-title {
+  font-size: var(--kudu-text-component-title-size);
+  font-weight: var(--kudu-font-weight-bold);
+  color: var(--kudu-text-primary);
+}
+
+.state-message {
+  max-width: 440px;
+  font-size: var(--kudu-text-body-size);
+}
+
+.error-state svg {
+  color: var(--kudu-status-error-text);
+}
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kudu-space-3);
+  padding: var(--kudu-space-1) 0;
+}
+
+.skeleton-block {
+  border-radius: var(--kudu-radius-control);
+  background: linear-gradient(
+    90deg,
+    var(--kudu-surface-subtle) 25%,
+    var(--kudu-surface-hover) 37%,
+    var(--kudu-surface-subtle) 63%
+  );
+  background-size: 400% 100%;
+  animation: kudu-skeleton 1.4s ease infinite;
+}
+
+.skeleton-row {
+  height: 20px;
+  width: 100%;
+}
+
+.skeleton-row.short {
+  width: 40%;
+}
+
+.skeleton-tile {
+  height: 76px;
+  border-radius: var(--kudu-radius-panel);
+}
+
+.skeleton-card {
+  height: 220px;
+  border-radius: var(--kudu-radius-panel);
+}
+
+.skeleton-grid {
+  display: grid;
+  gap: var(--kudu-space-3);
+}
+
+.skeleton-grid.metrics {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.skeleton-grid.cards {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+@keyframes kudu-skeleton {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+/* ==========================================================================
+   Price
+   ========================================================================== */
+
+.price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--kudu-text-primary);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--kudu-font-weight-medium);
+  white-space: nowrap;
+  unicode-bidi: isolate;
+}
+
+.price.unknown {
+  color: var(--kudu-text-muted);
+  font-weight: var(--kudu-font-weight-regular);
+}
+
+.price-previous {
+  color: var(--kudu-text-muted);
+  font-weight: var(--kudu-font-weight-regular);
+  text-decoration: line-through;
+  font-size: var(--kudu-text-small-size);
+}
+
+.price-delta {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--kudu-text-small-size);
+  font-weight: var(--kudu-font-weight-bold);
+}
+
+.price-delta.down {
+  color: var(--kudu-status-success-text);
+}
+
+.price-delta.up {
+  color: var(--kudu-status-error-text);
+}
+
+/* ==========================================================================
+   Product image
+   ========================================================================== */
+
+.thumb,
+.thumb-missing {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: var(--kudu-radius-control);
+  background: var(--kudu-surface-subtle);
+}
+
+.thumb-missing,
+.thumb-lg-missing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--kudu-text-muted);
+  font-size: 10px;
+  text-align: center;
+  padding: var(--kudu-space-1);
+}
+
+.thumb-lg,
+.thumb-lg-missing {
+  width: 100%;
+  height: 160px;
+  border-radius: var(--kudu-radius-panel) var(--kudu-radius-panel) 0 0;
+  object-fit: cover;
+  background: var(--kudu-surface-subtle);
+}
+
+/* ==========================================================================
+   Promo cards
+   Each promotion is a genuine independent unit - a card is justified here.
+   ========================================================================== */
+
+.grid.cards {
+  display: grid;
+  gap: var(--kudu-space-3);
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.promo-card {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--kudu-duration-fast) var(--kudu-ease-standard);
+}
+
+.promo-card:hover {
+  border-color: var(--kudu-border-brand);
+}
+
+.promo-card .body {
+  padding: var(--kudu-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--kudu-space-1);
+}
+
+.promo-card h3 {
+  font-size: var(--kudu-text-component-title-size);
+  font-weight: var(--kudu-font-weight-bold);
+  margin-top: 2px;
+}
+
+.promo-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sizes {
+  color: var(--kudu-text-secondary);
+  font-size: var(--kudu-text-small-size);
+}
+
+/* ==========================================================================
+   Responsive (draft boundaries: 640 / 1024 / 1440)
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .app-shell {
+    grid-template-columns: 216px 1fr;
+  }
+
+  .main {
+    padding: var(--kudu-space-6);
+  }
+
+  .kpi-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .panel-grid,
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    display: block;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    z-index: var(--kudu-z-sticky);
+    flex-direction: row;
+    align-items: center;
+    gap: var(--kudu-space-3);
+    padding: var(--kudu-space-3);
+    border-inline-end: 0;
+    border-bottom: 1px solid var(--kudu-border-subtle);
+    overflow-x: auto;
+  }
+
+  .sidebar-brand {
+    padding: 0;
+  }
+
+  .sidebar-brand span {
+    display: none;
+  }
+
+  .nav-group {
+    flex-direction: row;
+    flex: none;
+  }
+
+  .nav-group-label {
+    display: none;
+  }
+
+  .nav-link {
+    flex: 0 0 auto;
+    padding: var(--kudu-space-2);
+  }
+
+  .nav-link-status {
+    display: none;
+  }
+
+  .main {
+    padding: var(--kudu-space-4);
+  }
+
+  .page-header {
+    flex-direction: column;
+  }
+
+  .kpi-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .table-scroll table {
+    min-width: 640px;
+  }
+
+  .field-search .control {
+    min-width: 0;
+  }
+}
+
+/* Market Overview: one explicit action with compact per-source progress. */
+.pull-panel {
+  margin-bottom: var(--kudu-space-5);
+}
+
+.pull-panel-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--kudu-space-3);
+  flex-wrap: wrap;
+}
+
+.pull-panel-heading .panel-title {
+  margin-bottom: 0;
+}
+
+.pull-panel > .meta-text {
+  margin: var(--kudu-space-2) 0 var(--kudu-space-3);
+}

@@ -3,10 +3,12 @@
 A local, multi-competitor price/offer monitoring repository. Each
 competitor is completely isolated inside its own folder under
 `competitors/`, with its own collector, database, raw data, screenshots,
-exports, and tests. The **only** place all competitors meet is the root
-Streamlit application, through one separate page per competitor.
+exports, and tests. The React/BFF app composes their read-only views, while
+the root Streamlit application links to separate operational pages. KUDU is
+kept in its own baseline module.
 
 ```text
+KUDU:         Production menu baseline (delivery and pickup)
 KFC:          Implemented
 Burger King:  Implemented
 Herfy:        Implemented
@@ -15,8 +17,48 @@ McDonald's:   Scaffold only (blocked - see competitors/mcdonalds/README.md)
 Albaik:       Scaffold only
 ```
 
+## KUDU baseline
+
+KUDU is the first brand in the React/BFF app and the Streamlit landing page.
+The React app opens the KUDU delivery menu by default; pickup is selectable.
+Its initial production snapshot lives in `kudu/data/catalog.json` and includes
+item names, prices, images, descriptions, calories, and publish flags for both
+services. The BFF reads this snapshot without exposing API credentials to the
+browser. The full API export from 2026-09-27 is in `exports/`.
+
+To refresh the baseline, set `KUDU_API_USERNAME` and `KUDU_API_PASSWORD` in
+`.env` or the shell, then run:
+
+```bash
+.venv/bin/python -m kudu.refresh
+```
+
+On **Market Overview**, the **Pull data for all competitors** button starts
+KUDU and the four connected competitors (KFC, Hardee's, Burger King, Herfy)
+at the same time. It collects both channels for each source, shows per-brand
+progress, and refreshes the overview when the batch completes. A second click
+while a batch is running reuses the active run. Collector output is saved in
+`bff/data/pull_logs/<run-id>/`; the competitor batch skips event screenshots
+so the parallel job focuses on menu and price data. Each source gets one
+retry after a failed or incomplete pass; KUDU also retries transient GET errors.
+A pull is marked successful only when its collector confirms completion. The
+latest progress is saved locally so a BFF restart marks unfinished work as
+interrupted, and the button can start a new pull. Previous complete snapshots
+stay available when a source fails. Upstream outages can still make a batch
+partial; the page shows which source failed. McDonald's and Albaik remain
+outside this action until they have working collectors.
+
+The refresh fetches `menuList` and `itemList` for every menu in delivery and
+pickup. It replaces the snapshot only after both services finish and validate.
+The production API does not return a currency field; the app displays its
+price values as SAR for this Saudi market. Records with `isPublish=false`
+remain in the catalog and are visibly marked. A single snapshot provides one
+price observation per item; change history starts only when snapshots are
+retained and compared in a later collector stage.
+
 ## Table of contents
 
+- [KUDU baseline](#kudu-baseline)
 - [Multi-competitor architecture](#multi-competitor-architecture)
 - [Project structure](#project-structure)
 - [Isolation rules](#isolation-rules)

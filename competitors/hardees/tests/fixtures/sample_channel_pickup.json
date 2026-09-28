@@ -122,6 +122,24 @@
           ]
         }
       ],
+      "items": [
+        {
+          "id": 71011,
+          "name": "Low Mein Thickburger Combo - Medium",
+          "sku": 91031,
+          "originalPrice": 32,
+          "specialPrice": 32,
+          "sel1Value": 3011
+        },
+        {
+          "id": 71012,
+          "name": "Low Mein Thickburger Combo - Large",
+          "sku": 91032,
+          "originalPrice": 37,
+          "specialPrice": 37,
+          "sel1Value": 3012
+        }
+      ],
       "subOptionStr": "Thickburger,Medium Fries,Medium Pepsi",
       "steps": [
         { "id": 1, "title": "Choice of Side Item", "subtitle": "Choice of Side Item", "type": "radio", "isHidden": 0, "isModifier": 0, "isAddon": 0, "isDependent": 0, "minimum": 1, "maximum": 1 },

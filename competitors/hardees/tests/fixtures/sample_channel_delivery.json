@@ -244,7 +244,25 @@
       ],
       "__categoryId": 5002,
       "__categoryName": "Chargrilled & Thick Burgers",
-      "__sourceEndpoint": "/api/getProductsByCategory"
+      "__sourceEndpoint": "/api/getProductsByCategory",
+      "items": [
+        {
+          "id": 71011,
+          "name": "Low Mein Thickburger Combo - Medium",
+          "sku": 91031,
+          "originalPrice": 32,
+          "specialPrice": 32,
+          "sel1Value": 3011
+        },
+        {
+          "id": 71012,
+          "name": "Low Mein Thickburger Combo - Large",
+          "sku": 91032,
+          "originalPrice": 37,
+          "specialPrice": 37,
+          "sel1Value": 3012
+        }
+      ]
     }
   ],
   "promotions": [],

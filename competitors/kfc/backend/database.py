@@ -283,6 +283,56 @@ MIGRATIONS: list[tuple[int, str, list[str]]] = [
             """,
         ],
     ),
+    (
+        2,
+        "external mobile-app channels",
+        [
+            """
+            CREATE TABLE IF NOT EXISTS external_channel_runs (
+                run_id TEXT PRIMARY KEY,
+                channel TEXT NOT NULL,
+                source TEXT NOT NULL,
+                restaurant_name TEXT NOT NULL,
+                branch_name TEXT,
+                started_at TEXT NOT NULL,
+                finished_at TEXT,
+                status TEXT NOT NULL CHECK (status IN ('RUNNING','SUCCESS','PARTIAL','FAILED')),
+                product_count INTEGER NOT NULL DEFAULT 0,
+                error_message TEXT,
+                raw_capture_path TEXT,
+                created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+            )
+            """,
+            "CREATE INDEX IF NOT EXISTS idx_external_runs_channel_status ON external_channel_runs(channel, status, started_at)",
+            """
+            CREATE TABLE IF NOT EXISTS external_channel_products (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                run_id TEXT NOT NULL,
+                source_product_id TEXT NOT NULL,
+                channel TEXT NOT NULL,
+                source TEXT NOT NULL,
+                restaurant_name TEXT NOT NULL,
+                name_en TEXT NOT NULL,
+                description_en TEXT,
+                category_name_en TEXT,
+                currency TEXT,
+                regular_price REAL,
+                special_price REAL,
+                effective_price REAL,
+                discount_percentage REAL,
+                calories INTEGER,
+                availability INTEGER,
+                image_url TEXT,
+                captured_at TEXT NOT NULL,
+                raw_json TEXT,
+                UNIQUE (run_id, source_product_id),
+                FOREIGN KEY (run_id) REFERENCES external_channel_runs(run_id)
+            )
+            """,
+            "CREATE INDEX IF NOT EXISTS idx_external_products_source_history ON external_channel_products(source_product_id, captured_at)",
+            "CREATE INDEX IF NOT EXISTS idx_external_products_run ON external_channel_products(run_id)",
+        ],
+    ),
 ]
 
 

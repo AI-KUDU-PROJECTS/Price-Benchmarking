@@ -151,6 +151,7 @@ python run_kfc_collector.py
 python run_kfc_collector.py --channel=PICKUP
 python run_kfc_collector.py --channel=DELIVERY
 python run_kfc_collector.py --no-screenshots
+python run_hungerstation_collector.py
 python run_kfc_scheduler.py
 
 # Equivalent module invocations (also from the repo root):
@@ -161,6 +162,20 @@ python -m competitors.kfc.scheduler
 # sidebar (or it's pages/1_KFC.py directly):
 streamlit run app.py
 ```
+
+### HungerStation mobile channel
+
+Start the Android emulator and leave the KFC restaurant menu open in the
+HungerStation app, then run `python run_hungerstation_collector.py` from the
+repository root. The collector reads the Android accessibility hierarchy,
+stores a historical snapshot, exposes the data as the `hungerstation`
+channel, creates promotions for discounted products, and reuses KFC images
+from Pickup or Delivery when the normalized product name matches.
+
+The daily KFC scheduler also runs this mobile collection when
+`KFC_HUNGERSTATION_ENABLED=true`. The emulator must stay running and the KFC
+menu must remain available. Set `KFC_HUNGERSTATION_ADB_SERIAL` when the device
+serial is different from `emulator-5554`.
 
 The Node collector itself has no such restriction (it's invoked as a
 subprocess by `backend/run_service.py`, or directly via the root
@@ -254,10 +269,11 @@ an incomplete/wrong branch is ever collected or compared**.
 Two further, channel-specific checks run per channel:
 
 - **Pickup** calls `getNewStore` with the configured coordinates and
-  confirms it resolves to `KFC_STORE_ID`. If the *nearest pickup-capable*
-  branch has changed (or the branch is currently closed and no longer
-  eligible for pickup - see note below), Pickup is marked FAILED for that
-  run while Delivery can still succeed independently.
+  confirms it resolves to `KFC_STORE_ID`. If it returns the `storeId: 0`
+  sentinel, read-only catalog collection may use the configured branch only
+  when that same run verified the branch is published and explicitly has
+  `services.tak == 1`. A different non-zero branch remains a hard failure,
+  preventing prices from being assigned to the wrong location.
 - **Delivery** calls `validateLocation` and confirms it resolves to
   `KFC_STORE_ID` and is deliverable. If not, Delivery is marked FAILED for
   that run.
@@ -268,10 +284,8 @@ Two further, channel-specific checks run per channel:
 > whether it still exists - `getMenu`/`getProductsByCategory` continue to
 > return full, correct catalog data for a "closed" branch. Only
 > `cmsStatus` gates the FAILED-run branch-existence check; a closed branch
-> is logged as an informational note (`branch_currently_closed` on the
-> run), never treated as a reason to fail catalog collection. Pickup can
-> still fail separately at that moment because `getNewStore` itself stops
-> considering a closed branch "nearest" - a distinct, and correct, signal.
+> is logged as an informational note and never treated as a reason to fail
+> read-only catalog collection.
 
 ## Database
 

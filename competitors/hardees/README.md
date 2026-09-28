@@ -250,9 +250,10 @@ competitor's folder.
 
 Every run, before collecting anything, `channel-collector.js`'s
 `verifyBranchExists()` calls `getStoreList` and confirms the configured
-`HRD_STORE_ID` appears with `cmsStatus == 1` and `active == 1`. If this
-fails, the run is marked **FAILED immediately** for every requested
-channel, with a clear error message, and **no product data from an
+`HRD_STORE_ID` is still present and published (`cmsStatus == 1`). A
+real-time `active == 0` value does not block read-only catalog collection.
+If the branch is missing or unpublished, the run is marked **FAILED
+immediately** for every requested channel, and **no product data from an
 incomplete/wrong branch is ever collected or compared**.
 
 **Known quirk - transient `BlobNotFound`:** `getStoreList` is served
@@ -266,9 +267,13 @@ validity directly (up to `MAX_RETRIES`, linear backoff) rather than via
 `http-client.js`'s exception-based `withRetry()` helper.
 
 Two further, channel-specific checks run per channel, mirroring KFC's
-pattern exactly: **Pickup** resolves the branch via `getNewStore`
-(`data.storeId`); **Delivery** resolves it via `validateLocation`
-(`data.store.storeId`, `deliverable` flag).
+pattern exactly. **Pickup** resolves the branch via `getNewStore`. When
+that endpoint returns `storeId: 0`, the collector may still read the
+configured branch's catalog only if the same run's verified `getStoreList`
+record says the branch is published and has `services.tak == 1`. A real,
+different non-zero branch remains a hard failure, so prices are never
+silently attributed to the wrong location. **Delivery** resolves via
+`validateLocation` (`data.store.storeId`, `deliverable` flag).
 
 ## Database
 
@@ -453,6 +458,13 @@ EUROMARCHE-H originally - see api-map.md) to find a current
 Pickup-capable branch and update `HRD_STORE_ID` accordingly, the same way
 KFC's own branch was once switched from RABWAH to EUROMARCHE for the same
 reason.
+
+> **Updated 2026-09-28:** the production endpoint still intermittently
+> returns `storeId: 0` while the published EUROMARCHE-H record continues
+> to advertise Pickup support. The collector now treats this sentinel as
+> live-ordering availability only and uses the verified configured branch
+> for read-only catalog collection. A live regression run completed Pickup
+> with 13/13 categories and 117 products.
 
 ## Security & compliance
 

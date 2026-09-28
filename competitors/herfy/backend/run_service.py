@@ -90,6 +90,8 @@ def is_run_active() -> bool:
 
 
 def _invoke_node(script: Path, args: list[str], timeout: int) -> subprocess.CompletedProcess:
+    from playwright_browsers import node_env
+
     cmd = [config.NODE_BIN, str(script), *args]
     return subprocess.run(
         cmd,
@@ -97,6 +99,7 @@ def _invoke_node(script: Path, args: list[str], timeout: int) -> subprocess.Comp
         capture_output=True,
         text=True,
         timeout=timeout,
+        env=node_env(),
     )
 
 

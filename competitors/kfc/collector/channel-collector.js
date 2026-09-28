@@ -28,7 +28,7 @@
 
 const CONFIG = require('./config');
 const apiClient = require('./api-client');
-const { wait, withRetry } = require('./http-client');
+const { wait } = require('./http-client');
 
 /**
  * Verifies the fixed branch (CONFIG.BRANCH) still exists (is configured in
@@ -52,7 +52,14 @@ const { wait, withRetry } = require('./http-client');
  * an informational note on the run, never as a failure reason.
  */
 async function verifyBranchExists(session, logger) {
-  const res = await apiClient.getStoreList(session, logger);
+  // The blob-backed store list can briefly return an upstream error while
+  // Azure refreshes it. Retry as the Hardee's collector does on this platform.
+  let res = await apiClient.getStoreList(session, logger);
+  for (let attempt = 0; !res.schema.valid && attempt < CONFIG.MAX_RETRIES; attempt++) {
+    if (logger) logger.tag('RETRY', `getStoreList attempt ${attempt + 1}/${CONFIG.MAX_RETRIES} failed (${res.schema.reason}) - retrying`);
+    await wait(600 * (attempt + 1));
+    res = await apiClient.getStoreList(session, logger);
+  }
   if (!res.schema.valid) {
     return { ok: false, error: `getStoreList failed schema validation: ${res.schema.reason}`, raw: res };
   }
@@ -82,12 +89,35 @@ async function verifyBranchExists(session, logger) {
   return { ok: true, menuTempId: store.menuTempId, storeRecord: store, currentlyClosed };
 }
 
-/** PICKUP: resolve nearest branch via getNewStore and confirm it matches the configured branch. */
-async function resolveBranchForChannel(session, channel, logger) {
+/**
+ * PICKUP: resolve the nearest branch via getNewStore. A storeId of 0 means
+ * the ordering service has no currently selectable Pickup branch (commonly
+ * outside operating hours). That must not block a read-only catalog refresh
+ * when getStoreList still confirms the configured branch is published and
+ * explicitly supports take-away.
+ */
+async function resolveBranchForChannel(session, channel, logger, branchVerify = null) {
   if (channel === 'PICKUP') {
     const res = await apiClient.getNewStore(session, { lat: CONFIG.BRANCH.latitude, lng: CONFIG.BRANCH.longitude }, logger);
     if (!res.schema.valid) return { ok: false, error: `getNewStore failed schema validation: ${res.schema.reason}` };
     const resolvedStoreId = Number(apiClient.getPath(res.data, 'data.storeId'));
+    if (resolvedStoreId === 0) {
+      const store = branchVerify && branchVerify.storeRecord;
+      const supportsPickup = store && store.services && Number(store.services.tak) === 1;
+      if (supportsPickup) {
+        if (logger) {
+          logger.warn(
+            `[BRANCH] getNewStore returned storeId=0 (no currently selectable Pickup branch); ` +
+            `using verified published KFC_STORE_ID=${CONFIG.BRANCH.storeId} for read-only catalog collection`
+          );
+        }
+        return { ok: true, storeId: CONFIG.BRANCH.storeId, catalogFallback: true };
+      }
+      return {
+        ok: false,
+        error: `getNewStore returned storeId=0 and verified branch KFC_STORE_ID=${CONFIG.BRANCH.storeId} does not advertise Pickup support`,
+      };
+    }
     if (resolvedStoreId !== Number(CONFIG.BRANCH.storeId)) {
       return { ok: false, error: `getNewStore resolved storeId=${resolvedStoreId} for the configured coordinates, but KFC_STORE_ID=${CONFIG.BRANCH.storeId} - the nearest pickup branch for this location has changed` };
     }
@@ -131,7 +161,7 @@ async function collectChannel(session, channel, logger, { onRawResponse } = {}) 
     return buildFailedResult(channel, startedAt, branchVerify.error, { categoryCount: 0, productCount: 0, offerCount: 0 });
   }
 
-  const branchRes = await resolveBranchForChannel(session, channel, logger);
+  const branchRes = await resolveBranchForChannel(session, channel, logger, branchVerify);
   if (!branchRes.ok) {
     logger.error(`[BRANCH] ${branchRes.error}`);
     return buildFailedResult(channel, startedAt, branchRes.error, { categoryCount: 0, productCount: 0, offerCount: 0 });
@@ -166,16 +196,13 @@ async function collectChannel(session, channel, logger, { onRawResponse } = {}) 
     const cat = categories[i];
     await wait(CONFIG.DELAY_BETWEEN_REQUESTS);
     logger.tag('CATEGORY', `[CATEGORY ${i + 1}/${categories.length}] ${cat.name}`);
-    let catRes;
-    try {
-      catRes = await withRetry(
-        () => apiClient.getProductsByCategory(session, { categoryId: cat.id, cluster: clusterId, configId: menuConfigId, service: channel, menuTempId: branchVerify.menuTempId }, logger),
-        CONFIG.MAX_RETRIES,
-        logger,
-        `getProductsByCategory(${cat.id})`
-      );
-    } catch (e) {
-      catRes = { schema: { valid: false, reason: e.message }, error: e.message };
+    // apiClient returns schema failures instead of throwing; retry those
+    // responses explicitly when the upstream category blob is unavailable.
+    let catRes = await apiClient.getProductsByCategory(session, { categoryId: cat.id, cluster: clusterId, configId: menuConfigId, service: channel, menuTempId: branchVerify.menuTempId }, logger);
+    for (let attempt = 0; !catRes.schema.valid && attempt < CONFIG.MAX_RETRIES; attempt++) {
+      logger.tag('RETRY', `getProductsByCategory(${cat.id}) attempt ${attempt + 1}/${CONFIG.MAX_RETRIES} failed (${catRes.schema.reason}) - retrying`);
+      await wait(600 * (attempt + 1));
+      catRes = await apiClient.getProductsByCategory(session, { categoryId: cat.id, cluster: clusterId, configId: menuConfigId, service: channel, menuTempId: branchVerify.menuTempId }, logger);
     }
     record(`getProductsByCategory-${cat.id}`, { id: cat.id }, catRes);
 

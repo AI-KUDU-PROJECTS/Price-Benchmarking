@@ -410,11 +410,10 @@ _SIZE_TITLE_MAP = {"regular": "Regular", "medium": "Medium", "large": "Large"}
 
 def _legacy_view_rows(conn: sqlite3.Connection, channel: str, branch_id: int) -> list[list[Any]]:
     """Mirrors the existing Competitors Pricing workbook shape (Category /
-    Item / Sandwich / Regular / Medium / Large). Sizes come ONLY from
-    variants[].options[] (see api-map.md) - if a product has no size
-    variant recognized with confidence, every size column is left blank
-    rather than guessed (spec: "If a size cannot be identified with
-    confidence, do not guess. Leave the size field blank")."""
+    Item / Sandwich / Regular / Medium / Large). Sizes come from
+    variants[].options[] joined to items[].sel1Value prices when present
+    (see normalizer.extract_sizes). If a size cannot be identified with
+    confidence, that size column is left blank rather than guessed."""
     rows = []
     query = """
         SELECT ps.* FROM product_snapshots ps
@@ -430,14 +429,17 @@ def _legacy_view_rows(conn: sqlite3.Connection, channel: str, branch_id: int) ->
         sizes = _json_list(r["sizes"])
         size_price = {"Regular": None, "Medium": None, "Large": None}
         if sizes:
-            # variants[].options[] carries the option TITLE, not a per-size
-            # price (see api-map.md) - the product's own effective_price is
-            # the confirmed price for whichever size isSelected=true; other
-            # sizes' prices are not exposed by this endpoint and are left
-            # blank rather than guessed.
             for s in sizes:
+                if not isinstance(s, dict):
+                    continue
                 title = _SIZE_TITLE_MAP.get(str(s.get("title", "")).strip().lower())
-                if title and s.get("isSelected"):
+                if not title:
+                    continue
+                if s.get("price") is not None:
+                    size_price[title] = s.get("price")
+                elif s.get("isSelected"):
+                    # Fallback: only the selected size gets the card price
+                    # when items[] did not supply a per-size price.
                     size_price[title] = r["effective_price"]
         rows.append([
             r["category_name_en"], r["product_name_en"], r["product_name_en"] if not sizes else "",

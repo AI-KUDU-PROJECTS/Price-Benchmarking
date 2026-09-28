@@ -172,33 +172,27 @@ etc.) per POS vendor (`ncr`, `partner`, `sicom`, ...). These PLU codes are
 what the real point-of-sale uses to look up a price - **they are not
 prices themselves**.
 
-#### Known limitation: live prices
+#### Live prices: `storeMenu` (+ DOM fallback)
 
-**No price field of any kind exists anywhere in the `GetMenuSections`
-response** - confirmed by exhaustively grepping the full ~250KB response
-for `price`, `cost`, `amount`, `Cents`, and the literal SAR values
-visibly rendered on the page (e.g. `39.00`) - none matched. Prices
-clearly ARE fetched and rendered client-side once a store is selected
-(confirmed live: real prices like `CHEESEBURGER LOVERS SAR 39.00`,
-`WHOPPER® SAR 29.00` appear in the rendered page), and grepping the
-site's own compiled JS bundles found the responsible client-side state
-(`isPricesLoading`, a `.prices` object, `price.default` / `price.min`
-fields read off it) - but the exact network request that populates that
-state was not captured during this session's research window despite
-multiple full page-load-through-store-selection recording passes on both
-GraphQL backends.
+`GetMenuSections` still has **no price fields** (confirmed). Live prices
+are loaded from the RBI gateway once a store is selected:
 
-**This is deliberately documented rather than guessed.** Given a
-price-monitoring tool cannot skip prices, `collector/price-scraper.js`
-extracts prices directly from the rendered `/en/menu` page's visible text
-(`"<PRODUCT NAME>\nSAR <price>"` pattern, matched by normalized product
-name back to the `GetMenuSections`-sourced product), as a pragmatic,
-transparently-documented deviation from the pure-API approach used for
-menu structure. **A future session with manual browser DevTools (Network
-tab, "Preserve log", slowly scrolling through every menu category while
-watching for the request that fires as prices populate) would very
-likely be able to close this gap properly** - see
-`competitors/burger_king/README.md` "Known limitations."
+| Operation | Endpoint | Variables | Role |
+|-----------|----------|-----------|------|
+| `storeMenu` | `euc1-prod-bk-gateway.rbictg.com/graphql` | `region=SA`, `channel=whitelabel`, `storeId`, `serviceMode=pickup\|delivery` | Entity `id` → `price.{default,min,max}` in **cents**; ids match Sanity `_id` / picker option children |
+| `plusData` | same gateway | `storeId`, `serviceMode` | PLU → price (cents string); fills gaps when a vendor `constantPlu` is known |
+
+Standalone POST works with normal JSON headers (`content-type:
+application/json`); do **not** send the client `@gateway` / `@useCache`
+directives (they 400 on the public schema).
+
+`collector/price-resolver.js` joins `storeMenu` onto catalog products and
+onto picker size options (SANDWICH ONLY / GO REGULAR / GO MEDIUM / GO
+LARGE, or piece counts). `collector/price-scraper.js` remains a fallback
+only for products still unpriced after `storeMenu` (e.g. some promo SKUs
+with default/min `0` and no pickup PLU in `plusData`).
+
+There is still **no confirmed "was X, now Y" / special_price** signal.
 
 #### Deal category
 

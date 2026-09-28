@@ -1,0 +1,821 @@
+"""Collect configured restaurant menus from the HungerStation Android app."""
+from __future__ import annotations
+
+import argparse
+import io
+import json
+import os
+import re
+import shutil
+import subprocess
+import time
+import uuid
+import xml.etree.ElementTree as ET
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Iterable
+
+from PIL import Image
+
+from competitors.hungerstation import config, database
+from competitors.hungerstation.config import Restaurant
+from competitors.hungerstation.uploader import upload
+
+PACKAGE = "com.hungerstation.android.web"
+MAIN_ACTIVITY = f"{PACKAGE}/.hungeractivities.MainActivity"
+CURRENCY_LABELS = {"§", "SAR", "ر.س"}
+
+
+def utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _adb_candidates() -> Iterable[Path]:
+    executable = shutil.which("adb")
+    if executable:
+        yield Path(executable)
+    for name in ("ANDROID_HOME", "ANDROID_SDK_ROOT"):
+        value = os.environ.get(name)
+        if value:
+            yield Path(value) / "platform-tools" / ("adb.exe" if os.name == "nt" else "adb")
+    yield from Path("/mnt/c/Users").glob("*/AppData/Local/Android/Sdk/platform-tools/adb.exe")
+
+
+def find_adb(explicit: str | None = None) -> Path:
+    if explicit:
+        candidate = Path(explicit)
+        if candidate.exists():
+            return candidate
+        raise FileNotFoundError(f"ADB was not found at {candidate}")
+    for candidate in _adb_candidates():
+        if candidate.exists():
+            return candidate
+    raise FileNotFoundError("ADB was not found. Install Android SDK Platform Tools or pass --adb.")
+
+
+class AndroidDevice:
+    def __init__(self, adb: Path, serial: str) -> None:
+        self.adb = adb
+        self.serial = serial
+
+    def run(self, *args: str) -> str:
+        last_error: subprocess.CalledProcessError | None = None
+        max_attempts = 6
+        for attempt in range(max_attempts):
+            try:
+                completed = subprocess.run(
+                    [str(self.adb), "-s", self.serial, *args],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    errors="replace",
+                )
+                return completed.stdout
+            except subprocess.CalledProcessError as error:
+                last_error = error
+                time.sleep(0.8 * (attempt + 1))
+        assert last_error is not None
+        raise last_error
+
+    def run_bytes(self, *args: str) -> bytes:
+        last_error: subprocess.CalledProcessError | None = None
+        for attempt in range(3):
+            try:
+                completed = subprocess.run(
+                    [str(self.adb), "-s", self.serial, *args],
+                    check=True,
+                    capture_output=True,
+                )
+                return completed.stdout
+            except subprocess.CalledProcessError as error:
+                last_error = error
+                time.sleep(0.8 * (attempt + 1))
+        assert last_error is not None
+        raise last_error
+
+    def tap(self, x: int, y: int) -> None:
+        self.run("shell", "input", "tap", str(x), str(y))
+        time.sleep(0.8)
+
+    def swipe(self, x1: int, y1: int, x2: int, y2: int, duration: int = 500) -> None:
+        self.run("shell", "input", "swipe", str(x1), str(y1), str(x2), str(y2), str(duration))
+        time.sleep(0.7)
+
+    def key(self, code: str) -> None:
+        self.run("shell", "input", "keyevent", code)
+        time.sleep(0.5)
+
+    def dump(self) -> str:
+        last_output = ""
+        max_attempts = 6
+        for attempt in range(max_attempts):
+            last_output = self.run("exec-out", "uiautomator", "dump", "/dev/tty")
+            end = last_output.rfind("</hierarchy>")
+            if end >= 0:
+                return last_output[: end + len("</hierarchy>")]
+            time.sleep(0.8 * (attempt + 1))
+        raise RuntimeError(
+            f"Android returned an incomplete UI hierarchy after {max_attempts} attempts "
+            f"({len(last_output)} bytes)"
+        )
+
+    def screenshot(self) -> bytes:
+        last_error: OSError | None = None
+        for attempt in range(3):
+            payload = self.run_bytes("exec-out", "screencap", "-p")
+            try:
+                with Image.open(io.BytesIO(payload)) as screenshot:
+                    screenshot.verify()
+                return payload
+            except OSError as error:
+                last_error = error
+                time.sleep(0.8 * (attempt + 1))
+        raise RuntimeError("Android returned an invalid screenshot after 3 attempts") from last_error
+
+    def start_app(self) -> None:
+        if self.serial.startswith("emulator-"):
+            try:
+                self.run(
+                    "shell", "appops", "set", "io.appium.settings",
+                    "android:mock_location", "allow",
+                )
+                self.run(
+                    "shell", "am", "start-foreground-service",
+                    "-n", "io.appium.settings/.LocationService",
+                    "--es", "longitude", str(config.LONGITUDE),
+                    "--es", "latitude", str(config.LATITUDE),
+                )
+            except subprocess.CalledProcessError:
+                self.run(
+                    "emu", "geo", "fix",
+                    str(config.LONGITUDE), str(config.LATITUDE),
+                )
+            time.sleep(0.5)
+        self.run("shell", "am", "force-stop", PACKAGE)
+        self.run("shell", "am", "start", "-n", MAIN_ACTIVITY)
+        time.sleep(5.0)
+
+
+def _normalize(value: str) -> str:
+    return "".join(character.casefold() for character in value if character.isalnum())
+
+
+def _bounds(value: str) -> tuple[int, int, int, int] | None:
+    match = re.fullmatch(r"\[(\d+),(\d+)\]\[(\d+),(\d+)\]", value or "")
+    return tuple(map(int, match.groups())) if match else None  # type: ignore[return-value]
+
+
+def _labels(root: ET.Element) -> list[tuple[str, str]]:
+    labels: list[tuple[str, str]] = []
+    for node in root.iter("node"):
+        label = (node.attrib.get("content-desc") or "").strip()
+        if label:
+            labels.append((node.attrib.get("resource-id") or "", label))
+    return labels
+
+
+def _has_search_input(xml: str) -> bool:
+    return "com.hungerstation.android.web:id/input_csc" in xml
+
+
+def _find_search_input(xml: str) -> tuple[int, int] | None:
+    root = ET.fromstring(xml)
+    for node in root.iter("node"):
+        if node.attrib.get("resource-id", "").endswith("/input_csc"):
+            box = _bounds(node.attrib.get("bounds", ""))
+            if box:
+                return ((box[0] + box[2]) // 2, (box[1] + box[3]) // 2)
+    return None
+
+
+def _find_location_recovery(xml: str) -> tuple[int, int] | None:
+    root = ET.fromstring(xml)
+    for node in root.iter("node"):
+        resource_id = node.attrib.get("resource-id", "")
+        label = (node.attrib.get("text") or node.attrib.get("content-desc") or "").casefold()
+        if resource_id.endswith("/tooltip_message"):
+            return (1000, 500)
+        if resource_id.endswith("/confirm_drop_off_button") or "confirm location" in label:
+            box = _bounds(node.attrib.get("bounds", ""))
+            if box:
+                return ((box[0] + box[2]) // 2, (box[1] + box[3]) // 2)
+        if not (
+            resource_id.endswith("/empty_state_primary_button")
+            or "select a new location" in label
+        ):
+            continue
+        box = _bounds(node.attrib.get("bounds", ""))
+        if box:
+            return ((box[0] + box[2]) // 2, (box[1] + box[3]) // 2)
+    return None
+
+
+def _find_location_setup_action(xml: str) -> tuple[int, int] | None:
+    root = ET.fromstring(xml)
+    for suffix in ("/confirm_drop_off_button", "/detect_my_location", "/change_location_header_v2"):
+        if suffix == "/change_location_header_v2" and "Select your location" not in xml:
+            continue
+        for node in root.iter("node"):
+            if not node.attrib.get("resource-id", "").endswith(suffix):
+                continue
+            if suffix == "/confirm_drop_off_button" and (
+                node.attrib.get("clickable") != "true"
+                or node.attrib.get("enabled") == "false"
+            ):
+                continue
+            box = _bounds(node.attrib.get("bounds", ""))
+            if box:
+                return ((box[0] + box[2]) // 2, (box[1] + box[3]) // 2)
+    return None
+
+
+def _clickable_restaurants(root: ET.Element) -> Iterable[tuple[ET.Element, list[tuple[str, ET.Element]]]]:
+    for node in root.iter("node"):
+        if node.attrib.get("clickable") != "true":
+            continue
+        titles: list[tuple[str, ET.Element]] = []
+        for child in node.iter("node"):
+            resource_id = child.attrib.get("resource-id", "")
+            if resource_id.endswith("/title"):
+                value = (child.attrib.get("text") or child.attrib.get("content-desc") or "").strip()
+                if value:
+                    titles.append((value, child))
+        if titles:
+            yield node, titles
+
+
+def _find_restaurant_result(xml: str, restaurant: Restaurant) -> tuple[int, int, str] | None:
+    aliases = {_normalize(alias) for alias in restaurant.aliases}
+    root = ET.fromstring(xml)
+    candidates: list[tuple[int, ET.Element, str]] = []
+    for node, titles in _clickable_restaurants(root):
+        for title, title_node in titles:
+            normalized = _normalize(title)
+            score = 2 if normalized in aliases else 1 if any(alias in normalized for alias in aliases) else 0
+            if score:
+                candidates.append((score, title_node, title))
+    for _, title_node, title in sorted(candidates, key=lambda item: item[0], reverse=True):
+        box = _bounds(title_node.attrib.get("bounds", ""))
+        if box:
+            return ((box[0] + box[2]) // 2, (box[1] + box[3]) // 2, title)
+    return None
+
+
+def _find_first_restaurant_card(xml: str, restaurant: Restaurant) -> tuple[int, int, str] | None:
+    """Use the first full result when HungerStation omits its title from accessibility."""
+    root = ET.fromstring(xml)
+    cards: list[tuple[int, tuple[int, int, int, int]]] = []
+    for node in root.iter("node"):
+        if node.attrib.get("clickable") != "true":
+            continue
+        resource_ids = {child.attrib.get("resource-id", "") for child in node.iter("node")}
+        if not any(value.endswith("/description") for value in resource_ids):
+            continue
+        if not any(value.endswith("/rate_value") for value in resource_ids):
+            continue
+        if not any(value.endswith("/product_name") for value in resource_ids):
+            continue
+        box = _bounds(node.attrib.get("bounds", ""))
+        if box and box[2] - box[0] >= 800 and box[3] - box[1] >= 400:
+            cards.append((box[1], box))
+    if not cards:
+        return None
+    _, box = min(cards, key=lambda card: card[0])
+    return ((box[0] + box[2]) // 2, min(box[1] + 80, box[3] - 1), restaurant.name)
+
+
+def _find_popular_search_shortcut(xml: str, restaurant: Restaurant) -> tuple[int, int] | None:
+    targets = {_normalize(restaurant.search_term), *(_normalize(alias) for alias in restaurant.aliases)}
+    root = ET.fromstring(xml)
+    for node in root.iter("node"):
+        if not node.attrib.get("resource-id", "").startswith("UniversalSearch_popular_search_cell_"):
+            continue
+        label = node.attrib.get("content-desc") or node.attrib.get("text") or ""
+        if _normalize(label) not in targets:
+            continue
+        box = _bounds(node.attrib.get("bounds", ""))
+        if box:
+            return ((box[0] + box[2]) // 2, (box[1] + box[3]) // 2)
+    return None
+
+
+def _find_search_suggestion(xml: str, restaurant: Restaurant) -> tuple[int, int] | None:
+    aliases = {_normalize(alias) for alias in restaurant.aliases}
+    root = ET.fromstring(xml)
+    for node in root.iter("node"):
+        if node.attrib.get("clickable") != "true":
+            continue
+        if any(
+            child.attrib.get("resource-id", "").endswith("/input_csc")
+            for child in node.iter("node")
+        ):
+            continue
+        values: list[str] = []
+        for child in node.iter("node"):
+            values.extend((child.attrib.get("text", ""), child.attrib.get("content-desc", "")))
+        normalized_values = {_normalize(value) for value in values if value}
+        if not any(alias in value for alias in aliases for value in normalized_values):
+            continue
+        box = _bounds(node.attrib.get("bounds", ""))
+        if box:
+            return ((box[0] + box[2]) // 2, (box[1] + box[3]) // 2)
+    return None
+
+
+def _find_autocomplete_shortcut(xml: str, restaurant: Restaurant) -> tuple[int, int] | None:
+    targets = {_normalize(restaurant.search_term), *(_normalize(alias) for alias in restaurant.aliases)}
+    root = ET.fromstring(xml)
+    for node in root.iter("node"):
+        if not node.attrib.get("resource-id", "").startswith("UniversalSearch_autocomplete_cell_"):
+            continue
+        label = node.attrib.get("content-desc") or node.attrib.get("text") or ""
+        first_suggestion = _normalize(label.split(",", 1)[0])
+        if first_suggestion not in targets:
+            continue
+        box = _bounds(node.attrib.get("bounds", ""))
+        if box:
+            return ((box[0] + box[2]) // 2, (box[1] + box[3]) // 2)
+    return None
+
+
+def _is_restaurant_menu(xml: str, restaurant: Restaurant) -> bool:
+    aliases = {_normalize(alias) for alias in restaurant.aliases}
+    root = ET.fromstring(xml)
+    header_values: list[str] = []
+    for node in root.iter("node"):
+        box = _bounds(node.attrib.get("bounds", ""))
+        if box is not None and box[1] < 800:
+            header_values.extend((node.attrib.get("text", ""), node.attrib.get("content-desc", "")))
+    normalized_headers = {_normalize(value) for value in header_values if value}
+    matches_brand = any(alias in value for alias in aliases for value in normalized_headers)
+    has_product = any(
+        parse_accessibility_label(
+            node.attrib.get("content-desc", ""),
+            restaurant.id,
+            node.attrib.get("resource-id", ""),
+        )
+        is not None
+        for node in root.iter("node")
+    )
+    return (
+        "android.widget.ScrollView" in xml
+        and matches_brand
+        and ("Min. Order" in xml or has_product)
+    )
+
+
+def _is_active_menu_page(xml: str, brand_id: str) -> bool:
+    if PACKAGE not in xml or "android.widget.ScrollView" not in xml:
+        return False
+    root = ET.fromstring(xml)
+    return "Min. Order" in xml or any(
+        parse_accessibility_label(
+            node.attrib.get("content-desc", ""),
+            brand_id,
+            node.attrib.get("resource-id", ""),
+        )
+        is not None
+        for node in root.iter("node")
+    )
+
+
+def open_restaurant(device: AndroidDevice, restaurant: Restaurant) -> str:
+    device.start_app()
+    xml = device.dump()
+    for _ in range(10):
+        location_setup = _find_location_setup_action(xml)
+        if location_setup is not None:
+            device.tap(*location_setup)
+            time.sleep(2.5)
+            xml = device.dump()
+            continue
+        if _has_search_input(xml):
+            break
+        location_recovery = _find_location_recovery(xml)
+        if location_recovery is not None:
+            device.tap(*location_recovery)
+            time.sleep(2.5)
+            xml = device.dump()
+            continue
+        if "com.google.android.apps.nexuslauncher" in xml:
+            device.start_app()
+        else:
+            time.sleep(1.0)
+            xml = device.dump()
+            if _has_search_input(xml):
+                break
+            device.key("4")
+        time.sleep(1.0)
+        xml = device.dump()
+    if not _has_search_input(xml):
+        raise RuntimeError("Could not reach the HungerStation restaurant search screen")
+
+    point = _find_search_input(xml)
+    if point is None:
+        raise RuntimeError("HungerStation search input was not found")
+    device.tap(*point)
+    time.sleep(1.5)
+    xml = device.dump()
+    transitioned_point = _find_search_input(xml)
+    if transitioned_point is not None:
+        device.tap(*transitioned_point)
+    device.key("123")
+    for _ in range(60):
+        device.run("shell", "input", "keyevent", "67")
+    encoded = restaurant.search_term.replace(" ", "%s")
+    device.run("shell", "input", "text", encoded)
+    time.sleep(0.8)
+    xml = device.dump()
+    autocomplete = _find_autocomplete_shortcut(xml, restaurant)
+    if autocomplete:
+        device.tap(*autocomplete)
+    else:
+        device.key("66")
+    result: tuple[int, int, str] | None = None
+    search_shortcut_tapped = False
+    for _ in range(10):
+        time.sleep(1.2)
+        xml = device.dump()
+        if _is_restaurant_menu(xml, restaurant):
+            return restaurant.name
+        result = _find_restaurant_result(xml, restaurant)
+        if result is not None:
+            break
+        if not search_shortcut_tapped:
+            shortcut = (
+                _find_popular_search_shortcut(xml, restaurant)
+                or _find_search_suggestion(xml, restaurant)
+            )
+            if shortcut is not None:
+                device.tap(*shortcut)
+                search_shortcut_tapped = True
+    if result is None:
+        result = _find_first_restaurant_card(xml, restaurant)
+    if result is None:
+        raise RuntimeError(f"{restaurant.name} was not found for the configured HungerStation location")
+    device.tap(result[0], result[1])
+
+    for _ in range(12):
+        time.sleep(0.8)
+        xml = device.dump()
+        if _is_restaurant_menu(xml, restaurant):
+            return result[2]
+    raise RuntimeError(f"Opened result did not resolve to the {restaurant.name} menu")
+
+
+def _slug(value: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", value.casefold()).strip("-")
+    return slug or uuid.uuid5(uuid.NAMESPACE_URL, value).hex[:12]
+
+
+def parse_accessibility_label(label: str, brand_id: str, resource_id: str = "") -> dict[str, Any] | None:
+    parts = [part.strip() for part in label.splitlines() if part.strip()]
+    if not parts or "Min. Order" in parts or "more to place your order" in label:
+        return None
+    try:
+        currency_at = next(index for index, part in enumerate(parts) if part in CURRENCY_LABELS)
+    except StopIteration:
+        return None
+    if currency_at < 1 or currency_at + 1 >= len(parts):
+        return None
+    try:
+        current_price = float(parts[currency_at + 1].replace(",", ""))
+    except ValueError:
+        return None
+    if current_price < 0:
+        return None
+
+    metadata = re.compile(r"^(?:\d+(?:\.\d+)?%|\d+\+? orders|Bestseller|Top Rated)$", re.I)
+    pre_price = parts[:currency_at]
+    name = next((part for part in pre_price if not metadata.match(part)), None)
+    if not name:
+        return None
+    description_parts = [
+        part for part in pre_price
+        if part != name and not metadata.match(part) and part.casefold() != "description undefined"
+    ]
+    calorie_text = next((part for part in description_parts if re.fullmatch(r"[\d,]+\s*kcal", part, re.I)), None)
+    calories = int(re.sub(r"\D", "", calorie_text)) if calorie_text else None
+    description = " ".join(part for part in description_parts if part != calorie_text) or None
+    original_price = None
+    for index in range(currency_at + 2, len(parts) - 1):
+        if parts[index] in CURRENCY_LABELS:
+            try:
+                original_price = float(parts[index + 1].replace(",", ""))
+            except ValueError:
+                pass
+            break
+    discount_text = next((part for part in parts if re.fullmatch(r"\d+(?:\.\d+)?%", part)), None)
+    discount = float(discount_text.rstrip("%")) if discount_text else None
+    return {
+        "source_product_id": f"HUNGERSTATION|{brand_id}|{_slug(name)}",
+        "name_en": name,
+        "description_en": description,
+        "category_name_en": "HungerStation Menu",
+        "currency": "SAR",
+        "regular_price": original_price if original_price is not None else current_price,
+        "special_price": current_price if original_price is not None else None,
+        "effective_price": current_price,
+        "discount_percentage": discount,
+        "calories": calories,
+        "availability": 1,
+        "image_url": None,
+        "raw_label": label,
+        "is_summary_card": resource_id.startswith("gridMenuCell-"),
+    }
+
+
+def deduplicate(labels: Iterable[tuple[str, str]], brand_id: str) -> list[dict[str, Any]]:
+    items: dict[str, dict[str, Any]] = {}
+    for resource_id, label in labels:
+        item = parse_accessibility_label(label, brand_id, resource_id)
+        if item is None:
+            continue
+        key = item["source_product_id"]
+        previous = items.get(key)
+        if previous is None or (previous["is_summary_card"] and not item["is_summary_card"]):
+            items[key] = item
+    return sorted(items.values(), key=lambda item: item["name_en"].casefold())
+
+
+def product_image_candidates(
+    xml: str,
+    brand_id: str,
+) -> list[tuple[str, str, tuple[int, int, int, int], int]]:
+    """Find the largest product ImageView inside each accessible menu card."""
+    root = ET.fromstring(xml)
+    candidates: dict[str, tuple[str, str, tuple[int, int, int, int], int]] = {}
+    for node in root.iter("node"):
+        label = (node.attrib.get("content-desc") or "").strip()
+        if not label:
+            continue
+        item = parse_accessibility_label(label, brand_id, node.attrib.get("resource-id", ""))
+        if item is None:
+            continue
+        image_boxes: list[tuple[int, tuple[int, int, int, int]]] = []
+        for child in node.iter("node"):
+            if child.attrib.get("class") != "android.widget.ImageView":
+                continue
+            box = _bounds(child.attrib.get("bounds", ""))
+            if box is None:
+                continue
+            width = box[2] - box[0]
+            height = box[3] - box[1]
+            if width < 120 or height < 100:
+                continue
+            image_boxes.append((width * height, box))
+        if not image_boxes:
+            continue
+        area, box = max(image_boxes, key=lambda candidate: candidate[0])
+        source_id = item["source_product_id"]
+        candidate = (source_id, item["name_en"], box, area)
+        previous = candidates.get(source_id)
+        if previous is None or area > previous[3]:
+            candidates[source_id] = candidate
+    return list(candidates.values())
+
+
+def save_product_images(
+    screenshot_bytes: bytes,
+    candidates: Iterable[tuple[str, str, tuple[int, int, int, int], int]],
+    brand_id: str,
+    image_scores: dict[str, int],
+    *,
+    image_dir: Path = config.IMAGE_DIR,
+) -> dict[str, str]:
+    """Crop product artwork from a menu screenshot and return public image URLs."""
+    output: dict[str, str] = {}
+    destination = image_dir / brand_id
+    destination.mkdir(parents=True, exist_ok=True)
+    with Image.open(io.BytesIO(screenshot_bytes)) as opened:
+        screenshot = opened.convert("RGB")
+    screen_width, screen_height = screenshot.size
+    for source_id, product_name, box, area in candidates:
+        x1, y1, x2, y2 = box
+        if (
+            area <= image_scores.get(source_id, 0)
+            or x1 < 0
+            or y1 < 80
+            or x2 > screen_width
+            or y2 > screen_height - 100
+            or x2 <= x1
+            or y2 <= y1
+        ):
+            continue
+        filename = f"{_slug(product_name)}.jpg"
+        image_path = destination / filename
+        screenshot.crop(box).save(image_path, format="JPEG", quality=86, optimize=True)
+        image_scores[source_id] = area
+        output[source_id] = f"/hungerstation-images/{brand_id}/{filename}"
+    return output
+
+
+def collect_menu(device: AndroidDevice, brand_id: str, *, max_pages: int = 45) -> tuple[list[dict[str, Any]], list[list[str]]]:
+    for _ in range(8):
+        device.swipe(540, 650, 540, 1950, 350)
+    pages: list[list[str]] = []
+    labels: list[tuple[str, str]] = []
+    image_scores: dict[str, int] = {}
+    image_urls: dict[str, str] = {}
+    previous_signature = ""
+    repeated = 0
+    for _ in range(max_pages):
+        xml = device.dump()
+        if not _is_active_menu_page(xml, brand_id):
+            raise RuntimeError(
+                f"{config.RESTAURANT_BY_ID[brand_id].name} menu closed before collection completed"
+            )
+        page_labels = _labels(ET.fromstring(xml))
+        labels.extend(page_labels)
+        pages.append([label for _, label in page_labels])
+        try:
+            candidates = product_image_candidates(xml, brand_id)
+            uncaptured = []
+            for source_id, product_name, box, area in candidates:
+                filename = f"{_slug(product_name)}.jpg"
+                existing = config.IMAGE_DIR / brand_id / filename
+                if existing.exists():
+                    image_urls[source_id] = f"/hungerstation-images/{brand_id}/{filename}"
+                    image_scores[source_id] = max(area, image_scores.get(source_id, 0))
+                else:
+                    uncaptured.append((source_id, product_name, box, area))
+            if uncaptured:
+                image_urls.update(
+                    save_product_images(
+                        device.screenshot(),
+                        uncaptured,
+                        brand_id,
+                        image_scores,
+                    )
+                )
+        except Exception as error:
+            print(f"HUNGERSTATION_IMAGE_WARNING brand={brand_id} message={error}")
+        signature = "|".join(label for resource_id, label in page_labels if resource_id.startswith("gridMenuCell-") or "\n§\n" in label)
+        repeated = repeated + 1 if signature and signature == previous_signature else 0
+        if repeated >= 2:
+            break
+        previous_signature = signature
+        device.swipe(540, 1910, 540, 610, 600)
+    items = deduplicate(labels, brand_id)
+    for item in items:
+        item["image_url"] = image_urls.get(item["source_product_id"])
+    return items, pages
+
+
+def load_capture(path: Path, brand_id: str) -> list[dict[str, Any]]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    captured_items = payload.get("items", [])
+    if captured_items:
+        items_by_source: dict[str, dict[str, Any]] = {}
+        for item in captured_items:
+            source_id = item.get("source_product_id")
+            if not source_id:
+                continue
+            previous = items_by_source.get(source_id)
+            if previous is None or (
+                previous.get("is_summary_card") and not item.get("is_summary_card")
+            ):
+                items_by_source[source_id] = item
+        return sorted(
+            items_by_source.values(),
+            key=lambda item: item.get("name_en", "").casefold(),
+        )
+    labels: list[tuple[str, str]] = []
+    for page in payload.get("pages", []):
+        descriptions = page.get("descriptions", []) if isinstance(page, dict) else page
+        labels.extend(("", label) for label in descriptions)
+    if not labels:
+        for item in payload.get("items", []):
+            label = item.get("raw_accessibility_label") or item.get("raw_label")
+            if label:
+                labels.append((item.get("source_id", ""), label))
+    return deduplicate(labels, brand_id)
+
+
+def collect_restaurant(
+    restaurant: Restaurant,
+    *,
+    device: AndroidDevice,
+    db_path: Path = config.DB_PATH,
+    batch_id: str | None = None,
+    from_capture: Path | None = None,
+) -> dict[str, Any]:
+    started_at = utc_now()
+    run_id = f"hs-{restaurant.id}-{datetime.now(timezone.utc):%Y%m%dT%H%M%SZ}-{uuid.uuid4().hex[:8]}"
+    try:
+        resolved_name = restaurant.name
+        if from_capture:
+            items = load_capture(from_capture, restaurant.id)
+            pages: list[list[str]] = []
+        else:
+            resolved_name = open_restaurant(device, restaurant)
+            items, pages = collect_menu(device, restaurant.id)
+        items_by_source: dict[str, dict[str, Any]] = {}
+        for item in items:
+            source_id = item["source_product_id"]
+            previous = items_by_source.get(source_id)
+            if previous is None or (
+                previous.get("is_summary_card") and not item.get("is_summary_card")
+            ):
+                items_by_source[source_id] = item
+        items = sorted(
+            items_by_source.values(),
+            key=lambda item: item.get("name_en", "").casefold(),
+        )
+        if len(items) < restaurant.minimum_products:
+            raise RuntimeError(
+                f"Only {len(items)} products were found; expected at least {restaurant.minimum_products}"
+            )
+        finished_at = utc_now()
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        raw_path = config.RAW_DIR / restaurant.id / f"{stamp}.json"
+        raw_path.parent.mkdir(parents=True, exist_ok=True)
+        raw_payload = {
+            "run_id": run_id,
+            "batch_id": batch_id,
+            "brand_id": restaurant.id,
+            "restaurant": resolved_name,
+            "collected_at": finished_at,
+            "items": items,
+            "pages": pages,
+        }
+        raw_path.write_text(json.dumps(raw_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        database.save_success(
+            run_id=run_id,
+            batch_id=batch_id,
+            brand_id=restaurant.id,
+            restaurant_name=resolved_name,
+            started_at=started_at,
+            finished_at=finished_at,
+            items=items,
+            raw_capture_path=str(raw_path),
+            path=db_path,
+        )
+        uploaded = upload(raw_payload)
+        return {
+            "brand_id": restaurant.id,
+            "name": restaurant.name,
+            "status": "success",
+            "run_id": run_id,
+            "product_count": len(items),
+            "uploaded": uploaded,
+        }
+    except Exception as error:
+        database.save_failure(
+            run_id=run_id,
+            batch_id=batch_id,
+            brand_id=restaurant.id,
+            restaurant_name=restaurant.name,
+            started_at=started_at,
+            finished_at=utc_now(),
+            error=str(error),
+            path=db_path,
+        )
+        return {
+            "brand_id": restaurant.id,
+            "name": restaurant.name,
+            "status": "failed",
+            "run_id": run_id,
+            "product_count": 0,
+            "error": str(error),
+        }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    selection = parser.add_mutually_exclusive_group(required=True)
+    selection.add_argument("--brand", choices=sorted(config.RESTAURANT_BY_ID))
+    selection.add_argument("--all", action="store_true")
+    parser.add_argument("--serial", default=config.ADB_SERIAL)
+    parser.add_argument("--adb")
+    parser.add_argument("--db", type=Path, default=config.DB_PATH)
+    parser.add_argument("--batch-id", default=os.environ.get("PULL_RUN_ID"))
+    parser.add_argument("--from-capture", type=Path)
+    args = parser.parse_args()
+
+    database.init_db(args.db)
+    device = AndroidDevice(find_adb(args.adb), args.serial)
+    restaurants = config.RESTAURANTS if args.all else (config.RESTAURANT_BY_ID[args.brand],)
+    results = []
+    for restaurant in restaurants:
+        result = collect_restaurant(
+            restaurant,
+            device=device,
+            db_path=args.db,
+            batch_id=args.batch_id,
+            from_capture=args.from_capture,
+        )
+        results.append(result)
+        print(
+            f"HUNGERSTATION_RESULT brand={restaurant.id} status={result['status'].upper()} "
+            f"products={result['product_count']}"
+        )
+        if result.get("error"):
+            print(f"HUNGERSTATION_ERROR brand={restaurant.id} message={result['error']}")
+    print(json.dumps({"results": results}, ensure_ascii=False))
+    return 0 if all(result["status"] == "success" for result in results) else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
