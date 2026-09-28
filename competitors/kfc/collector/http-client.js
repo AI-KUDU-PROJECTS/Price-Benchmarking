@@ -62,7 +62,9 @@ function request({ method = 'GET', url, headers = {}, body = null, timeoutMs }) 
         const chunks = [];
         res.on('data', (c) => chunks.push(c));
         res.on('end', () => {
-          const bodyText = Buffer.concat(chunks).toString('utf8');
+          let bodyText = Buffer.concat(chunks).toString('utf8');
+          // Azure's blob-backed store list can include a UTF-8 BOM.
+          if (bodyText.charCodeAt(0) === 0xfeff) bodyText = bodyText.slice(1);
           let json = null;
           let parseError = null;
           if (bodyText) {

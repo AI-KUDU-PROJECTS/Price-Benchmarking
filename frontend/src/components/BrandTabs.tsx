@@ -8,11 +8,18 @@ const TABS = [
   ["History", "/history"],
 ];
 
+const KUDU_TABS = [
+  ["Menu", "/menu"],
+  ["Overview", ""],
+  ["Offers", "/promotions"],
+];
+
 export function BrandTabs({ brandId }: { brandId: string }) {
   const base = `/competitors/${brandId}`;
+  const tabs = brandId === "kudu" ? KUDU_TABS : TABS;
   return (
     <div className="tabs">
-      {TABS.map(([label, suffix]) => (
+      {tabs.map(([label, suffix]) => (
         <NavLink
           key={label}
           to={`${base}${suffix}`}

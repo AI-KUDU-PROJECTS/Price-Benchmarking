@@ -10,6 +10,8 @@ Streamlit dashboards remain the operations surface (Run Now, logs, Excel export)
 
 ## Current Implementation Scope
 
+**Scope update (2026-09-27):** KUDU production menu ingestion is now implemented as the first, baseline brand. Delivery and pickup item names, prices, images, and publish flags are loaded through a dedicated snapshot adapter. Cross-brand product matching and price positioning remain deferred.
+
 The first release covers four competitors in this exact order:
 
 1. KFC
@@ -53,7 +55,10 @@ Keep a persistent left sidebar with the following order:
 
 ```text
 KUDU
-PRICE INTELLIGENCE
+PRICE BENCHMARK
+
+BASELINE
+  KUDU Menu
 
 OVERVIEW
   Market Overview
@@ -407,7 +412,7 @@ Contract rules:
 The following items are explicitly deferred and should not block or expand Phases 1–6:
 
 - cross-brand **Market Comparison**;
-- Kudu pricing ingestion or Kudu-versus-market positioning;
+- Kudu-versus-market positioning;
 - unified product classification across brands;
 - product matching/equivalency between brands;
 - automated alerts or notifications;
@@ -433,4 +438,4 @@ These features require additional product decisions and, especially for comparis
 - all four independent backends feed the frontend through adapters and the BFF;
 - KFC is implemented and accepted as the reference before the other brand integrations;
 - Market Overview, Market Changes, and Promotions Monitor meet their phase exit criteria;
-- no future-scope comparison, Kudu pricing, matching, alerts, or long-term trend work is included.
+- no future-scope cross-brand comparison, matching, alerts, or long-term trend work is included.

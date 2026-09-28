@@ -18,7 +18,7 @@ STALE_AFTER = timedelta(hours=30)
 
 Health = Literal["healthy", "partial", "stale", "error", "disconnected"]
 Freshness = Literal["fresh", "stale", "unavailable"]
-Channel = Literal["pickup", "delivery"]
+Channel = Literal["pickup", "delivery", "hungerstation"]
 ProductStatus = Literal["active", "not_observed", "removed", "returned"]
 PromotionStatus = Literal["active", "not_observed", "ended", "returned"]
 RunStatus = Literal["running", "success", "partial", "failed"]
@@ -96,10 +96,13 @@ RUN_STATUS_TO_CONTRACT: dict[str, RunStatus] = {
 }
 
 KNOWN_BRANDS: tuple[tuple[str, str], ...] = (
+    ("kudu", "KUDU"),
     ("kfc", "KFC"),
     ("hardees", "Hardee's"),
     ("burger-king", "Burger King"),
     ("herfy", "Herfy"),
+    ("mcdonalds", "McDonald's"),
+    ("albaik", "AlBaik"),
 )
 
 
@@ -141,6 +144,7 @@ class Product(ContractModel):
     name_ar: str | None = None
     name_en: str | None = None
     category: str | None = None
+    category_ar: str | None = None
     image_url: str | None = None
     channel: Channel
     location: str | None = None
@@ -151,6 +155,11 @@ class Product(ContractModel):
     currency: str | None = None
     sizes: list[ProductSize] = Field(default_factory=list)
     availability: bool | None = None
+    is_published: bool | None = None
+    is_hidden: bool | None = None
+    description_ar: str | None = None
+    description_en: str | None = None
+    calories: int | None = None
     status: ProductStatus
     first_seen_at: str | None = None
     last_seen_at: str | None = None

@@ -55,6 +55,7 @@ export function BrandChangesPage({ brandId }: { brandId: string }) {
           <option value="">All channels</option>
           <option value="pickup">Pickup</option>
           <option value="delivery">Delivery</option>
+          {brandId !== "kudu" && <option value="hungerstation">HungerStation</option>}
         </select>
         <label className="visually-hidden" htmlFor="filter-type">Event type</label>
         <select id="filter-type" className="control" value={params.get("type") || ""} onChange={(e) => setSearchParam(setParams, params, "type", e.target.value)}>

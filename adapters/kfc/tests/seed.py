@@ -18,6 +18,26 @@ def seed_kfc_db(db_path: Path) -> None:
         _run(conn, "run-new-p", "PICKUP", "2026-09-08T06:00:00Z", "SUCCESS", 2)
         _run(conn, "run-new-d", "DELIVERY", "2026-09-08T06:05:00Z", "SUCCESS", 2)
         _run(conn, "run-fail-p", "PICKUP", "2026-09-08T07:00:00Z", "FAILED", 0, error="schema")
+        _external_run(conn, "run-hungerstation-old", "2026-09-01T06:10:00Z", 1)
+        _external_product(
+            conn,
+            run_id="run-hungerstation-old",
+            source_id="HUNGERSTATION|KFC|spicy-bites",
+            captured="2026-09-01T06:10:00Z",
+            name="Spicy Bites",
+            regular=40.0,
+            special=20.0,
+        )
+        _external_run(conn, "run-hungerstation", "2026-09-08T06:10:00Z", 1)
+        _external_product(
+            conn,
+            run_id="run-hungerstation",
+            source_id="HUNGERSTATION|KFC|spicy-bites",
+            captured="2026-09-08T06:10:00Z",
+            name="Spicy Bites",
+            regular=40.0,
+            special=18.0,
+        )
 
         sizes = json.dumps(
             [
@@ -97,6 +117,7 @@ def seed_kfc_db(db_path: Path) -> None:
             regular=19.0,
             special=None,
             sizes=sizes,
+            image="https://images.example.test/chicken-combo.jpg",
         )
         _snapshot(
             conn,
@@ -222,6 +243,32 @@ def _run(conn, run_id, channel, started, status, products, error=None):
     )
 
 
+def _external_run(conn, run_id, started, products):
+    conn.execute(
+        """
+        INSERT INTO external_channel_runs (
+            run_id, channel, source, restaurant_name, branch_name,
+            started_at, finished_at, status, product_count
+        ) VALUES (?, 'HUNGERSTATION', 'hungerstation', 'KFC', 'HungerStation', ?, ?, 'SUCCESS', ?)
+        """,
+        (run_id, started, started, products),
+    )
+
+
+def _external_product(conn, *, run_id, source_id, captured, name, regular, special):
+    conn.execute(
+        """
+        INSERT INTO external_channel_products (
+            run_id, source_product_id, channel, source, restaurant_name,
+            name_en, category_name_en, currency, regular_price, special_price,
+            effective_price, discount_percentage, availability, captured_at
+        ) VALUES (?, ?, 'HUNGERSTATION', 'hungerstation', 'KFC', ?,
+                  'HungerStation Menu', 'SAR', ?, ?, ?, 55, 1, ?)
+        """,
+        (run_id, source_id, name, regular, special, special or regular, captured),
+    )
+
+
 def _product(conn, *, key, product_id, channel, name, category, status, first, last):
     conn.execute(
         """
@@ -234,16 +281,16 @@ def _product(conn, *, key, product_id, channel, name, category, status, first, l
     )
 
 
-def _snapshot(conn, *, run_id, key, product_id, channel, captured, name, category, regular, special, sizes):
+def _snapshot(conn, *, run_id, key, product_id, channel, captured, name, category, regular, special, sizes, image=None):
     conn.execute(
         """
         INSERT INTO product_snapshots (
             run_id, product_key, product_id, channel, branch_id, captured_at,
             product_name_en, category_name_en, currency, regular_price, special_price,
-            effective_price, availability, sizes
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'SAR', ?, ?, ?, 1, ?)
+            effective_price, availability, sizes, image_url
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'SAR', ?, ?, ?, 1, ?, ?)
         """,
-        (run_id, key, product_id, channel, BRANCH_ID, captured, name, category, regular, special, special or regular, sizes),
+        (run_id, key, product_id, channel, BRANCH_ID, captured, name, category, regular, special, special or regular, sizes, image),
     )
 
 

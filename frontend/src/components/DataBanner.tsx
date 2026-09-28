@@ -35,7 +35,7 @@ export function DataBanner({
   if (health === "disconnected") {
     return (
       <Alert tone="neutral" icon={<WifiOff size={18} aria-hidden="true" />}>
-        This competitor is not connected yet. The first slice covers KFC only.
+        This brand is not connected yet.
       </Alert>
     );
   }

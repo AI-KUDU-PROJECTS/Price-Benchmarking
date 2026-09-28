@@ -17,7 +17,8 @@ import { setSearchParam } from "../lib/params";
 
 export function BrandMenuPage({ brandId }: { brandId: string }) {
   const [params, setParams] = useSearchParams();
-  const channel = params.get("channel") || "";
+  const isKudu = brandId === "kudu";
+  const channel = params.get("channel") || (isKudu ? "delivery" : "");
   const q = params.get("q") || "";
   const query = new URLSearchParams();
   if (channel) query.set("channel", channel);
@@ -31,9 +32,14 @@ export function BrandMenuPage({ brandId }: { brandId: string }) {
 
   return (
     <>
-      <PageHeader title="Menu" subtitle="Latest successful collection. Missing prices stay blank." />
+      <PageHeader
+        title={isKudu ? "KUDU menu" : "Menu"}
+        subtitle={isKudu
+          ? "Production menu · template 1 · prices and images from the latest saved collection"
+          : "Latest successful collection. Missing prices stay blank."}
+      />
       <BrandTabs brandId={brandId} />
-      <DataBanner freshness={data.meta.freshness} />
+      <DataBanner freshness={data.meta.freshness} lastUpdatedAt={isKudu ? data.items[0]?.observedAt : undefined} />
       <div className="filter-bar">
         <SearchField
           label="Search products"
@@ -48,9 +54,10 @@ export function BrandMenuPage({ brandId }: { brandId: string }) {
           value={channel}
           onChange={(e) => setSearchParam(setParams, params, "channel", e.target.value)}
         >
-          <option value="">All channels</option>
+          {!isKudu && <option value="">All channels</option>}
           <option value="pickup">Pickup</option>
           <option value="delivery">Delivery</option>
+          {!isKudu && <option value="hungerstation">HungerStation</option>}
         </select>
       </div>
       {data.items.length === 0 ? (
@@ -59,14 +66,14 @@ export function BrandMenuPage({ brandId }: { brandId: string }) {
         <DataTable caption={`${brandId} menu items`}>
           <thead>
             <tr>
-              <th></th>
+              <th><span className="visually-hidden">Image</span></th>
               <th>Product</th>
               <th>Category</th>
               <th>Channel</th>
-              <th className="num">Current</th>
-              <th className="num">Previous</th>
-              <th>Sizes</th>
-              <th>Last seen</th>
+              <th className="num">{isKudu ? "Price" : "Current"}</th>
+              {!isKudu && <th className="num">Previous</th>}
+              {!isKudu && <th>Sizes</th>}
+              <th>{isKudu ? "Collected" : "Last seen"}</th>
             </tr>
           </thead>
           <tbody>
@@ -78,9 +85,9 @@ export function BrandMenuPage({ brandId }: { brandId: string }) {
                     {product.nameEn || product.nameAr || product.id}
                   </Link>
                   <div className="meta-text">{product.nameAr || "Arabic name unavailable"}</div>
-                  <Badge value={product.status} />
+                  <Badge value={product.isPublished === false ? "unpublished" : product.status} />
                 </td>
-                <td>{product.category || "—"}</td>
+                <td>{product.category || "—"}{isKudu && product.categoryAr && <div className="meta-text">{product.categoryAr}</div>}</td>
                 <td className="nowrap">{product.channel}</td>
                 <td className="num">
                   <Price
@@ -93,13 +100,14 @@ export function BrandMenuPage({ brandId }: { brandId: string }) {
                     <div className="meta-text">Regular <Price value={product.regularPrice} currency={product.currency} /></div>
                   ) : null}
                 </td>
-                <td className="num">
-                  <Price
-                    value={product.previousSpecialPrice ?? product.previousRegularPrice}
-                    currency={product.currency}
-                  />
-                </td>
-                <td><SizeList sizes={product.sizes} currency={product.currency} /></td>
+                {!isKudu && (
+                  <>
+                    <td className="num">
+                      <Price value={product.previousSpecialPrice ?? product.previousRegularPrice} currency={product.currency} />
+                    </td>
+                    <td><SizeList sizes={product.sizes} currency={product.currency} /></td>
+                  </>
+                )}
                 <td className="nowrap">{formatRiyadhDateTime(product.lastSeenAt)}</td>
               </tr>
             ))}

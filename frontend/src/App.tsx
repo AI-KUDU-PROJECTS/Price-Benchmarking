@@ -13,13 +13,13 @@ import { MarketPromotionsPage } from "./pages/MarketPromotionsPage";
 import { ProductHistoryPage } from "./pages/ProductHistoryPage";
 import { PromotionDetailPage } from "./pages/PromotionDetailPage";
 
-const BRANDS = ["kfc", "hardees", "burger-king", "herfy"];
+const BRANDS = ["kudu", "kfc", "hardees", "burger-king", "herfy", "mcdonalds", "albaik"];
 
 export function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/" element={<Navigate to="/overview" replace />} />
+        <Route path="/" element={<Navigate to="/competitors/kudu/menu" replace />} />
         <Route path="/overview" element={<MarketOverviewPage />} />
         <Route path="/changes" element={<MarketChangesPage />} />
         <Route path="/promotions" element={<MarketPromotionsPage />} />

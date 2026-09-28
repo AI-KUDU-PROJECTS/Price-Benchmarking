@@ -36,6 +36,40 @@ def test_pickup_and_delivery_are_separate_identities(adapter: KfcAdapter) -> Non
     assert pickup.previous_regular_price == 21.0
 
 
+def test_hungerstation_is_exposed_as_third_channel(adapter: KfcAdapter) -> None:
+    brand = adapter.get_brand()
+    assert brand.channels == ["pickup", "delivery", "hungerstation"]
+
+    products = adapter.list_products(channel="hungerstation")
+    assert len(products) == 1
+    product = products[0]
+    assert product.name_en == "Spicy Bites"
+    assert product.channel == "hungerstation"
+    assert product.regular_price == 40.0
+    assert product.special_price == 18.0
+    assert product.currency == "SAR"
+    assert product.image_url == "https://images.example.test/chicken-combo.jpg"
+    assert product.previous_special_price == 20.0
+
+    history = adapter.get_product_history(product.id)
+    assert history is not None
+    assert len(history.observations) == 2
+    assert history.observations[0].channel == "hungerstation"
+
+    promotions = adapter.list_promotions(channel="hungerstation")
+    assert len(promotions) == 1
+    assert promotions[0].product_id == product.id
+    assert promotions[0].promotional_price == 18.0
+    assert promotions[0].regular_price == 40.0
+    assert promotions[0].image_url == product.image_url
+
+    changes = adapter.list_changes(channel="hungerstation")
+    assert len(changes) == 1
+    assert changes[0].type == "price_decreased"
+    assert changes[0].before_value == "20.0"
+    assert changes[0].after_value == "18.0"
+
+
 def test_size_prices_preserved_and_not_invented(adapter: KfcAdapter) -> None:
     pickup = adapter.get_product("143--PICKUP--id:100")
     assert pickup is not None
@@ -79,11 +113,10 @@ def test_highlights_skip_not_observed(adapter: KfcAdapter) -> None:
     assert "offer_not_observed" not in types
     assert types[0] in HIGHLIGHT_RANK
     ranked = select_highlights(adapter.list_changes())
-    assert [h.type for h in ranked[:3]] == [
-        "offer_started",
-        "price_decreased",
-        "offer_ended",
-    ]
+    ranked_types = [highlight.type for highlight in ranked]
+    assert ranked_types[0] == "offer_started"
+    assert ranked_types.count("price_decreased") == 2
+    assert "offer_ended" in ranked_types
 
 
 def test_history_has_observations(adapter: KfcAdapter) -> None:

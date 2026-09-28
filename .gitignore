@@ -79,3 +79,6 @@ npm-debug.log*
 .pytest_cache/
 .coverage
 frontend/dist/
+
+# Pull-all progress state and collector output (may include upstream details)
+bff/data/pull_logs/

@@ -7,6 +7,7 @@ import type {
   Product,
   ProductHistory,
   Promotion,
+  PullResponse,
 } from "./types";
 
 const BASE = "/api/v1";
@@ -22,8 +23,8 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(path: string): Promise<T> {
-  const response = await fetch(`${BASE}${path}`);
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(`${BASE}${path}`, init);
   const body = await response.json().catch(() => null);
   if (!response.ok) {
     const detail =
@@ -37,6 +38,10 @@ async function request<T>(path: string): Promise<T> {
 
 export const api = {
   marketOverview: () => request<MarketOverview>("/market/overview"),
+  pullStatus: () => request<PullResponse>("/market/pull"),
+  startPullAll: () => request<PullResponse>("/market/pull", { method: "POST" }),
+  hungerstationPullStatus: () => request<PullResponse>("/market/hungerstation/pull"),
+  startHungerstationPull: () => request<PullResponse>("/market/hungerstation/pull", { method: "POST" }),
   marketChanges: (params = "") => request<ListResponse<ChangeEvent>>(`/market/changes${params}`),
   marketPromotions: (params = "") => request<ListResponse<Promotion>>(`/market/promotions${params}`),
   brands: () => request<ListResponse<Brand>>("/brands"),

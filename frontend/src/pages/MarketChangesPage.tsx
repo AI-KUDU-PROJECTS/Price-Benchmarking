@@ -60,6 +60,7 @@ export function MarketChangesPage() {
           <option value="">All channels</option>
           <option value="pickup">Pickup</option>
           <option value="delivery">Delivery</option>
+          <option value="hungerstation">HungerStation</option>
         </select>
         <label className="visually-hidden" htmlFor="filter-type">Event type</label>
         <select id="filter-type" className="control" value={params.get("type") || ""} onChange={(event) => setSearchParam(setParams, params, "type", event.target.value)}>

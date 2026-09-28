@@ -79,7 +79,7 @@ def test_market_feeds_use_connected_adapters(client: TestClient) -> None:
 
 
 def test_contract_uses_camel_case_and_riyadh(client: TestClient) -> None:
-    brand = client.get("/api/v1/brands").json()["items"][0]
+    brand = next(item for item in client.get("/api/v1/brands").json()["items"] if item["id"] == "kfc")
     assert "lastSuccessfulRunAt" in brand
     assert "dataFreshness" in brand
     assert brand["id"] == "kfc"

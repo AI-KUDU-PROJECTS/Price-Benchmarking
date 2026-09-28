@@ -101,13 +101,16 @@
   --kudu-status-neutral-border: var(--kudu-neutral-200);
 
   /* -- Typography --
-     Font names: approved faces first (loaded only if licensed files are
-     ever provisioned locally), then a disclosed fallback. See rebuild
-     report for why Nunito was chosen. */
-  --kudu-font-en: "Config Rounded", "Nunito", "Segoe UI", system-ui, sans-serif;
-  --kudu-font-ar: "DIN Next Arabic", "Nunito", "Segoe UI", Tahoma, sans-serif;
+     Poppins (English) / Tajawal (Arabic): owner-approved product
+     typography per the kudu-product-ui skill's decision register (D46),
+     superseding the original brand-PDF faces (Config Rounded / DIN Next
+     Arabic), which remain licensed assets not distributed here. Stack
+     matches the skill's typography.css verbatim - font name + generic
+     sans-serif, no extra fallback fonts. */
+  --kudu-font-en: "Poppins", sans-serif;
+  --kudu-font-ar: "Tajawal", sans-serif;
   --kudu-font-weight-regular: 400;
-  --kudu-font-weight-medium: 600;
+  --kudu-font-weight-medium: 500;
   --kudu-font-weight-bold: 700;
   --kudu-text-page-title-size: 28px;
   --kudu-text-section-title-size: 20px;

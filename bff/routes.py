@@ -19,8 +19,31 @@ from bff.contract import (
     select_highlights,
 )
 from bff.registry import all_brands, connected_adapters, get_adapter
+from bff.pull_all import hungerstation_pull_manager, pull_manager
 
 router = APIRouter()
+
+
+@router.post("/market/pull", status_code=202)
+def start_market_pull() -> dict[str, Any]:
+    run, started = pull_manager.start()
+    return {"run": run, "started": started}
+
+
+@router.get("/market/pull")
+def market_pull_status() -> dict[str, Any]:
+    return {"run": pull_manager.latest()}
+
+
+@router.post("/market/hungerstation/pull", status_code=202)
+def start_hungerstation_pull() -> dict[str, Any]:
+    run, started = hungerstation_pull_manager.start()
+    return {"run": run, "started": started}
+
+
+@router.get("/market/hungerstation/pull")
+def hungerstation_pull_status() -> dict[str, Any]:
+    return {"run": hungerstation_pull_manager.latest()}
 
 def _meta(items: list[Any], freshness: str, source_run_ids: list[str],
           page: int = 1, page_size: int | None = None) -> dict[str, Any]:
@@ -66,7 +89,7 @@ def _require_adapter(brand_id: str):
                 detail={
                     "error": "brand_not_connected",
                     "brandId": brand_id,
-                    "message": "This competitor is not connected in the first KFC slice.",
+                    "message": "This brand is not connected.",
                 },
             )
         raise HTTPException(status_code=404, detail={"error": "unknown_brand", "brandId": brand_id})
@@ -194,10 +217,7 @@ def market_promotions(
 @router.get("/brands")
 def list_brands() -> dict[str, Any]:
     brands = all_brands()
-    freshness = brands[0].data_freshness if brands else "unavailable"
-    kfc = next((b for b in brands if b.id == "kfc"), None)
-    if kfc:
-        freshness = kfc.data_freshness
+    freshness = _market_freshness(connected_adapters())
     return _meta(brands, freshness, [])
 
 

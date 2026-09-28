@@ -1,6 +1,6 @@
 export type Health = "healthy" | "partial" | "stale" | "error" | "disconnected";
 export type Freshness = "fresh" | "stale" | "unavailable";
-export type Channel = "pickup" | "delivery";
+export type Channel = "pickup" | "delivery" | "hungerstation";
 
 export interface BrandCapabilities {
   hasDiscount: boolean;
@@ -32,6 +32,7 @@ export interface Product {
   nameAr: string | null;
   nameEn: string | null;
   category: string | null;
+  categoryAr: string | null;
   imageUrl: string | null;
   channel: Channel;
   location: string | null;
@@ -42,6 +43,11 @@ export interface Product {
   currency: string | null;
   sizes: ProductSize[];
   availability: boolean | null;
+  isPublished: boolean | null;
+  isHidden: boolean | null;
+  descriptionAr: string | null;
+  descriptionEn: string | null;
+  calories: number | null;
   status: "active" | "not_observed" | "removed" | "returned";
   firstSeenAt: string | null;
   lastSeenAt: string | null;
@@ -172,4 +178,28 @@ export interface BrandOverview {
   promotionCount: number;
   recentChanges: ChangeEvent[];
   highlights: Highlight[];
+}
+
+export type PullStatus = "pending" | "running" | "success" | "partial" | "failed" | "already_running";
+
+export interface PullBrand {
+  id: string;
+  name: string;
+  status: PullStatus;
+  startedAt: string | null;
+  completedAt: string | null;
+  message: string | null;
+}
+
+export interface PullRun {
+  runId: string;
+  status: "running" | "success" | "partial" | "failed";
+  startedAt: string;
+  completedAt: string | null;
+  brands: PullBrand[];
+}
+
+export interface PullResponse {
+  run: PullRun | null;
+  started?: boolean;
 }

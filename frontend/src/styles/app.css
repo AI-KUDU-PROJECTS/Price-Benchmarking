@@ -367,6 +367,14 @@ img {
   background: var(--kudu-action-primary-soft);
 }
 
+.btn:disabled,
+.btn:disabled:hover {
+  background: var(--kudu-surface-disabled);
+  border-color: var(--kudu-border-default);
+  color: var(--kudu-text-secondary);
+  cursor: not-allowed;
+}
+
 .btn-secondary {
   background: var(--kudu-action-secondary);
   border-color: transparent;
@@ -1056,4 +1064,24 @@ select.control {
   .field-search .control {
     min-width: 0;
   }
+}
+
+/* Market Overview: one explicit action with compact per-source progress. */
+.pull-panel {
+  margin-bottom: var(--kudu-space-5);
+}
+
+.pull-panel-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--kudu-space-3);
+  flex-wrap: wrap;
+}
+
+.pull-panel-heading .panel-title {
+  margin-bottom: 0;
+}
+
+.pull-panel > .meta-text {
+  margin: var(--kudu-space-2) 0 var(--kudu-space-3);
 }

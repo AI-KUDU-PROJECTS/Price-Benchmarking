@@ -73,7 +73,7 @@ class KfcAdapter:
                 last_successful_run_at=None,
                 data_freshness="unavailable",
                 capabilities=self._capabilities(),
-                channels=["pickup", "delivery"],
+                channels=["pickup", "delivery", "hungerstation"],
                 location_label=self.location_label,
             )
         with self._connect() as conn:
@@ -196,7 +196,7 @@ class KfcAdapter:
             last_successful_run_at=last_success_iso,
             data_freshness=freshness,
             capabilities=self._capabilities(),
-            channels=["pickup", "delivery"],
+            channels=["pickup", "delivery", "hungerstation"],
             location_label=self.location_label,
         )
 
@@ -212,6 +212,14 @@ class KfcAdapter:
                 (channel, self.branch_id),
             ).fetchone()
             out[channel] = row
+        if _table_exists(conn, "external_channel_runs"):
+            out["HUNGERSTATION"] = conn.execute(
+                """
+                SELECT * FROM external_channel_runs
+                WHERE channel = 'HUNGERSTATION'
+                ORDER BY started_at DESC LIMIT 1
+                """
+            ).fetchone()
         return out
 
     def _latest_success_by_channel(self, conn: sqlite3.Connection) -> dict[str, sqlite3.Row | None]:
@@ -226,6 +234,14 @@ class KfcAdapter:
                 (channel, self.branch_id),
             ).fetchone()
             out[channel] = row
+        if _table_exists(conn, "external_channel_runs"):
+            out["HUNGERSTATION"] = conn.execute(
+                """
+                SELECT * FROM external_channel_runs
+                WHERE channel = 'HUNGERSTATION' AND status = 'SUCCESS'
+                ORDER BY started_at DESC LIMIT 1
+                """
+            ).fetchone()
         return out
 
     def _runs(self, conn: sqlite3.Connection, limit: int = 8) -> list[CollectionRun]:
@@ -237,11 +253,24 @@ class KfcAdapter:
             """,
             (self.branch_id, limit),
         ).fetchall()
-        return [self._run_from_row(r) for r in rows]
+        all_rows = list(rows)
+        if _table_exists(conn, "external_channel_runs"):
+            all_rows.extend(
+                conn.execute(
+                    """
+                    SELECT * FROM external_channel_runs
+                    WHERE channel = 'HUNGERSTATION'
+                    ORDER BY started_at DESC LIMIT ?
+                    """,
+                    (limit,),
+                ).fetchall()
+            )
+        all_rows.sort(key=lambda row: row["started_at"] or "", reverse=True)
+        return [self._run_from_row(r) for r in all_rows[:limit]]
 
     def _run_from_row(self, row: sqlite3.Row) -> CollectionRun:
         warnings = 0
-        if row["branch_currently_closed"]:
+        if "branch_currently_closed" in row.keys() and row["branch_currently_closed"]:
             warnings += 1
         return CollectionRun(
             id=row["run_id"],
@@ -250,7 +279,7 @@ class KfcAdapter:
             started_at=to_riyadh_iso(row["started_at"]),
             completed_at=to_riyadh_iso(row["finished_at"]),
             channel=_to_channel(row["channel"]),
-            location=self.location_label,
+            location=(row["branch_name"] if "branch_name" in row.keys() else None) or self.location_label,
             item_count=row["product_count"] if row["product_count"] is not None else None,
             warning_count=warnings or None,
             error_summary=row["error_message"],
@@ -262,13 +291,15 @@ class KfcAdapter:
         channel: Channel | None = None,
     ) -> list[Product]:
         source_channel = _from_channel(channel)
+        products: list[Product] = []
         params: list[Any] = [self.branch_id, self.branch_id]
         channel_sql = ""
-        if source_channel:
+        if source_channel and source_channel != "HUNGERSTATION":
             channel_sql = "AND ranked.channel = ?"
             params.append(source_channel)
-        rows = conn.execute(
-            f"""
+        if source_channel != "HUNGERSTATION":
+            rows = conn.execute(
+                f"""
             WITH latest AS (
                 SELECT channel, run_id FROM (
                     SELECT channel, run_id,
@@ -307,9 +338,111 @@ class KfcAdapter:
             WHERE 1 = 1 {channel_sql}
             ORDER BY ranked.category_name_en, ranked.product_name_en
             """,
-            params,
+                params,
+            ).fetchall()
+            products.extend(self._product_from_row(r) for r in rows)
+        if source_channel in (None, "HUNGERSTATION"):
+            products.extend(self._latest_external_products(conn))
+        return products
+
+    def _latest_external_products(self, conn: sqlite3.Connection) -> list[Product]:
+        if not _table_exists(conn, "external_channel_products"):
+            return []
+        rows = conn.execute(
+            """
+            WITH latest AS (
+                SELECT run_id
+                FROM external_channel_runs
+                WHERE channel = 'HUNGERSTATION' AND status = 'SUCCESS'
+                ORDER BY started_at DESC LIMIT 1
+            ),
+            ranked AS (
+                SELECT
+                    ep.*,
+                    er.started_at AS run_started,
+                    er.branch_name,
+                    LAG(ep.regular_price) OVER (
+                        PARTITION BY ep.source_product_id ORDER BY er.started_at
+                    ) AS prev_regular,
+                    LAG(ep.special_price) OVER (
+                        PARTITION BY ep.source_product_id ORDER BY er.started_at
+                    ) AS prev_special,
+                    MIN(ep.captured_at) OVER (
+                        PARTITION BY ep.source_product_id
+                    ) AS first_seen_at,
+                    MAX(ep.captured_at) OVER (
+                        PARTITION BY ep.source_product_id
+                    ) AS last_seen_at
+                FROM external_channel_products ep
+                JOIN external_channel_runs er ON er.run_id = ep.run_id
+                WHERE er.channel = 'HUNGERSTATION' AND er.status = 'SUCCESS'
+            )
+            SELECT ranked.*
+            FROM ranked JOIN latest ON latest.run_id = ranked.run_id
+            ORDER BY ranked.category_name_en, ranked.name_en
+            """
         ).fetchall()
-        return [self._product_from_row(r) for r in rows]
+        image_by_name = self._image_by_product_name(conn)
+        return [
+            self._external_product_from_row(
+                row,
+                fallback_image_url=image_by_name.get(_normalize_product_name(row["name_en"])),
+            )
+            for row in rows
+        ]
+
+    def _image_by_product_name(self, conn: sqlite3.Connection) -> dict[str, str]:
+        rows = conn.execute(
+            """
+            SELECT ps.product_name_en, ps.image_url
+            FROM product_snapshots ps
+            JOIN crawl_runs cr ON cr.run_id = ps.run_id
+            WHERE cr.status = 'SUCCESS'
+              AND ps.image_url IS NOT NULL
+              AND TRIM(ps.image_url) != ''
+              AND ps.product_name_en IS NOT NULL
+            ORDER BY cr.started_at DESC
+            """
+        ).fetchall()
+        images: dict[str, str] = {}
+        for row in rows:
+            key = _normalize_product_name(row["product_name_en"])
+            if key:
+                images.setdefault(key, row["image_url"])
+        return images
+
+    def _external_product_from_row(
+        self,
+        row: sqlite3.Row | dict[str, Any],
+        *,
+        fallback_image_url: str | None = None,
+    ) -> Product:
+        data = dict(row)
+        source_id = data["source_product_id"]
+        return Product(
+            id=_public_id(source_id),
+            brand_id=self.brand_id,
+            source_id=source_id,
+            name_en=_blank_to_none(data.get("name_en")),
+            category=_blank_to_none(data.get("category_name_en")),
+            image_url=_blank_to_none(data.get("image_url")) or _blank_to_none(fallback_image_url),
+            channel="hungerstation",
+            location=_blank_to_none(data.get("branch_name")) or "HungerStation",
+            regular_price=as_money(data.get("regular_price")),
+            special_price=as_money(data.get("special_price")),
+            previous_regular_price=as_money(data.get("prev_regular")),
+            previous_special_price=as_money(data.get("prev_special")),
+            currency=_blank_to_none(data.get("currency")),
+            sizes=[],
+            availability=_availability(data.get("availability")),
+            description_en=_blank_to_none(data.get("description_en")),
+            calories=data.get("calories"),
+            status="active",
+            first_seen_at=to_riyadh_iso(data.get("first_seen_at") or data.get("captured_at")),
+            last_seen_at=to_riyadh_iso(data.get("last_seen_at") or data.get("captured_at")),
+            observed_at=to_riyadh_iso(data.get("captured_at")),
+            source_run_id=data.get("run_id"),
+        )
 
     def _product_from_row(self, row: sqlite3.Row) -> Product:
         source_id = row["product_key"]
@@ -407,6 +540,31 @@ class KfcAdapter:
         )
 
     def _observations(self, conn: sqlite3.Connection, source_id: str) -> list[Observation]:
+        if source_id.startswith("HUNGERSTATION|") and _table_exists(conn, "external_channel_products"):
+            rows = conn.execute(
+                """
+                SELECT ep.*
+                FROM external_channel_products ep
+                JOIN external_channel_runs er ON er.run_id = ep.run_id
+                WHERE ep.source_product_id = ? AND er.status = 'SUCCESS'
+                ORDER BY er.started_at ASC
+                """,
+                (source_id,),
+            ).fetchall()
+            image_by_name = self._image_by_product_name(conn)
+            return [
+                Observation(
+                    observed_at=to_riyadh_iso(row["captured_at"]),
+                    source_run_id=row["run_id"],
+                    channel="hungerstation",
+                    regular_price=as_money(row["regular_price"]),
+                    special_price=as_money(row["special_price"]),
+                    availability=_availability(row["availability"]),
+                    image_url=_blank_to_none(row["image_url"]) or image_by_name.get(_normalize_product_name(row["name_en"])),
+                    sizes=[],
+                )
+                for row in rows
+            ]
         rows = conn.execute(
             """
             SELECT ps.*, cr.started_at AS run_started
@@ -445,6 +603,8 @@ class KfcAdapter:
             if r is not None
         }
         source_channel = _from_channel(channel)
+        if source_channel == "HUNGERSTATION":
+            return self._latest_external_promotions(conn)
         params: list[Any] = [self.branch_id]
         channel_sql = ""
         if source_channel:
@@ -504,6 +664,41 @@ class KfcAdapter:
             payload["last_seen_at"] = extra["last_seen_at"]
             payload["first_seen_run_id"] = extra["first_seen_run_id"]
             promotions.append(self._promotion_from_row(payload, latest_ids))
+        if source_channel is None:
+            promotions.extend(self._latest_external_promotions(conn))
+        return promotions
+
+    def _latest_external_promotions(self, conn: sqlite3.Connection) -> list[Promotion]:
+        promotions: list[Promotion] = []
+        for product in self._latest_external_products(conn):
+            if product.special_price is None:
+                continue
+            discount = None
+            if product.regular_price and product.regular_price > 0:
+                discount = round(
+                    (product.regular_price - product.special_price) / product.regular_price * 100,
+                    2,
+                )
+            promotion_key = product.source_id.replace("|KFC|", "|KFC|PROMO|")
+            promotions.append(
+                Promotion(
+                    id=_public_id(promotion_key),
+                    brand_id=self.brand_id,
+                    product_id=product.id,
+                    title=product.name_en,
+                    image_url=product.image_url,
+                    status="active",
+                    is_new=product.previous_special_price is None,
+                    regular_price=product.regular_price,
+                    promotional_price=product.special_price,
+                    discount_percent=discount,
+                    first_seen_at=product.first_seen_at,
+                    last_seen_at=product.last_seen_at,
+                    channel="hungerstation",
+                    source="HungerStation",
+                    category=product.category,
+                )
+            )
         return promotions
 
     def _promotion_from_row(self, row: sqlite3.Row | dict[str, Any], latest_ids: set[str]) -> Promotion:
@@ -598,6 +793,104 @@ class KfcAdapter:
                     category=_blank_to_none(row["field_name"]),
                 )
             )
+        events.extend(self._external_changes(conn))
+        events.sort(key=lambda event: event.detected_at, reverse=True)
+        return events
+
+    def _external_changes(self, conn: sqlite3.Connection) -> list[ChangeEvent]:
+        if not _table_exists(conn, "external_channel_products"):
+            return []
+        rows = conn.execute(
+            """
+            WITH history AS (
+                SELECT
+                    ep.*,
+                    er.started_at,
+                    er.branch_name,
+                    LAG(ep.run_id) OVER (
+                        PARTITION BY ep.source_product_id ORDER BY er.started_at
+                    ) AS previous_run_id,
+                    LAG(ep.effective_price) OVER (
+                        PARTITION BY ep.source_product_id ORDER BY er.started_at
+                    ) AS previous_effective_price,
+                    LAG(ep.special_price) OVER (
+                        PARTITION BY ep.source_product_id ORDER BY er.started_at
+                    ) AS previous_special_price,
+                    LAG(ep.availability) OVER (
+                        PARTITION BY ep.source_product_id ORDER BY er.started_at
+                    ) AS previous_availability
+                FROM external_channel_products ep
+                JOIN external_channel_runs er ON er.run_id = ep.run_id
+                WHERE er.channel = 'HUNGERSTATION' AND er.status = 'SUCCESS'
+            )
+            SELECT * FROM history
+            WHERE previous_run_id IS NOT NULL
+            ORDER BY started_at DESC
+            """
+        ).fetchall()
+        events: list[ChangeEvent] = []
+        for row in rows:
+            source_id = row["source_product_id"]
+            product_id = _public_id(source_id)
+            common = {
+                "brand_id": self.brand_id,
+                "product_id": product_id,
+                "title": _blank_to_none(row["name_en"]),
+                "detected_at": to_riyadh_iso(row["captured_at"]) or now_riyadh().isoformat(),
+                "channel": "hungerstation",
+                "location": row["branch_name"] or "HungerStation",
+                "source_run_id": row["run_id"],
+                "category": _blank_to_none(row["category_name_en"]),
+            }
+            before = as_money(row["previous_effective_price"])
+            after = as_money(row["effective_price"])
+            if before is not None and after is not None and before != after:
+                percentage = round((after - before) / before * 100, 2) if before else None
+                events.append(
+                    ChangeEvent(
+                        id=f"hs-price-{row['run_id']}-{_normalize_product_name(row['name_en'])}",
+                        type="price_increased" if after > before else "price_decreased",
+                        before_value=str(before),
+                        after_value=str(after),
+                        percentage_change=percentage,
+                        **common,
+                    )
+                )
+            previous_special = as_money(row["previous_special_price"])
+            current_special = as_money(row["special_price"])
+            if previous_special is None and current_special is not None:
+                events.append(
+                    ChangeEvent(
+                        id=f"hs-offer-start-{row['run_id']}-{_normalize_product_name(row['name_en'])}",
+                        promotion_id=_public_id(source_id.replace("|KFC|", "|KFC|PROMO|")),
+                        type="offer_started",
+                        before_value=None,
+                        after_value=str(current_special),
+                        **common,
+                    )
+                )
+            elif previous_special is not None and current_special is None:
+                events.append(
+                    ChangeEvent(
+                        id=f"hs-offer-end-{row['run_id']}-{_normalize_product_name(row['name_en'])}",
+                        promotion_id=_public_id(source_id.replace("|KFC|", "|KFC|PROMO|")),
+                        type="offer_ended",
+                        before_value=str(previous_special),
+                        after_value=None,
+                        **common,
+                    )
+                )
+            previous_availability = row["previous_availability"]
+            if previous_availability is not None and previous_availability != row["availability"]:
+                events.append(
+                    ChangeEvent(
+                        id=f"hs-availability-{row['run_id']}-{_normalize_product_name(row['name_en'])}",
+                        type="availability_changed",
+                        before_value=str(bool(previous_availability)),
+                        after_value=str(bool(row["availability"])),
+                        **common,
+                    )
+                )
         return events
 
 
@@ -634,13 +927,26 @@ def parse_sizes(raw: Any, currency: str | None) -> list[ProductSize]:
 
 
 def _to_channel(value: str) -> Channel:
-    return "delivery" if str(value).upper() == "DELIVERY" else "pickup"
+    normalized = str(value).upper()
+    if normalized == "HUNGERSTATION":
+        return "hungerstation"
+    return "delivery" if normalized == "DELIVERY" else "pickup"
 
 
 def _from_channel(value: Channel | str | None) -> str | None:
     if value is None or value == "":
         return None
-    return "DELIVERY" if str(value).lower() == "delivery" else "PICKUP"
+    normalized = str(value).lower()
+    if normalized == "hungerstation":
+        return "HUNGERSTATION"
+    return "DELIVERY" if normalized == "delivery" else "PICKUP"
+
+
+def _table_exists(conn: sqlite3.Connection, name: str) -> bool:
+    return conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+        (name,),
+    ).fetchone() is not None
 
 
 def _public_id(source_key: str | None) -> str:
@@ -658,6 +964,12 @@ def _blank_to_none(value: Any) -> str | None:
         return None
     text = str(value).strip()
     return text or None
+
+
+def _normalize_product_name(value: Any) -> str:
+    if value is None:
+        return ""
+    return "".join(character.casefold() for character in str(value) if character.isalnum())
 
 
 def _availability(value: Any) -> bool | None:

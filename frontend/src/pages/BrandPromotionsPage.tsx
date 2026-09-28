@@ -37,6 +37,7 @@ export function BrandPromotionsPage({ brandId }: { brandId: string }) {
           <option value="">All channels</option>
           <option value="pickup">Pickup</option>
           <option value="delivery">Delivery</option>
+          {brandId !== "kudu" && <option value="hungerstation">HungerStation</option>}
         </select>
         <label className="visually-hidden" htmlFor="filter-status">Status</label>
         <select id="filter-status" className="control" value={status} onChange={(e) => setSearchParam(setParams, params, "status", e.target.value)}>
