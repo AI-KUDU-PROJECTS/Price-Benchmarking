@@ -6,6 +6,7 @@
   "outputDirectory": "frontend/dist",
   "functions": {
     "api/index.py": {
+      "includeFiles": "{bff/**,adapters/**,competitors/__init__.py,competitors/hungerstation/__init__.py,competitors/hungerstation/config.py,competitors/hungerstation/database.py,competitors/hungerstation/data/hungerstation.db*,competitors/hungerstation/data/images/**,competitors/kfc/__init__.py,competitors/kfc/backend/__init__.py,competitors/kfc/backend/config.py,competitors/hardees/__init__.py,competitors/hardees/backend/__init__.py,competitors/hardees/backend/config.py,competitors/burger_king/__init__.py,competitors/burger_king/backend/__init__.py,competitors/burger_king/backend/config.py,competitors/herfy/__init__.py,competitors/herfy/backend/__init__.py,competitors/herfy/backend/config.py,kudu/__init__.py,kudu/catalog.py,kudu/data/catalog.json}",
       "excludeFiles": "{**/__pycache__/**,**/*.pyc,**/tests/**,**/data/raw/**,**/data/screenshots/**,**/data/logs/**,frontend/**,node_modules/**}"
     }
   },
