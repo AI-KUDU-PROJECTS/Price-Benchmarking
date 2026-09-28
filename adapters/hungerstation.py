@@ -94,7 +94,7 @@ class HungerstationOverlayAdapter:
 
     def get_brand(self) -> Brand:
         base = self._base_brand()
-        with database.connection(self.db_path) as db:
+        with database.readonly_connection(self.db_path) as db:
             latest = database.latest_run(db, self.brand_id)
             success = database.latest_run(db, self.brand_id, success_only=True)
         hs_time = to_riyadh_iso(success["finished_at"]) if success else None
@@ -147,7 +147,7 @@ class HungerstationOverlayAdapter:
         )
 
     def _runs(self) -> list[CollectionRun]:
-        with database.connection(self.db_path) as db:
+        with database.readonly_connection(self.db_path) as db:
             rows = db.execute(
                 "SELECT * FROM runs WHERE brand_id = ? ORDER BY started_at DESC LIMIT 20",
                 (self.brand_id,),
@@ -168,7 +168,7 @@ class HungerstationOverlayAdapter:
         ]
 
     def _hungerstation_products(self) -> list[Product]:
-        with database.connection(self.db_path) as db:
+        with database.readonly_connection(self.db_path) as db:
             rows = database.latest_products(db, self.brand_id)
         images = _image_map(self.base)
         return [self._product(row, _match_image(row["name_en"], images)) for row in rows]
@@ -244,7 +244,7 @@ class HungerstationOverlayAdapter:
         if product is None:
             return None
         source_id = _source_id(product_id)
-        with database.connection(self.db_path) as db:
+        with database.readonly_connection(self.db_path) as db:
             rows = database.observations(db, self.brand_id, source_id)
         images = _image_map(self.base)
         fallback = _match_image(product.name_en, images)
@@ -329,7 +329,7 @@ class HungerstationOverlayAdapter:
         return self.base.get_promotion(promotion_id) if self.base else None
 
     def _hungerstation_changes(self) -> list[ChangeEvent]:
-        with database.connection(self.db_path) as db:
+        with database.readonly_connection(self.db_path) as db:
             rows = database.historical_products(db, self.brand_id)
         events: list[ChangeEvent] = []
         for row in rows:
