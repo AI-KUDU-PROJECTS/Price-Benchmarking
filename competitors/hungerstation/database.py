@@ -64,6 +64,13 @@ def _connect(path: Path) -> sqlite3.Connection:
     return connection
 
 
+def _connect_readonly(path: Path) -> sqlite3.Connection:
+    connection = sqlite3.connect(f"file:{path.resolve()}?mode=ro", uri=True, timeout=30)
+    connection.row_factory = sqlite3.Row
+    connection.execute("PRAGMA query_only = ON")
+    return connection
+
+
 def init_db(path: Path = config.DB_PATH) -> None:
     with _connect(path) as connection:
         for statement in SCHEMA:
@@ -80,6 +87,16 @@ def connection(path: Path = config.DB_PATH) -> Iterator[sqlite3.Connection]:
     except Exception:
         db.rollback()
         raise
+    finally:
+        db.close()
+
+
+@contextmanager
+def readonly_connection(path: Path = config.DB_PATH) -> Iterator[sqlite3.Connection]:
+    """Open an existing snapshot without creating files or SQLite journals."""
+    db = _connect_readonly(path)
+    try:
+        yield db
     finally:
         db.close()
 

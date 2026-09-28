@@ -230,7 +230,8 @@ price-intelligence/
 ├── run_hardees_collector.py      Root wrapper -> competitors.hardees.run_collector
 ├── run_hardees_scheduler.py      Root wrapper -> competitors.hardees.scheduler
 ├── package.json / package-lock.json   Shared Node deps (playwright) - see below
-├── requirements.txt               Shared Python deps - see below
+├── requirements.txt              Vercel FastAPI runtime dependencies
+├── requirements-local.txt        Full local Python dependencies
 ├── pytest.ini                     testpaths = competitors (discovers every competitor's tests/)
 ├── .env / .env.example
 └── .gitignore
@@ -273,7 +274,7 @@ are (a folder of `.js` files, no `__init__.py` anywhere).
 
 ## Installation
 
-`package.json`, `requirements.txt`, `node_modules/`, and the Python
+`package.json`, `requirements-local.txt`, `node_modules/`, and the Python
 `.venv/` are shared at the repository root (there is one Node/Python
 toolchain for the whole repo, even though each competitor's own code
 stays isolated):
@@ -283,7 +284,7 @@ npm install
 npx playwright install chromium
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements-local.txt
 cp .env.example .env
 ```
 
@@ -294,7 +295,7 @@ npm install
 npx playwright install chromium
 python -m venv .venv
 .venv\Scripts\activate
-pip install -r requirements.txt
+pip install -r requirements-local.txt
 copy .env.example .env
 ```
 

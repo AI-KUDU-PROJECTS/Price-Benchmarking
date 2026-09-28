@@ -183,7 +183,7 @@ streamlit run app.py
 
 ## Installation
 
-`package.json`, `requirements.txt`, `node_modules/`, and `.venv/` are all
+`package.json`, `requirements-local.txt`, `node_modules/`, and `.venv/` are all
 shared at the **repository root** (see root README.md), not duplicated
 per competitor. Install once, from the repo root:
 
@@ -192,7 +192,7 @@ npm install
 npx playwright install chromium
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements-local.txt
 cp .env.example .env
 ```
 
