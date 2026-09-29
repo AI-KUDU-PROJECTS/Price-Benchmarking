@@ -62,6 +62,9 @@ TIMEZONE = os.environ.get("TIMEZONE", "Asia/Riyadh")
 
 # --- Data locations (all scoped inside competitors/burger_king/) ----------
 DB_PATH = PROJECT_ROOT / os.environ.get("BK_DB_PATH", "data/database/burger_king_monitor.db")
+DEPLOYMENT_DB_PATH = REPO_ROOT / "bff" / "data" / "snapshots" / "burger_king_monitor.db"
+if os.environ.get("VERCEL") and DEPLOYMENT_DB_PATH.exists():
+    DB_PATH = DEPLOYMENT_DB_PATH
 RAW_DATA_DIR = PROJECT_ROOT / os.environ.get("BK_RAW_DATA_DIR", "data/raw")
 SCREENSHOTS_DIR = PROJECT_ROOT / os.environ.get("BK_SCREENSHOTS_DIR", "data/screenshots")
 EXPORTS_DIR = PROJECT_ROOT / os.environ.get("BK_EXPORTS_DIR", "exports")
