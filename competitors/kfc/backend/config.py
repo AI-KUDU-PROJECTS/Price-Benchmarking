@@ -68,6 +68,9 @@ TIMEZONE = os.environ.get("TIMEZONE", "Asia/Riyadh")
 # required by the multi-competitor layout, e.g.
 # competitors/kfc/data/database/kfc_monitor.db) --------------------------
 DB_PATH = PROJECT_ROOT / os.environ.get("DB_PATH", "data/database/kfc_monitor.db")
+DEPLOYMENT_DB_PATH = REPO_ROOT / "bff" / "data" / "snapshots" / "kfc_monitor.db"
+if os.environ.get("VERCEL") and DEPLOYMENT_DB_PATH.exists():
+    DB_PATH = DEPLOYMENT_DB_PATH
 RAW_DATA_DIR = PROJECT_ROOT / os.environ.get("RAW_DATA_DIR", "data/raw")
 SCREENSHOTS_DIR = PROJECT_ROOT / os.environ.get("SCREENSHOTS_DIR", "data/screenshots")
 EXPORTS_DIR = PROJECT_ROOT / os.environ.get("EXPORTS_DIR", "exports")
