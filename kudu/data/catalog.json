@@ -1,5 +1,5 @@
 {
-  "retrievedAtUtc": "2026-09-29T10:34:05+00:00",
+  "retrievedAtUtc": "2026-09-29T12:03:06+00:00",
   "templateId": 1,
   "services": {
     "delivery": [
@@ -22,7 +22,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:34:34.473Z"
+            "updatedAt": "2026-09-29T11:57:36.683Z"
           },
           {
             "itemId": 102600,
@@ -97,7 +97,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:28:47.134Z"
+            "updatedAt": "2026-09-29T12:01:16.946Z"
           },
           {
             "itemId": 103511,
@@ -112,7 +112,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T05:28:33.968Z"
+            "updatedAt": "2026-09-29T10:52:55.148Z"
           },
           {
             "itemId": 103513,
@@ -150,7 +150,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:29:35.361Z"
+            "updatedAt": "2026-09-29T12:01:05.488Z"
           },
           {
             "itemId": 102896,
@@ -165,7 +165,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:30:30.446Z"
+            "updatedAt": "2026-09-29T11:48:39.421Z"
           },
           {
             "itemId": 103774,
@@ -180,7 +180,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:29:26.566Z"
+            "updatedAt": "2026-09-29T11:51:51.770Z"
           },
           {
             "itemId": 104296,
@@ -195,7 +195,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:19:41.690Z"
+            "updatedAt": "2026-09-29T11:47:34.896Z"
           }
         ]
       },
@@ -218,7 +218,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:12:24.544Z"
+            "updatedAt": "2026-09-29T11:52:36.077Z"
           },
           {
             "itemId": 101878,
@@ -263,7 +263,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T07:30:08.234Z"
+            "updatedAt": "2026-09-29T11:08:39.456Z"
           },
           {
             "itemId": 102847,
@@ -278,7 +278,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T06:30:37.856Z"
+            "updatedAt": "2026-09-29T11:37:16.622Z"
           },
           {
             "itemId": 102848,
@@ -308,7 +308,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T05:34:04.039Z"
+            "updatedAt": "2026-09-29T10:35:33.593Z"
           },
           {
             "itemId": 102850,
@@ -346,7 +346,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:26:32.961Z"
+            "updatedAt": "2026-09-29T10:58:44.424Z"
           },
           {
             "itemId": 102721,
@@ -361,7 +361,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:33:37.222Z"
+            "updatedAt": "2026-09-29T12:02:32.495Z"
           },
           {
             "itemId": 102724,
@@ -376,7 +376,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:25:33.205Z"
+            "updatedAt": "2026-09-29T11:37:12.497Z"
           },
           {
             "itemId": 102725,
@@ -391,7 +391,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:21:49.147Z"
+            "updatedAt": "2026-09-29T11:33:38.455Z"
           },
           {
             "itemId": 102727,
@@ -406,7 +406,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:31:01.509Z"
+            "updatedAt": "2026-09-29T12:02:29.225Z"
           },
           {
             "itemId": 102728,
@@ -421,7 +421,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:21:49.147Z"
+            "updatedAt": "2026-09-29T11:35:43.159Z"
           },
           {
             "itemId": 102974,
@@ -436,7 +436,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:31:33.578Z"
+            "updatedAt": "2026-09-29T11:51:51.770Z"
           },
           {
             "itemId": 103013,
@@ -451,7 +451,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:11:31.452Z"
+            "updatedAt": "2026-09-29T11:53:23.017Z"
           },
           {
             "itemId": 104174,
@@ -466,7 +466,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:59:26.806Z"
+            "updatedAt": "2026-09-29T11:54:45.370Z"
           },
           {
             "itemId": 104177,
@@ -722,7 +722,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:25:39.799Z"
+            "updatedAt": "2026-09-29T11:38:58.245Z"
           },
           {
             "itemId": 103844,
@@ -737,7 +737,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T06:45:47.042Z"
+            "updatedAt": "2026-09-29T11:34:08.510Z"
           }
         ]
       },
@@ -760,7 +760,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:29:20.855Z"
+            "updatedAt": "2026-09-29T11:59:13.183Z"
           },
           {
             "itemId": 103291,
@@ -775,7 +775,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:33:56.396Z"
+            "updatedAt": "2026-09-29T11:53:08.878Z"
           },
           {
             "itemId": 103293,
@@ -790,7 +790,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:33:56.396Z"
+            "updatedAt": "2026-09-29T12:01:05.488Z"
           },
           {
             "itemId": 103294,
@@ -805,7 +805,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:20:10.263Z"
+            "updatedAt": "2026-09-29T11:29:25.171Z"
           },
           {
             "itemId": 103295,
@@ -820,7 +820,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:25:50.213Z"
+            "updatedAt": "2026-09-29T11:40:03.063Z"
           },
           {
             "itemId": 103296,
@@ -835,7 +835,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:28:28.024Z"
+            "updatedAt": "2026-09-29T11:55:29.540Z"
           },
           {
             "itemId": 103298,
@@ -850,7 +850,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:28:40.266Z"
+            "updatedAt": "2026-09-29T12:01:16.946Z"
           },
           {
             "itemId": 103299,
@@ -865,7 +865,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:29:20.855Z"
+            "updatedAt": "2026-09-29T12:01:05.488Z"
           },
           {
             "itemId": 103302,
@@ -880,7 +880,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:29:35.361Z"
+            "updatedAt": "2026-09-29T11:57:32.431Z"
           },
           {
             "itemId": 103303,
@@ -895,7 +895,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:32:55.028Z"
+            "updatedAt": "2026-09-29T12:02:29.225Z"
           },
           {
             "itemId": 103635,
@@ -910,7 +910,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:10:53.126Z"
+            "updatedAt": "2026-09-29T11:05:04.885Z"
           },
           {
             "itemId": 103746,
@@ -925,7 +925,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:32:31.785Z"
+            "updatedAt": "2026-09-29T12:01:38.220Z"
           },
           {
             "itemId": 104163,
@@ -940,7 +940,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:15:13.209Z"
+            "updatedAt": "2026-09-29T11:55:02.607Z"
           },
           {
             "itemId": 104169,
@@ -955,7 +955,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:18:42.329Z"
+            "updatedAt": "2026-09-29T11:34:51.662Z"
           },
           {
             "itemId": 104250,
@@ -970,7 +970,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:33:37.222Z"
+            "updatedAt": "2026-09-29T11:41:57.776Z"
           },
           {
             "itemId": 104267,
@@ -985,7 +985,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:11:31.452Z"
+            "updatedAt": "2026-09-29T11:41:03.300Z"
           }
         ]
       },
@@ -1008,7 +1008,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:30:29.514Z"
+            "updatedAt": "2026-09-29T11:39:55.393Z"
           },
           {
             "itemId": 100376,
@@ -1023,7 +1023,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:54:16.686Z"
+            "updatedAt": "2026-09-29T11:07:25.037Z"
           },
           {
             "itemId": 103215,
@@ -1038,7 +1038,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:30:29.514Z"
+            "updatedAt": "2026-09-29T11:20:00.374Z"
           },
           {
             "itemId": 103216,
@@ -1083,7 +1083,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T03:34:07.941Z"
+            "updatedAt": "2026-09-29T10:35:33.593Z"
           },
           {
             "itemId": 103219,
@@ -1113,7 +1113,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:28:40.266Z"
+            "updatedAt": "2026-09-29T11:31:33.090Z"
           },
           {
             "itemId": 103241,
@@ -1218,7 +1218,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:21:49.147Z"
+            "updatedAt": "2026-09-29T10:35:33.593Z"
           },
           {
             "itemId": 104235,
@@ -1256,7 +1256,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:52:34.169Z"
+            "updatedAt": "2026-09-29T11:40:03.063Z"
           },
           {
             "itemId": 102608,
@@ -1286,7 +1286,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:29:21.957Z"
+            "updatedAt": "2026-09-29T11:10:19.695Z"
           },
           {
             "itemId": 102611,
@@ -1301,7 +1301,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:26:32.961Z"
+            "updatedAt": "2026-09-29T11:37:16.622Z"
           },
           {
             "itemId": 102612,
@@ -1331,7 +1331,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:10:50.901Z"
+            "updatedAt": "2026-09-29T10:44:56.862Z"
           },
           {
             "itemId": 102615,
@@ -1346,7 +1346,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:21:49.147Z"
+            "updatedAt": "2026-09-29T11:53:02.329Z"
           },
           {
             "itemId": 102616,
@@ -1376,7 +1376,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:29:35.361Z"
+            "updatedAt": "2026-09-29T11:35:38.821Z"
           },
           {
             "itemId": 102997,
@@ -1391,7 +1391,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:25:33.205Z"
+            "updatedAt": "2026-09-29T11:25:15.001Z"
           },
           {
             "itemId": 103633,
@@ -1406,7 +1406,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:31:33.578Z"
+            "updatedAt": "2026-09-29T11:24:23.698Z"
           },
           {
             "itemId": 103743,
@@ -1421,7 +1421,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:32:55.028Z"
+            "updatedAt": "2026-09-29T12:02:32.495Z"
           },
           {
             "itemId": 104160,
@@ -1451,7 +1451,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:23:28.721Z"
+            "updatedAt": "2026-09-29T11:04:15.693Z"
           },
           {
             "itemId": 104247,
@@ -1481,7 +1481,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:02:44.833Z"
+            "updatedAt": "2026-09-29T11:59:10.426Z"
           }
         ]
       },
@@ -1519,7 +1519,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:31:01.509Z"
+            "updatedAt": "2026-09-29T11:22:14.773Z"
           },
           {
             "itemId": 103288,
@@ -1534,7 +1534,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:30:08.619Z"
+            "updatedAt": "2026-09-29T11:54:07.816Z"
           },
           {
             "itemId": 103289,
@@ -1549,7 +1549,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:30:38.709Z"
+            "updatedAt": "2026-09-29T11:52:36.077Z"
           },
           {
             "itemId": 103789,
@@ -1564,7 +1564,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:10:50.901Z"
+            "updatedAt": "2026-09-29T11:59:10.426Z"
           }
         ]
       },
@@ -1574,21 +1574,6 @@
         "titleEnglish": "Special Offers",
         "displayOrder": 41,
         "items": [
-          {
-            "itemId": 104214,
-            "nameArabic": "بوكس كودو + باكيت ستربس",
-            "nameEnglish": "Chicken Box + StripsBuckt",
-            "price": 96,
-            "itemImageUrl": "https://d15pngy0ricipl.cloudfront.net/1789567382649_bhdvU.webp",
-            "descriptionArabic": "احتفل باليوم الوطني السعودي مع بوكس كودو دجاج  وباكيت ستربس الدجاج، مثالي للمشاركة.",
-            "descriptionEnglish": "Celebrate Saudi National Day with Kudu Chicken Box and Chicken Strips Bucket, made for sharing.",
-            "calories": 0,
-            "isAvailable": true,
-            "isPublish": false,
-            "isHidden": false,
-            "status": "active",
-            "updatedAt": "2026-09-29T10:33:28.692Z"
-          },
           {
             "itemId": 104324,
             "nameArabic": "كوري لاسع كومبو + ناتشوز",
@@ -1602,7 +1587,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:26:57.122Z"
+            "updatedAt": "2026-09-29T10:39:39.903Z"
           },
           {
             "itemId": 104325,
@@ -1617,7 +1602,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:19:57.577Z"
+            "updatedAt": "2026-09-29T11:57:36.683Z"
           }
         ]
       },
@@ -1640,7 +1625,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:02:44.833Z"
+            "updatedAt": "2026-09-29T11:35:43.159Z"
           },
           {
             "itemId": 103050,
@@ -1655,7 +1640,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:29:20.855Z"
+            "updatedAt": "2026-09-29T11:43:23.639Z"
           },
           {
             "itemId": 103297,
@@ -1670,7 +1655,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:32:06.442Z"
+            "updatedAt": "2026-09-29T11:43:42.064Z"
           },
           {
             "itemId": 103304,
@@ -1685,7 +1670,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:54:50.717Z"
+            "updatedAt": "2026-09-29T12:01:05.488Z"
           },
           {
             "itemId": 103306,
@@ -1700,7 +1685,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:25:50.213Z"
+            "updatedAt": "2026-09-29T12:00:23.810Z"
           },
           {
             "itemId": 104185,
@@ -1715,7 +1700,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:24:30.398Z"
+            "updatedAt": "2026-09-29T12:01:05.488Z"
           },
           {
             "itemId": 104187,
@@ -1730,7 +1715,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:24:30.398Z"
+            "updatedAt": "2026-09-29T11:48:39.421Z"
           }
         ]
       },
@@ -1753,7 +1738,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T07:17:47.124Z"
+            "updatedAt": "2026-09-29T10:54:46.606Z"
           },
           {
             "itemId": 103690,
@@ -1798,7 +1783,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:32:10.869Z"
+            "updatedAt": "2026-09-29T11:58:24.564Z"
           }
         ]
       },
@@ -1821,7 +1806,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:33:05.075Z"
+            "updatedAt": "2026-09-29T11:58:58.167Z"
           },
           {
             "itemId": 103856,
@@ -1836,7 +1821,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:33:06.270Z"
+            "updatedAt": "2026-09-29T11:41:50.404Z"
           },
           {
             "itemId": 104194,
@@ -1851,7 +1836,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:32:55.028Z"
+            "updatedAt": "2026-09-29T11:54:07.816Z"
           }
         ]
       },
@@ -1881,7 +1866,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:54:35.096Z"
+            "updatedAt": "2026-09-29T10:53:03.202Z"
           },
           {
             "itemId": 104282,
@@ -1896,7 +1881,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:28:38.433Z"
+            "updatedAt": "2026-09-29T11:35:22.141Z"
           },
           {
             "itemId": 104285,
@@ -1911,7 +1896,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:09:42.136Z"
+            "updatedAt": "2026-09-29T11:37:16.622Z"
           },
           {
             "itemId": 104288,
@@ -1926,7 +1911,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:32:06.442Z"
+            "updatedAt": "2026-09-29T11:55:02.607Z"
           }
         ]
       }
@@ -1951,7 +1936,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:33:58.082Z"
+            "updatedAt": "2026-09-29T12:02:49.821Z"
           },
           {
             "itemId": 100054,
@@ -1966,7 +1951,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:30:41.576Z"
+            "updatedAt": "2026-09-29T12:02:05.879Z"
           },
           {
             "itemId": 100057,
@@ -1981,7 +1966,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:33:10.516Z"
+            "updatedAt": "2026-09-29T11:49:03.057Z"
           },
           {
             "itemId": 100060,
@@ -1996,7 +1981,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:30:15.509Z"
+            "updatedAt": "2026-09-29T11:58:46.797Z"
           },
           {
             "itemId": 100274,
@@ -2011,7 +1996,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:33:02.441Z"
+            "updatedAt": "2026-09-29T12:02:52.919Z"
           },
           {
             "itemId": 100294,
@@ -2026,7 +2011,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:31:40.517Z"
+            "updatedAt": "2026-09-29T12:01:34.681Z"
           },
           {
             "itemId": 100681,
@@ -2041,7 +2026,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:31:40.677Z"
+            "updatedAt": "2026-09-29T11:58:12.573Z"
           },
           {
             "itemId": 102929,
@@ -2056,7 +2041,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:29:05.219Z"
+            "updatedAt": "2026-09-29T12:02:01.140Z"
           },
           {
             "itemId": 102996,
@@ -2071,7 +2056,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:34:00.547Z"
+            "updatedAt": "2026-09-29T12:02:48.984Z"
           },
           {
             "itemId": 103634,
@@ -2086,7 +2071,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:31:44.884Z"
+            "updatedAt": "2026-09-29T12:02:52.919Z"
           },
           {
             "itemId": 103744,
@@ -2101,7 +2086,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:22:28.241Z"
+            "updatedAt": "2026-09-29T11:49:18.761Z"
           },
           {
             "itemId": 104162,
@@ -2116,7 +2101,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:34:02.504Z"
+            "updatedAt": "2026-09-29T11:58:29.696Z"
           },
           {
             "itemId": 104168,
@@ -2131,7 +2116,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:27:25.736Z"
+            "updatedAt": "2026-09-29T11:47:24.463Z"
           },
           {
             "itemId": 104249,
@@ -2146,7 +2131,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:28:41.413Z"
+            "updatedAt": "2026-09-29T11:56:42.360Z"
           },
           {
             "itemId": 104266,
@@ -2161,7 +2146,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:29:33.905Z"
+            "updatedAt": "2026-09-29T11:53:29.250Z"
           }
         ]
       },
@@ -2184,7 +2169,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:31:02.841Z"
+            "updatedAt": "2026-09-29T11:56:26.963Z"
           },
           {
             "itemId": 101211,
@@ -2199,7 +2184,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:24:44.284Z"
+            "updatedAt": "2026-09-29T11:35:24.825Z"
           },
           {
             "itemId": 102115,
@@ -2214,7 +2199,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:37:26.529Z"
+            "updatedAt": "2026-09-29T11:19:42.356Z"
           },
           {
             "itemId": 102116,
@@ -2229,7 +2214,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:22:52.704Z"
+            "updatedAt": "2026-09-29T11:19:48.245Z"
           },
           {
             "itemId": 102664,
@@ -2244,7 +2229,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:22:52.704Z"
+            "updatedAt": "2026-09-29T11:43:23.045Z"
           },
           {
             "itemId": 102665,
@@ -2259,7 +2244,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:30:03.519Z"
+            "updatedAt": "2026-09-29T11:43:23.045Z"
           },
           {
             "itemId": 103843,
@@ -2274,7 +2259,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:07:56.196Z"
+            "updatedAt": "2026-09-29T11:48:55.496Z"
           }
         ]
       },
@@ -2297,7 +2282,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:45:59.129Z"
+            "updatedAt": "2026-09-29T11:20:52.784Z"
           },
           {
             "itemId": 100003,
@@ -2312,7 +2297,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:55:05.005Z"
+            "updatedAt": "2026-09-29T11:59:48.544Z"
           },
           {
             "itemId": 100004,
@@ -2327,7 +2312,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:29:59.888Z"
+            "updatedAt": "2026-09-29T11:54:46.345Z"
           },
           {
             "itemId": 100006,
@@ -2342,7 +2327,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:33:10.434Z"
+            "updatedAt": "2026-09-29T12:02:49.821Z"
           },
           {
             "itemId": 100015,
@@ -2357,7 +2342,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:32:37.160Z"
+            "updatedAt": "2026-09-29T12:01:02.311Z"
           },
           {
             "itemId": 100273,
@@ -2372,7 +2357,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:32:37.160Z"
+            "updatedAt": "2026-09-29T12:01:33.517Z"
           },
           {
             "itemId": 100293,
@@ -2387,7 +2372,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:30:53.497Z"
+            "updatedAt": "2026-09-29T11:02:43.163Z"
           },
           {
             "itemId": 100680,
@@ -2402,7 +2387,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:30:03.905Z"
+            "updatedAt": "2026-09-29T11:52:24.008Z"
           },
           {
             "itemId": 102928,
@@ -2417,7 +2402,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:30:22.985Z"
+            "updatedAt": "2026-09-29T11:28:42.482Z"
           },
           {
             "itemId": 102995,
@@ -2432,7 +2417,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:04:43.313Z"
+            "updatedAt": "2026-09-29T11:55:39.745Z"
           },
           {
             "itemId": 103632,
@@ -2447,7 +2432,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:31:52.478Z"
+            "updatedAt": "2026-09-29T11:49:07.128Z"
           },
           {
             "itemId": 103742,
@@ -2462,7 +2447,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:15:59.616Z"
+            "updatedAt": "2026-09-29T11:53:15.968Z"
           },
           {
             "itemId": 104159,
@@ -2477,7 +2462,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:29:17.847Z"
+            "updatedAt": "2026-09-29T12:01:02.311Z"
           },
           {
             "itemId": 104165,
@@ -2492,7 +2477,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:22:28.241Z"
+            "updatedAt": "2026-09-29T11:39:39.890Z"
           },
           {
             "itemId": 104246,
@@ -2507,7 +2492,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:31:16.557Z"
+            "updatedAt": "2026-09-29T11:54:28.734Z"
           },
           {
             "itemId": 104263,
@@ -2522,7 +2507,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:18:49.074Z"
+            "updatedAt": "2026-09-29T11:56:38.074Z"
           }
         ]
       },
@@ -2778,7 +2763,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:19:05.518Z"
+            "updatedAt": "2026-09-29T11:51:14.525Z"
           },
           {
             "itemId": 102201,
@@ -2793,7 +2778,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:32:10.426Z"
+            "updatedAt": "2026-09-29T11:56:27.766Z"
           },
           {
             "itemId": 103044,
@@ -2808,7 +2793,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:33:06.464Z"
+            "updatedAt": "2026-09-29T12:01:42.261Z"
           },
           {
             "itemId": 103046,
@@ -2823,7 +2808,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:29:05.640Z"
+            "updatedAt": "2026-09-29T11:24:46.726Z"
           },
           {
             "itemId": 103059,
@@ -2838,7 +2823,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:58:45.797Z"
+            "updatedAt": "2026-09-29T11:57:51.375Z"
           },
           {
             "itemId": 103060,
@@ -2853,7 +2838,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:24:43.145Z"
+            "updatedAt": "2026-09-29T11:49:21.722Z"
           },
           {
             "itemId": 104185,
@@ -2868,7 +2853,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:30:53.497Z"
+            "updatedAt": "2026-09-29T12:01:26.271Z"
           },
           {
             "itemId": 104186,
@@ -2883,7 +2868,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:33:49.509Z"
+            "updatedAt": "2026-09-29T12:01:03.418Z"
           }
         ]
       },
@@ -2906,7 +2891,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:29:57.510Z"
+            "updatedAt": "2026-09-29T11:47:57.361Z"
           },
           {
             "itemId": 100902,
@@ -2921,7 +2906,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:33:58.082Z"
+            "updatedAt": "2026-09-29T12:02:49.821Z"
           },
           {
             "itemId": 103773,
@@ -2936,7 +2921,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:29:57.510Z"
+            "updatedAt": "2026-09-29T11:52:24.008Z"
           },
           {
             "itemId": 104295,
@@ -2951,7 +2936,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:28:43.754Z"
+            "updatedAt": "2026-09-29T11:34:24.862Z"
           }
         ]
       },
@@ -2974,7 +2959,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:27:03.412Z"
+            "updatedAt": "2026-09-29T12:02:21.117Z"
           },
           {
             "itemId": 100032,
@@ -2989,7 +2974,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:34:30.406Z"
+            "updatedAt": "2026-09-29T11:32:11.360Z"
           },
           {
             "itemId": 100040,
@@ -3004,7 +2989,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:14:01.617Z"
+            "updatedAt": "2026-09-29T11:56:06.202Z"
           },
           {
             "itemId": 100409,
@@ -3019,7 +3004,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:32:38.809Z"
+            "updatedAt": "2026-09-29T11:53:41.483Z"
           },
           {
             "itemId": 103788,
@@ -3034,7 +3019,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:15:06.320Z"
+            "updatedAt": "2026-09-29T12:01:58.716Z"
           }
         ]
       },
@@ -3057,7 +3042,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:08:49.717Z"
+            "updatedAt": "2026-09-29T11:58:02.454Z"
           },
           {
             "itemId": 102600,
@@ -3087,7 +3072,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:30:31.376Z"
+            "updatedAt": "2026-09-29T11:57:13.117Z"
           },
           {
             "itemId": 102918,
@@ -3117,7 +3102,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-28T18:07:39.923Z"
+            "updatedAt": "2026-09-29T11:53:08.168Z"
           },
           {
             "itemId": 102979,
@@ -3132,7 +3117,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:33:58.082Z"
+            "updatedAt": "2026-09-29T11:54:46.345Z"
           },
           {
             "itemId": 103511,
@@ -3147,7 +3132,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:12:35.044Z"
+            "updatedAt": "2026-09-29T12:01:58.716Z"
           },
           {
             "itemId": 103513,
@@ -3185,7 +3170,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:26:59.719Z"
+            "updatedAt": "2026-09-29T11:54:37.771Z"
           },
           {
             "itemId": 100037,
@@ -3200,7 +3185,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:21:41.062Z"
+            "updatedAt": "2026-09-29T11:59:26.085Z"
           },
           {
             "itemId": 100039,
@@ -3215,7 +3200,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:45:12.197Z"
+            "updatedAt": "2026-09-29T11:56:20.531Z"
           },
           {
             "itemId": 100042,
@@ -3230,7 +3215,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:32:38.809Z"
+            "updatedAt": "2026-09-29T12:02:49.821Z"
           },
           {
             "itemId": 100110,
@@ -3245,7 +3230,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:28:19.081Z"
+            "updatedAt": "2026-09-29T12:01:34.681Z"
           },
           {
             "itemId": 100591,
@@ -3260,7 +3245,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:32:08.766Z"
+            "updatedAt": "2026-09-29T11:28:35.031Z"
           },
           {
             "itemId": 102023,
@@ -3275,7 +3260,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:28:19.081Z"
+            "updatedAt": "2026-09-29T11:53:29.250Z"
           },
           {
             "itemId": 102348,
@@ -3290,7 +3275,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:30:28.287Z"
+            "updatedAt": "2026-09-29T11:58:02.454Z"
           },
           {
             "itemId": 102568,
@@ -3305,7 +3290,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:33:58.082Z"
+            "updatedAt": "2026-09-29T11:34:13.547Z"
           },
           {
             "itemId": 103012,
@@ -3320,7 +3305,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:32:37.160Z"
+            "updatedAt": "2026-09-29T12:02:18.447Z"
           },
           {
             "itemId": 104173,
@@ -3335,7 +3320,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:16:22.793Z"
+            "updatedAt": "2026-09-29T11:58:46.797Z"
           },
           {
             "itemId": 104176,
@@ -3350,7 +3335,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:10:07.914Z"
+            "updatedAt": "2026-09-29T11:59:11.349Z"
           }
         ]
       },
@@ -3373,7 +3358,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:33:06.464Z"
+            "updatedAt": "2026-09-29T12:00:51.942Z"
           },
           {
             "itemId": 104277,
@@ -3403,7 +3388,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:33:10.434Z"
+            "updatedAt": "2026-09-29T11:53:53.660Z"
           },
           {
             "itemId": 104327,
@@ -3418,7 +3403,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:10:07.914Z"
+            "updatedAt": "2026-09-29T11:59:11.349Z"
           },
           {
             "itemId": 104328,
@@ -3433,7 +3418,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:27:44.642Z"
+            "updatedAt": "2026-09-29T11:54:41.694Z"
           }
         ]
       },
@@ -3456,7 +3441,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T07:28:41.270Z"
+            "updatedAt": "2026-09-29T11:05:21.265Z"
           },
           {
             "itemId": 100376,
@@ -3486,7 +3471,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:45:28.535Z"
+            "updatedAt": "2026-09-29T11:54:54.689Z"
           },
           {
             "itemId": 101878,
@@ -3516,7 +3501,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:33:30.127Z"
+            "updatedAt": "2026-09-29T11:23:31.863Z"
           },
           {
             "itemId": 102846,
@@ -3531,7 +3516,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:43:56.364Z"
+            "updatedAt": "2026-09-29T10:36:11.021Z"
           },
           {
             "itemId": 102847,
@@ -3546,7 +3531,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:24:17.665Z"
+            "updatedAt": "2026-09-29T11:54:54.689Z"
           },
           {
             "itemId": 102848,
@@ -3591,7 +3576,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:50:57.152Z"
+            "updatedAt": "2026-09-29T11:16:12.288Z"
           },
           {
             "itemId": 103200,
@@ -3606,7 +3591,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:26:20.491Z"
+            "updatedAt": "2026-09-29T11:30:28.677Z"
           },
           {
             "itemId": 103201,
@@ -3621,7 +3606,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:10:35.944Z"
+            "updatedAt": "2026-09-29T11:18:27.476Z"
           },
           {
             "itemId": 103202,
@@ -3651,7 +3636,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:46:20.844Z"
+            "updatedAt": "2026-09-29T12:00:51.942Z"
           },
           {
             "itemId": 103204,
@@ -3666,7 +3651,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:22:01.340Z"
+            "updatedAt": "2026-09-29T10:48:22.515Z"
           },
           {
             "itemId": 103235,
@@ -3681,7 +3666,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:17:07.833Z"
+            "updatedAt": "2026-09-29T11:54:35.636Z"
           },
           {
             "itemId": 103240,
@@ -3696,7 +3681,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:22:28.241Z"
+            "updatedAt": "2026-09-29T11:59:48.544Z"
           },
           {
             "itemId": 103241,
@@ -3756,7 +3741,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:28:01.043Z"
+            "updatedAt": "2026-09-29T11:56:20.531Z"
           },
           {
             "itemId": 103997,
@@ -3771,7 +3756,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:09:41.632Z"
+            "updatedAt": "2026-09-29T11:56:38.074Z"
           },
           {
             "itemId": 104234,
@@ -3786,7 +3771,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:31:44.884Z"
+            "updatedAt": "2026-09-29T11:45:47.668Z"
           }
         ]
       },
@@ -3809,7 +3794,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-28T20:41:33.048Z"
+            "updatedAt": "2026-09-29T10:54:22.063Z"
           },
           {
             "itemId": 103689,
@@ -3824,7 +3809,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:07:56.196Z"
+            "updatedAt": "2026-09-29T11:11:19.260Z"
           },
           {
             "itemId": 103709,
@@ -3839,7 +3824,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:07:56.196Z"
+            "updatedAt": "2026-09-29T11:24:24.461Z"
           },
           {
             "itemId": 104143,
@@ -3854,7 +3839,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:26:32.915Z"
+            "updatedAt": "2026-09-29T12:01:49.770Z"
           }
         ]
       },
@@ -3877,7 +3862,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:30:19.147Z"
+            "updatedAt": "2026-09-29T11:53:10.641Z"
           },
           {
             "itemId": 103855,
@@ -3892,7 +3877,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:32:19.835Z"
+            "updatedAt": "2026-09-29T11:49:49.306Z"
           },
           {
             "itemId": 104193,
@@ -3907,7 +3892,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:33:10.434Z"
+            "updatedAt": "2026-09-29T11:58:51.685Z"
           }
         ]
       },
@@ -3937,7 +3922,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:32:19.590Z"
+            "updatedAt": "2026-09-29T11:13:19.012Z"
           },
           {
             "itemId": 104281,
@@ -3952,7 +3937,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:30:31.376Z"
+            "updatedAt": "2026-09-29T11:58:46.797Z"
           },
           {
             "itemId": 104284,
@@ -3967,7 +3952,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:29:18.897Z"
+            "updatedAt": "2026-09-29T11:31:12.089Z"
           },
           {
             "itemId": 104287,
@@ -3982,7 +3967,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:33:00.488Z"
+            "updatedAt": "2026-09-29T11:58:46.797Z"
           }
         ]
       }

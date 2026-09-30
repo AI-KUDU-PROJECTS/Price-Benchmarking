@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Response
 
 from bff.contract import (
     BrandOverview,
@@ -14,9 +14,18 @@ from bff.contract import (
     MarketCounts,
     MarketOverview,
     PromotionStatus,
+    PriceMappingList,
+    PriceMappingWrite,
     dump,
     now_riyadh_iso,
     select_highlights,
+)
+from bff.playground import (
+    create_mapping,
+    delete_mapping,
+    get_mapping,
+    list_mappings,
+    update_mapping,
 )
 from bff.registry import all_brands, connected_adapters, get_adapter
 from bff.pull_all import hungerstation_pull_manager, pull_manager
@@ -317,3 +326,48 @@ def get_change(change_id: str) -> dict[str, Any]:
         if event is not None:
             return dump(event)
     raise HTTPException(status_code=404, detail={"error": "change_not_found", "id": change_id})
+
+
+@router.get("/playground/mappings")
+def playground_mappings() -> dict[str, Any]:
+    return dump(PriceMappingList(items=list_mappings()))
+
+
+@router.get("/playground/mappings/{mapping_id}")
+def playground_mapping(mapping_id: str) -> dict[str, Any]:
+    mapping = get_mapping(mapping_id)
+    if mapping is None:
+        raise HTTPException(
+            status_code=404,
+            detail={"error": "mapping_not_found", "id": mapping_id},
+        )
+    return dump(mapping)
+
+
+@router.post("/playground/mappings", status_code=201)
+def create_playground_mapping(payload: PriceMappingWrite) -> dict[str, Any]:
+    return dump(create_mapping(payload))
+
+
+@router.put("/playground/mappings/{mapping_id}")
+def update_playground_mapping(
+    mapping_id: str,
+    payload: PriceMappingWrite,
+) -> dict[str, Any]:
+    mapping = update_mapping(mapping_id, payload)
+    if mapping is None:
+        raise HTTPException(
+            status_code=404,
+            detail={"error": "mapping_not_found", "id": mapping_id},
+        )
+    return dump(mapping)
+
+
+@router.delete("/playground/mappings/{mapping_id}", status_code=204)
+def delete_playground_mapping(mapping_id: str) -> Response:
+    if not delete_mapping(mapping_id):
+        raise HTTPException(
+            status_code=404,
+            detail={"error": "mapping_not_found", "id": mapping_id},
+        )
+    return Response(status_code=204)

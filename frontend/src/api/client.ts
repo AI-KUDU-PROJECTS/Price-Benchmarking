@@ -2,6 +2,10 @@ import type {
   Brand,
   BrandOverview,
   ChangeEvent,
+  Channel,
+  PriceMapping,
+  PriceMappingList,
+  PriceMappingWrite,
   ListResponse,
   MarketOverview,
   Product,
@@ -36,6 +40,25 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return body as T;
 }
 
+async function allProducts(brand: string, channel: Channel): Promise<Product[]> {
+  const items: Product[] = [];
+  let page = 1;
+  while (true) {
+    const query = new URLSearchParams({
+      channel,
+      page: String(page),
+      page_size: "500",
+    });
+    const response = await request<ListResponse<Product>>(
+      `/brands/${brand}/products?${query.toString()}`,
+    );
+    items.push(...response.items);
+    if (items.length >= response.meta.total || response.items.length === 0) break;
+    page += 1;
+  }
+  return items;
+}
+
 export const api = {
   marketOverview: () => request<MarketOverview>("/market/overview"),
   pullStatus: () => request<PullResponse>("/market/pull"),
@@ -59,4 +82,22 @@ export const api = {
   changes: (brand: string, params = "") =>
     request<ListResponse<ChangeEvent>>(`/brands/${brand}/changes${params}`),
   change: (id: string) => request<ChangeEvent>(`/changes/${encodeURIComponent(id)}`),
+  allProducts,
+  playgroundMappings: () => request<PriceMappingList>("/playground/mappings"),
+  playgroundMapping: (id: string) =>
+    request<PriceMapping>(`/playground/mappings/${encodeURIComponent(id)}`),
+  createPlaygroundMapping: (payload: PriceMappingWrite) =>
+    request<PriceMapping>("/playground/mappings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }),
+  updatePlaygroundMapping: (id: string, payload: PriceMappingWrite) =>
+    request<PriceMapping>(`/playground/mappings/${encodeURIComponent(id)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }),
+  deletePlaygroundMapping: (id: string) =>
+    request<void>(`/playground/mappings/${encodeURIComponent(id)}`, { method: "DELETE" }),
 };

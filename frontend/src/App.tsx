@@ -11,6 +11,7 @@ import { MarketChangesPage } from "./pages/MarketChangesPage";
 import { MarketOverviewPage } from "./pages/MarketOverviewPage";
 import { MarketPromotionsPage } from "./pages/MarketPromotionsPage";
 import { ProductHistoryPage } from "./pages/ProductHistoryPage";
+import { PlaygroundPage } from "./pages/PlaygroundPage";
 import { PromotionDetailPage } from "./pages/PromotionDetailPage";
 
 const BRANDS = ["kudu", "kfc", "hardees", "burger-king", "herfy", "mcdonalds", "albaik"];
@@ -24,6 +25,7 @@ export function App() {
         <Route path="/changes" element={<MarketChangesPage />} />
         <Route path="/promotions" element={<MarketPromotionsPage />} />
         <Route path="/changes/:changeId" element={<ChangeDetailPage />} />
+        <Route path="/playground" element={<PlaygroundPage />} />
         {BRANDS.map((brandId) => (
           <Fragment key={brandId}>
             <Route path={`/competitors/${brandId}`} element={<BrandOverviewPage brandId={brandId} />} />

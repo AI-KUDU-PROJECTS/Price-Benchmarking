@@ -24,6 +24,8 @@ export function ProductImage({
       className={large ? "thumb-lg" : "thumb"}
       src={src}
       alt={alt}
+      loading="lazy"
+      decoding="async"
       onError={() => setFailed(true)}
     />
   );
