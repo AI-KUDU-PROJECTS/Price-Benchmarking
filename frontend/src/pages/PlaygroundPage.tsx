@@ -1,5 +1,6 @@
 import { Plus, Trash2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { api, ApiError } from "../api/client";
 import type {
   Brand,
@@ -21,6 +22,13 @@ import {
 } from "../components/ProductPickerDialog";
 import { EmptyState, ErrorState, LoadingState } from "../components/States";
 import { formatRiyadhDateTime } from "../lib/dateTime";
+import {
+  channelLabel,
+  comparePrices,
+  flowProductName,
+  signedMoney,
+  signedPercent,
+} from "../lib/playground";
 
 const CHANNELS: Array<{ value: Channel; label: string }> = [
   { value: "pickup", label: "Pickup" },
@@ -33,14 +41,6 @@ type ConfirmAction =
   | { kind: "channel"; channel: Channel }
   | { kind: "kudu"; product: PlaygroundProductOption }
   | { kind: "new" };
-
-function channelLabel(channel: Channel): string {
-  return CHANNELS.find((item) => item.value === channel)?.label || channel;
-}
-
-function displayName(product: Pick<PlaygroundProductOption, "nameEn" | "nameAr" | "productId">): string {
-  return product.nameEn || product.nameAr || product.productId;
-}
 
 function toOption(product: Product, brandName: string): PlaygroundProductOption {
   return {
@@ -72,42 +72,11 @@ function readableError(error: unknown): string {
   return error instanceof Error ? error.message : "Something went wrong.";
 }
 
-function signedMoney(value: number | null, currency: string | null): string {
-  if (value === null) return "—";
-  const sign = value > 0 ? "+" : "";
-  return `${currency || "SAR"} ${sign}${value.toFixed(2)}`;
-}
-
-function signedPercent(value: number | null): string {
-  if (value === null) return "—";
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${value.toFixed(2)}%`;
-}
-
-function pricePosition(
-  competitor: PlaygroundProductOption,
-  kudu: PlaygroundProductOption | null,
-): { difference: number | null; percentage: number | null; label: string } {
-  if (
-    !kudu
-    || kudu.missing
-    || competitor.missing
-    || kudu.effectivePrice === null
-    || competitor.effectivePrice === null
-    || !kudu.currency
-    || kudu.currency !== competitor.currency
-  ) {
-    return { difference: null, percentage: null, label: "Unavailable" };
-  }
-  const difference = Math.round((competitor.effectivePrice - kudu.effectivePrice) * 100) / 100;
-  const percentage = kudu.effectivePrice === 0
-    ? null
-    : Math.round((difference / kudu.effectivePrice) * 10000) / 100;
-  const label = difference > 0 ? "Higher" : difference < 0 ? "Lower" : "Equal";
-  return { difference, percentage, label };
-}
-
 export function PlaygroundPage() {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const editId = searchParams.get("edit");
+
   const [brands, setBrands] = useState<Brand[]>([]);
   const [mappings, setMappings] = useState<PriceMapping[]>([]);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -123,6 +92,7 @@ export function PlaygroundPage() {
   const [selectedCompetitors, setSelectedCompetitors] = useState<PlaygroundProductOption[]>([]);
   const [mappingName, setMappingName] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [appliedEditId, setAppliedEditId] = useState<string | null>(null);
 
   const [kuduPickerOpen, setKuduPickerOpen] = useState(false);
   const [competitorPickerOpen, setCompetitorPickerOpen] = useState(false);
@@ -131,6 +101,20 @@ export function PlaygroundPage() {
   const [deleting, setDeleting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+
+  const openMapping = useCallback((mapping: PriceMapping) => {
+    const kudu = fromMappingProduct(mapping.kuduItem);
+    setEditingId(mapping.id);
+    setChannel(mapping.channel);
+    setSelectedKudu(kudu);
+    setSelectedCompetitors(mapping.competitorItems.map(fromMappingProduct));
+    setMappingName(mapping.name);
+    setFormError(null);
+    setStatusMessage(null);
+    requestAnimationFrame(() => {
+      document.getElementById("playground-builder-title")?.focus();
+    });
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -150,6 +134,30 @@ export function PlaygroundPage() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!editId || initialLoading || appliedEditId === editId) return;
+    setAppliedEditId(editId);
+    const existing = mappings.find((mapping) => mapping.id === editId);
+    if (existing) {
+      openMapping(existing);
+      return;
+    }
+
+    let cancelled = false;
+    api.playgroundMapping(editId)
+      .then((mapping) => {
+        if (cancelled) return;
+        setMappings((current) => [mapping, ...current.filter((item) => item.id !== mapping.id)]);
+        openMapping(mapping);
+      })
+      .catch((error) => {
+        if (!cancelled) setFormError(`Could not open this mapping. ${readableError(error)}`);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [appliedEditId, editId, initialLoading, mappings, openMapping]);
 
   useEffect(() => {
     if (!channel || brands.length === 0) {
@@ -191,9 +199,7 @@ export function PlaygroundPage() {
           current.map((option) => latest.get(optionKey(option)) || option),
         );
         setCatalogLoading(false);
-        if (!brandNames.has("kudu")) {
-          setCatalogError("KUDU data is not connected.");
-        }
+        if (!brandNames.has("kudu")) setCatalogError("KUDU data is not connected.");
       })
       .catch((error: unknown) => {
         if (cancelled) return;
@@ -217,14 +223,21 @@ export function PlaygroundPage() {
     );
   }, [channel, mappingName, selectedCompetitors, selectedKudu]);
 
+  const clearEditQuery = () => {
+    if (searchParams.has("edit")) setSearchParams({}, { replace: true });
+  };
+
   const resetForm = () => {
     setChannel("");
     setSelectedKudu(null);
     setSelectedCompetitors([]);
     setMappingName("");
     setEditingId(null);
+    setAppliedEditId(null);
     setFormError(null);
+    setCatalogError(null);
     setStatusMessage(null);
+    clearEditQuery();
   };
 
   const applyChannel = (nextChannel: Channel) => {
@@ -233,8 +246,11 @@ export function PlaygroundPage() {
     setSelectedCompetitors([]);
     setMappingName("");
     setEditingId(null);
+    setAppliedEditId(null);
     setFormError(null);
+    setCatalogError(null);
     setStatusMessage(null);
+    clearEditQuery();
   };
 
   const requestChannelChange = (nextChannel: Channel) => {
@@ -250,7 +266,7 @@ export function PlaygroundPage() {
     setSelectedKudu(product);
     setSelectedCompetitors([]);
     if (!editingId || !mappingName.trim()) {
-      setMappingName(`KUDU ${displayName(product)} · ${channelLabel(channel as Channel)}`);
+      setMappingName(`KUDU ${flowProductName(product)} · ${channelLabel(channel as Channel)}`);
     }
     setFormError(null);
     setStatusMessage(null);
@@ -260,24 +276,8 @@ export function PlaygroundPage() {
     const next = products[0];
     setKuduPickerOpen(false);
     if (!next || optionKey(next) === (selectedKudu ? optionKey(selectedKudu) : "")) return;
-    if (selectedCompetitors.length > 0) {
-      setConfirmAction({ kind: "kudu", product: next });
-    } else {
-      applyKudu(next);
-    }
-  };
-
-  const openMapping = (mapping: PriceMapping) => {
-    setEditingId(mapping.id);
-    setChannel(mapping.channel);
-    setSelectedKudu(fromMappingProduct(mapping.kuduItem));
-    setSelectedCompetitors(mapping.competitorItems.map(fromMappingProduct));
-    setMappingName(mapping.name);
-    setFormError(null);
-    setStatusMessage(null);
-    requestAnimationFrame(() => {
-      document.getElementById("playground-builder")?.focus();
-    });
+    if (selectedCompetitors.length > 0) setConfirmAction({ kind: "kudu", product: next });
+    else applyKudu(next);
   };
 
   const requestNewMapping = () => {
@@ -309,15 +309,7 @@ export function PlaygroundPage() {
       const saved = editingId
         ? await api.updatePlaygroundMapping(editingId, payload)
         : await api.createPlaygroundMapping(payload);
-      setMappings((current) =>
-        [saved, ...current.filter((mapping) => mapping.id !== saved.id)]
-          .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)),
-      );
-      setEditingId(saved.id);
-      setMappingName(saved.name);
-      setSelectedKudu(fromMappingProduct(saved.kuduItem));
-      setSelectedCompetitors(saved.competitorItems.map(fromMappingProduct));
-      setStatusMessage(editingId ? "Mapping updated." : "Mapping saved.");
+      navigate(`/playground/mappings/${encodeURIComponent(saved.id)}`);
     } catch (error) {
       setFormError(readableError(error));
     } finally {
@@ -346,9 +338,7 @@ export function PlaygroundPage() {
     setDeleting(true);
     try {
       await api.deletePlaygroundMapping(confirmAction.mapping.id);
-      setMappings((current) =>
-        current.filter((mapping) => mapping.id !== confirmAction.mapping.id),
-      );
+      setMappings((current) => current.filter((mapping) => mapping.id !== confirmAction.mapping.id));
       if (editingId === confirmAction.mapping.id) resetForm();
       setStatusMessage("Mapping deleted.");
       setConfirmAction(null);
@@ -410,10 +400,10 @@ export function PlaygroundPage() {
         )}
       />
 
-      <section className="playground-builder" aria-labelledby="playground-builder">
+      <section className="playground-builder" aria-labelledby="playground-builder-title">
         <div className="section-heading">
           <div>
-            <h2 id="playground-builder" className="section-title" tabIndex={-1}>
+            <h2 id="playground-builder-title" className="section-title" tabIndex={-1}>
               {editingId ? "Edit mapping" : "Build a comparison"}
             </h2>
             <p className="section-description">Complete the steps in order. Prices are never stored; the latest data is used each time.</p>
@@ -472,16 +462,14 @@ export function PlaygroundPage() {
             {catalogLoading && channel ? <div className="inline-loading" role="status">Loading channel products…</div> : null}
             {catalogError ? <div className="field-error" role="alert">{catalogError}</div> : null}
             {!catalogLoading && channel && kuduOptions.length === 0 ? (
-              <div className="inline-empty">
-                No KUDU products are available for {channelLabel(channel)} yet.
-              </div>
+              <div className="inline-empty">No KUDU products are available for {channelLabel(channel)} yet.</div>
             ) : null}
             {selectedKudu ? (
               <div className="selected-product">
                 <div className="selected-product-main">
-                  <ProductImage src={selectedKudu.imageUrl} alt={displayName(selectedKudu)} />
+                  <ProductImage src={selectedKudu.imageUrl} alt={flowProductName(selectedKudu)} />
                   <div>
-                    <strong dir="auto">{displayName(selectedKudu)}</strong>
+                    <strong dir="auto">{flowProductName(selectedKudu)}</strong>
                     {selectedKudu.nameAr && selectedKudu.nameEn ? (
                       <div className="meta-text" dir="auto">{selectedKudu.nameAr}</div>
                     ) : null}
@@ -533,13 +521,20 @@ export function PlaygroundPage() {
                 </thead>
                 <tbody>
                   {selectedCompetitors.map((competitor) => {
-                    const comparison = pricePosition(competitor, selectedKudu);
+                    const comparison = comparePrices(competitor, selectedKudu);
+                    const positionLabel = comparison.position === "higher"
+                      ? "Higher"
+                      : comparison.position === "lower"
+                        ? "Lower"
+                        : comparison.position === "equal"
+                          ? "Equal"
+                          : "Unavailable";
                     return (
                       <tr key={optionKey(competitor)}>
                         <td>{competitor.brandName}</td>
-                        <td><ProductImage src={competitor.imageUrl} alt={displayName(competitor)} /></td>
+                        <td><ProductImage src={competitor.imageUrl} alt={flowProductName(competitor)} /></td>
                         <td>
-                          <span dir="auto">{displayName(competitor)}</span>
+                          <span dir="auto">{flowProductName(competitor)}</span>
                           {competitor.nameAr && competitor.nameEn ? (
                             <div className="meta-text" dir="auto">{competitor.nameAr}</div>
                           ) : null}
@@ -548,11 +543,12 @@ export function PlaygroundPage() {
                         <td className="num"><Price value={competitor.effectivePrice} currency={competitor.currency} /></td>
                         <td className="num" dir="ltr">{signedMoney(comparison.difference, competitor.currency)}</td>
                         <td className="num" dir="ltr">{signedPercent(comparison.percentage)}</td>
-                        <td><span className="status-pill" data-tone="neutral">{comparison.label}</span></td>
+                        <td><span className="status-pill" data-tone="neutral">{positionLabel}</span></td>
                         <td>
                           <button
                             type="button"
                             className="btn btn-ghost btn-sm"
+                            aria-label={`Remove ${flowProductName(competitor)}`}
                             onClick={() => setSelectedCompetitors((current) =>
                               current.filter((item) => optionKey(item) !== optionKey(competitor)),
                             )}
@@ -575,7 +571,7 @@ export function PlaygroundPage() {
             <h3 className="step-title">Name and save mapping <span aria-hidden="true">*</span></h3>
             <p className="step-help">The suggested name is editable. Multiple mappings may use the same KUDU item.</p>
             <div className="form-field mapping-name-field">
-              <label htmlFor="playground-mapping-name">Mapping name</label>
+              <label htmlFor="playground-mapping-name">Mapping name <span aria-hidden="true">*</span></label>
               <input
                 id="playground-mapping-name"
                 className="control"
@@ -609,18 +605,14 @@ export function PlaygroundPage() {
         <div className="section-heading">
           <div>
             <h2 id="saved-mappings-title" className="section-title">Saved mappings</h2>
-            <p className="section-description">Open a saved mapping to see differences using the latest collected prices.</p>
+            <p className="section-description">Open a mapping flow to explore its nodes and latest product details.</p>
           </div>
           <span className="meta-text">{mappings.length} saved</span>
         </div>
         {mappings.length === 0 ? (
           <EmptyState
             message="No mappings have been saved yet."
-            action={(
-              <button type="button" className="btn btn-primary" onClick={requestNewMapping}>
-                Create first mapping
-              </button>
-            )}
+            action={<button type="button" className="btn btn-primary" onClick={requestNewMapping}>Create first mapping</button>}
           />
         ) : (
           <DataTable caption="Saved Playground mappings">
@@ -641,9 +633,9 @@ export function PlaygroundPage() {
                   <td>{channelLabel(mapping.channel)}</td>
                   <td>
                     <div className="product-with-image">
-                      <ProductImage src={mapping.kuduItem.imageUrl} alt={displayName(mapping.kuduItem)} />
+                      <ProductImage src={mapping.kuduItem.imageUrl} alt={flowProductName(mapping.kuduItem)} />
                       <div>
-                        <span dir="auto">{displayName(mapping.kuduItem)}</span>
+                        <span dir="auto">{flowProductName(mapping.kuduItem)}</span>
                         {mapping.kuduItem.missing ? <div className="field-error">No longer available</div> : null}
                       </div>
                     </div>
@@ -652,7 +644,18 @@ export function PlaygroundPage() {
                   <td className="nowrap">{formatRiyadhDateTime(mapping.updatedAt)}</td>
                   <td>
                     <div className="row-actions">
-                      <button type="button" className="btn btn-secondary btn-sm" onClick={() => openMapping(mapping)}>
+                      <Link className="btn btn-primary btn-sm" to={`/playground/mappings/${encodeURIComponent(mapping.id)}`}>
+                        View
+                      </Link>
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => {
+                          setAppliedEditId(mapping.id);
+                          setSearchParams({ edit: mapping.id }, { replace: true });
+                          openMapping(mapping);
+                        }}
+                      >
                         Edit
                       </button>
                       <button
@@ -712,4 +715,3 @@ export function PlaygroundPage() {
     </>
   );
 }
-

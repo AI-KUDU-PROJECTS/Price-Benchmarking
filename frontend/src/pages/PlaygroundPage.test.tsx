@@ -1,5 +1,6 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type {
   Brand,
@@ -12,7 +13,9 @@ import type {
 const apiMock = vi.hoisted(() => ({
   brands: vi.fn(),
   playgroundMappings: vi.fn(),
+  playgroundMapping: vi.fn(),
   allProducts: vi.fn(),
+  product: vi.fn(),
   createPlaygroundMapping: vi.fn(),
   updatePlaygroundMapping: vi.fn(),
   deletePlaygroundMapping: vi.fn(),
@@ -135,16 +138,48 @@ function savedMapping(name = "Saved benchmark"): PriceMapping {
 function setupApi(mappings: PriceMapping[] = []) {
   apiMock.brands.mockResolvedValue({ items: brands });
   apiMock.playgroundMappings.mockResolvedValue({ items: mappings });
+  apiMock.playgroundMapping.mockImplementation(async (id: string) => {
+    const mapping = mappings.find((item) => item.id === id);
+    if (!mapping) throw new Error("Mapping not found");
+    return mapping;
+  });
   apiMock.allProducts.mockImplementation(async (brandId: string) =>
     brandId === "kudu" ? [kuduProduct] : [kfcProduct],
   );
-  apiMock.createPlaygroundMapping.mockResolvedValue(
-    savedMapping("KUDU Chicken Meal · Pickup"),
+  apiMock.product.mockImplementation(async (brandId: string) =>
+    brandId === "kudu" ? kuduProduct : kfcProduct,
   );
+  apiMock.createPlaygroundMapping.mockResolvedValue(savedMapping("KUDU Chicken Meal · Pickup"));
   apiMock.updatePlaygroundMapping.mockImplementation(
     async (_id: string, payload: { name: string }) => savedMapping(payload.name),
   );
   apiMock.deletePlaygroundMapping.mockResolvedValue(undefined);
+}
+
+function renderPlayground(route = "/playground") {
+  return render(
+    <MemoryRouter initialEntries={[route]}>
+      <Routes>
+        <Route path="/playground" element={<PlaygroundPage />} />
+        <Route path="/playground/mappings/:mappingId" element={<h1>Mapping view destination</h1>} />
+      </Routes>
+    </MemoryRouter>,
+  );
+}
+
+async function buildBasicComparison(user: ReturnType<typeof userEvent.setup>) {
+  await user.selectOptions(screen.getByLabelText(/Choose channel/), "pickup");
+  await waitFor(() => expect(apiMock.allProducts).toHaveBeenCalledWith("kudu", "pickup"));
+
+  await user.click(await screen.findByRole("button", { name: "Choose KUDU item" }));
+  const kuduDialog = screen.getByRole("dialog", { name: "Choose KUDU item" });
+  await user.click(within(kuduDialog).getByRole("radio", { name: "Select Chicken Meal" }));
+  await user.click(within(kuduDialog).getByRole("button", { name: "Use selected item" }));
+
+  await user.click(await screen.findByRole("button", { name: "Add competitor items" }));
+  const competitorDialog = screen.getByRole("dialog", { name: "Choose competitor items" });
+  await user.click(within(competitorDialog).getByRole("checkbox", { name: "Select Chicken Offer" }));
+  await user.click(within(competitorDialog).getByRole("button", { name: "Add 1 selected" }));
 }
 
 describe("PlaygroundPage", () => {
@@ -153,42 +188,31 @@ describe("PlaygroundPage", () => {
     setupApi();
   });
 
-  it("guides selection, previews effective-price differences, and saves", async () => {
+  it("builds the four-step comparison with images and opens the saved flow", async () => {
     const user = userEvent.setup();
-    render(<PlaygroundPage />);
+    renderPlayground();
 
     await screen.findByRole("heading", { name: "Playground" });
-    const addCompetitors = screen.getByRole("button", { name: "Add competitor items" });
-    expect(addCompetitors.hasAttribute("disabled")).toBe(true);
+    expect(screen.queryByLabelText("Mapping flow canvas")).toBeNull();
+    expect(screen.getByRole("heading", { name: "Choose KUDU item" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Choose competitor items" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: /Name and save mapping/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Choose KUDU item" }).hasAttribute("disabled")).toBe(true);
+    expect(screen.getByRole("button", { name: "Add competitor items" }).hasAttribute("disabled")).toBe(true);
+    expect((screen.getByLabelText(/Mapping name/) as HTMLInputElement).disabled).toBe(true);
 
-    await user.selectOptions(screen.getByLabelText(/Choose channel/), "pickup");
-    await waitFor(() => expect(apiMock.allProducts).toHaveBeenCalledWith("kudu", "pickup"));
+    await buildBasicComparison(user);
 
-    await user.click(screen.getByRole("button", { name: "Choose KUDU item" }));
-    const kuduDialog = screen.getByRole("dialog", { name: "Choose KUDU item" });
-    const kuduSearch = within(kuduDialog).getByLabelText("Search products");
-    await waitFor(() => {
-      expect(document.activeElement).toBe(kuduSearch);
-    });
-    await user.click(within(kuduDialog).getByRole("radio", { name: "Select Chicken Meal" }));
-    await user.click(within(kuduDialog).getByRole("button", { name: "Use selected item" }));
-
+    const comparisonTable = screen.getByRole("table", { name: "Current price comparison" });
     expect(screen.getByRole("img", { name: "Chicken Meal" })).toBeTruthy();
+    expect(within(comparisonTable).getByRole("img", { name: "Chicken Offer" })).toBeTruthy();
+    expect(within(comparisonTable).getByText("SAR -5.00")).toBeTruthy();
+    expect(within(comparisonTable).getByText("-20.00%")).toBeTruthy();
+    expect(within(comparisonTable).getByText("Lower")).toBeTruthy();
+    expect(apiMock.product).not.toHaveBeenCalled();
 
-    const nameInput = screen.getByLabelText("Mapping name") as HTMLInputElement;
+    const nameInput = screen.getByLabelText(/Mapping name/) as HTMLInputElement;
     expect(nameInput.value).toBe("KUDU Chicken Meal · Pickup");
-
-    await user.click(screen.getByRole("button", { name: "Add competitor items" }));
-    const competitorDialog = screen.getByRole("dialog", { name: "Choose competitor items" });
-    await user.type(within(competitorDialog).getByLabelText("Search products"), "offer");
-    await user.click(within(competitorDialog).getByRole("checkbox", { name: "Select Chicken Offer" }));
-    await user.click(within(competitorDialog).getByRole("button", { name: "Add 1 selected" }));
-
-    expect(screen.getByRole("img", { name: "Chicken Offer" })).toBeTruthy();
-
-    expect(screen.getByText("SAR -5.00")).toBeTruthy();
-    expect(screen.getByText("-20.00%")).toBeTruthy();
-    expect(screen.getByText("Lower")).toBeTruthy();
 
     await user.click(screen.getByRole("button", { name: "Save mapping" }));
     await waitFor(() => {
@@ -199,19 +223,19 @@ describe("PlaygroundPage", () => {
         competitorItems: [{ brandId: "kfc", productId: "kfc-1" }],
       });
     });
-    expect(await screen.findByText("Mapping saved.")).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Mapping view destination" })).toBeTruthy();
   });
 
-  it("loads a saved mapping, updates it, and deletes it after confirmation", async () => {
+  it("loads a mapping from the edit URL and navigates back to its view after updating", async () => {
     setupApi([savedMapping()]);
     const user = userEvent.setup();
-    render(<PlaygroundPage />);
+    renderPlayground("/playground?edit=mapping-1");
 
-    await screen.findByText("Saved benchmark");
-    await user.click(screen.getByRole("button", { name: "Edit" }));
+    const nameInput = await screen.findByLabelText(/Mapping name/) as HTMLInputElement;
+    await waitFor(() => expect(nameInput.value).toBe("Saved benchmark"));
+    expect(screen.getByRole("table", { name: "Current price comparison" })).toBeTruthy();
+    expect(screen.queryByLabelText("Mapping flow canvas")).toBeNull();
 
-    const nameInput = screen.getByLabelText("Mapping name") as HTMLInputElement;
-    expect(nameInput.value).toBe("Saved benchmark");
     await user.clear(nameInput);
     await user.type(nameInput, "Updated benchmark");
     await user.click(screen.getByRole("button", { name: "Update mapping" }));
@@ -222,7 +246,17 @@ describe("PlaygroundPage", () => {
         expect.objectContaining({ name: "Updated benchmark" }),
       );
     });
-    expect(await screen.findByText("Mapping updated.")).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Mapping view destination" })).toBeTruthy();
+  });
+
+  it("offers View as the primary saved action and deletes only after confirmation", async () => {
+    setupApi([savedMapping()]);
+    const user = userEvent.setup();
+    renderPlayground();
+
+    await screen.findByText("Saved benchmark");
+    expect(screen.getByRole("link", { name: "View" }).getAttribute("href"))
+      .toBe("/playground/mappings/mapping-1");
 
     await user.click(screen.getByRole("button", { name: "Delete" }));
     const confirm = screen.getByRole("dialog", { name: "Delete mapping?" });
@@ -232,29 +266,38 @@ describe("PlaygroundPage", () => {
     expect(await screen.findByText("No mappings have been saved yet.")).toBeTruthy();
   });
 
-  it("keeps selections and shows an actionable API error when save fails", async () => {
+  it("removes competitor rows and keeps an actionable API error without losing selections", async () => {
     const user = userEvent.setup();
     apiMock.createPlaygroundMapping.mockRejectedValue(new Error("Local mapping database is unavailable."));
-    render(<PlaygroundPage />);
+    renderPlayground();
 
     await screen.findByRole("heading", { name: "Playground" });
-    await user.selectOptions(screen.getByLabelText(/Choose channel/), "pickup");
-    await waitFor(() => expect(apiMock.allProducts).toHaveBeenCalled());
-
-    await user.click(screen.getByRole("button", { name: "Choose KUDU item" }));
-    let dialog = screen.getByRole("dialog", { name: "Choose KUDU item" });
-    await user.click(within(dialog).getByRole("radio", { name: "Select Chicken Meal" }));
-    await user.click(within(dialog).getByRole("button", { name: "Use selected item" }));
-
-    await user.click(screen.getByRole("button", { name: "Add competitor items" }));
-    dialog = screen.getByRole("dialog", { name: "Choose competitor items" });
-    await user.click(within(dialog).getByRole("checkbox", { name: "Select Chicken Offer" }));
-    await user.click(within(dialog).getByRole("button", { name: "Add 1 selected" }));
+    await buildBasicComparison(user);
 
     await user.click(screen.getByRole("button", { name: "Save mapping" }));
     expect(await screen.findByText("Local mapping database is unavailable.")).toBeTruthy();
-    expect((screen.getByLabelText("Mapping name") as HTMLInputElement).value)
+    expect((screen.getByLabelText(/Mapping name/) as HTMLInputElement).value)
       .toBe("KUDU Chicken Meal · Pickup");
+
+    await user.click(screen.getByRole("button", { name: "Remove Chicken Offer" }));
+    expect(screen.queryByRole("table", { name: "Current price comparison" })).toBeNull();
+    expect(screen.getByText("No competitor items selected.")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Save mapping" }).hasAttribute("disabled")).toBe(true);
+  });
+
+  it("confirms before a channel change clears the current comparison", async () => {
+    const user = userEvent.setup();
+    renderPlayground();
+    await screen.findByRole("heading", { name: "Playground" });
+    await buildBasicComparison(user);
+
+    await user.selectOptions(screen.getByLabelText(/Choose channel/), "delivery");
+    const confirm = screen.getByRole("dialog", { name: "Change channel?" });
+    expect((screen.getByLabelText(/Choose channel/) as HTMLSelectElement).value).toBe("pickup");
+    await user.click(within(confirm).getByRole("button", { name: "Change channel" }));
+
+    expect((screen.getByLabelText(/Choose channel/) as HTMLSelectElement).value).toBe("delivery");
+    expect(screen.queryByRole("img", { name: "Chicken Meal" })).toBeNull();
+    expect(screen.queryByRole("table", { name: "Current price comparison" })).toBeNull();
   });
 });
-
