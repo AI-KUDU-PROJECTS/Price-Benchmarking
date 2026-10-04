@@ -82,3 +82,8 @@ frontend/dist/
 
 # Pull-all progress state and collector output (may include upstream details)
 bff/data/pull_logs/
+
+# Local Playground mappings (shared by the local/LAN BFF only)
+bff/data/playground.db
+bff/data/playground.db-wal
+bff/data/playground.db-shm

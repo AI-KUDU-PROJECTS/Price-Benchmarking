@@ -22,6 +22,7 @@ Channel = Literal["pickup", "delivery", "hungerstation"]
 ProductStatus = Literal["active", "not_observed", "removed", "returned"]
 PromotionStatus = Literal["active", "not_observed", "ended", "returned"]
 RunStatus = Literal["running", "success", "partial", "failed"]
+PricePosition = Literal["higher", "lower", "equal", "unavailable"]
 
 EventType = Literal[
     "price_increased",
@@ -287,6 +288,51 @@ class BrandOverview(ContractModel):
     promotion_count: int
     recent_changes: list[ChangeEvent]
     highlights: list[Highlight]
+
+class MappingSelectionInput(ContractModel):
+    brand_id: str = Field(min_length=1)
+    product_id: str = Field(min_length=1)
+
+
+class PriceMappingWrite(ContractModel):
+    name: str = Field(min_length=1, max_length=120)
+    channel: Channel
+    kudu_product_id: str = Field(min_length=1)
+    competitor_items: list[MappingSelectionInput] = Field(min_length=1)
+
+
+class MappingProduct(ContractModel):
+    brand_id: str
+    brand_name: str
+    product_id: str
+    name_ar: str | None = None
+    name_en: str | None = None
+    category: str | None = None
+    image_url: str | None = None
+    effective_price: float | None = None
+    currency: str | None = None
+    missing: bool = False
+
+
+class MappingCompetitor(MappingProduct):
+    difference_amount: float | None = None
+    difference_percentage: float | None = None
+    price_position: PricePosition = "unavailable"
+
+
+class PriceMapping(ContractModel):
+    id: str
+    name: str
+    channel: Channel
+    kudu_item: MappingProduct
+    competitor_items: list[MappingCompetitor] = Field(default_factory=list)
+    created_at: str
+    updated_at: str
+
+
+class PriceMappingList(ContractModel):
+    items: list[PriceMapping] = Field(default_factory=list)
+
 
 
 def parse_utc(value: str | None) -> datetime | None:

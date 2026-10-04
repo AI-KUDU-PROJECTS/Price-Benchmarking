@@ -203,3 +203,50 @@ export interface PullResponse {
   run: PullRun | null;
   started?: boolean;
 }
+
+export type PricePosition = "higher" | "lower" | "equal" | "unavailable";
+
+export interface MappingProduct {
+  brandId: string;
+  brandName: string;
+  productId: string;
+  nameAr: string | null;
+  nameEn: string | null;
+  category: string | null;
+  imageUrl: string | null;
+  effectivePrice: number | null;
+  currency: string | null;
+  missing: boolean;
+}
+
+export interface MappingCompetitor extends MappingProduct {
+  differenceAmount: number | null;
+  differencePercentage: number | null;
+  pricePosition: PricePosition;
+}
+
+export interface PriceMapping {
+  id: string;
+  name: string;
+  channel: Channel;
+  kuduItem: MappingProduct;
+  competitorItems: MappingCompetitor[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PriceMappingList {
+  items: PriceMapping[];
+}
+
+export interface MappingSelectionInput {
+  brandId: string;
+  productId: string;
+}
+
+export interface PriceMappingWrite {
+  name: string;
+  channel: Channel;
+  kuduProductId: string;
+  competitorItems: MappingSelectionInput[];
+}
