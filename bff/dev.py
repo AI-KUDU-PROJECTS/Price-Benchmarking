@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-"""Start the marketing app so it can be opened locally and on the LAN."""
+"""Start the React development server and FastAPI BFF together."""
 from __future__ import annotations
 
 import os
@@ -10,19 +9,18 @@ import sys
 import time
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "frontend"
 PYTHON = ROOT / ".venv" / "bin" / "python"
 PORT = 5173
 
 
 def wsl_ip() -> str:
-    hostname = subprocess.check_output(["hostname", "-I"], text=True).split()
-    for ip in hostname:
-        if ip.startswith("127.") or ip.startswith("10.255."):
-            continue
-        return ip
-    return hostname[0]
+    addresses = subprocess.check_output(["hostname", "-I"], text=True).split()
+    for address in addresses:
+        if not address.startswith(("127.", "10.255.")):
+            return address
+    return addresses[0]
 
 
 def windows_path(path: Path) -> str:
@@ -60,9 +58,9 @@ def share_on_lan() -> str | None:
         elif line.startswith("SHARE_STATUS=") and "needs-admin" in line:
             print("LAN sharing needs Administrator approval in the Windows prompt.")
     if result.returncode != 0 and not share_url:
-        err = (result.stderr or result.stdout or "").strip()
-        if err:
-            print(err)
+        error = (result.stderr or result.stdout or "").strip()
+        if error:
+            print(error)
     return share_url
 
 
@@ -90,21 +88,23 @@ def main() -> int:
     if port_open("127.0.0.1", 8000):
         print("BFF already running on http://127.0.0.1:8000")
     else:
-        children.append(subprocess.Popen([python, str(ROOT / "run_bff.py")], cwd=ROOT, env=env))
+        children.append(
+            subprocess.Popen([python, str(ROOT / "manage.py"), "api"], cwd=ROOT, env=env)
+        )
     if port_open("127.0.0.1", PORT):
         print(f"Frontend already running on http://127.0.0.1:{PORT}")
     else:
         children.append(subprocess.Popen(["npm", "run", "dev"], cwd=FRONTEND, env=env))
 
     def shutdown(_signum=None, _frame=None) -> None:
-        for proc in children:
-            if proc.poll() is None:
-                proc.terminate()
-        for proc in children:
+        for process in children:
+            if process.poll() is None:
+                process.terminate()
+        for process in children:
             try:
-                proc.wait(timeout=5)
+                process.wait(timeout=5)
             except subprocess.TimeoutExpired:
-                proc.kill()
+                process.kill()
 
     signal.signal(signal.SIGINT, shutdown)
     signal.signal(signal.SIGTERM, shutdown)
@@ -113,17 +113,13 @@ def main() -> int:
     ui_ready = wait_for_port("127.0.0.1", PORT)
     share_url = share_on_lan()
 
-    print()
-    print("Kudu Price Intelligence")
+    print("\nKudu Price Intelligence")
     if not bff_ready:
         print("BFF did not start on http://127.0.0.1:8000")
     if not ui_ready:
         print(f"Frontend did not start on http://127.0.0.1:{PORT}")
     print(f"Local:  http://127.0.0.1:{PORT}")
-    if share_url:
-        print(f"Share:  {share_url}")
-    else:
-        print("Share:  unavailable until Windows LAN forwarding is allowed")
+    print(f"Share:  {share_url or 'unavailable until Windows LAN forwarding is allowed'}")
     print("API:    http://127.0.0.1:8000")
     if children:
         print("Ctrl+C to stop")
@@ -131,11 +127,8 @@ def main() -> int:
 
     if not children:
         return 0
-
     try:
-        while True:
-            if any(proc.poll() is not None for proc in children):
-                break
+        while not any(process.poll() is not None for process in children):
             time.sleep(0.5)
     except KeyboardInterrupt:
         pass

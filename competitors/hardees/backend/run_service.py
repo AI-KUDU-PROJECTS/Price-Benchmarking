@@ -7,8 +7,8 @@ ingests its output into SQLite, runs change detection for every SUCCESS
 channel, triggers screenshot capture for NEW_PRODUCT/NEW_OFFER events, and
 returns a summary dict.
 
-This is the ONE function both run_collector.py (CLI), scheduler.py (the
-daily job), and app.py's "Run Now" button all call - so there is exactly
+This is the ONE function run_collector.py (CLI), scheduler.py (the daily job),
+and the BFF collection trigger all call - so there is exactly
 one code path that can ever start a collection run, which is also where
 the concurrency lock lives (spec: "Prevent concurrent runs").
 ---------------------------------------------------------------------
@@ -19,12 +19,11 @@ import json
 import os
 import subprocess
 import sqlite3
-import sys
 import time
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterator, Optional
+from typing import Any, Iterator
 
 from competitors.hardees.backend import change_detector, config, database, models, normalizer, offer_parser, schema_validator
 

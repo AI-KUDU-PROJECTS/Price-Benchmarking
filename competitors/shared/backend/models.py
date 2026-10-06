@@ -3,7 +3,7 @@ backend/models.py
 ---------------------------------------------------------------------
 Shared constants and light dataclasses used across backend/*. Keeping the
 event-type / status vocabularies in exactly one place means
-change_detector.py, excel_exporter.py, and app.py can never drift apart on
+change_detector.py and the source ingestion paths cannot drift apart on
 spelling.
 ---------------------------------------------------------------------
 """

@@ -5,7 +5,7 @@ Central configuration for the Python half of the Herfy system (SQLite,
 change detection, React/BFF, Excel export, scheduler - see
 competitors/herfy/README.md). Mirrors competitors/kfc's and
 competitors/burger_king's backend/config.py shape exactly - every other
-backend/* module, plus run_collector.py/scheduler.py/dashboard/page.py,
+backend/* module, plus run_collector.py and scheduler.py,
 import settings from here rather than reading os.environ directly.
 
 PROJECT_ROOT is this competitor's own package root (competitors/herfy) -
@@ -63,9 +63,6 @@ TIMEZONE = os.environ.get("TIMEZONE", "Asia/Riyadh")
 
 # --- Data locations (all scoped inside competitors/herfy/) -----------------
 DB_PATH = PROJECT_ROOT / os.environ.get("HERFY_DB_PATH", "data/database/herfy_monitor.db")
-DEPLOYMENT_DB_PATH = REPO_ROOT / "bff" / "data" / "snapshots" / "herfy_monitor.db"
-if os.environ.get("VERCEL") and DEPLOYMENT_DB_PATH.exists():
-    DB_PATH = DEPLOYMENT_DB_PATH
 RAW_DATA_DIR = PROJECT_ROOT / os.environ.get("HERFY_RAW_DATA_DIR", "data/raw")
 SCREENSHOTS_DIR = PROJECT_ROOT / os.environ.get("HERFY_SCREENSHOTS_DIR", "data/screenshots")
 EXPORTS_DIR = PROJECT_ROOT / os.environ.get("HERFY_EXPORTS_DIR", "exports")

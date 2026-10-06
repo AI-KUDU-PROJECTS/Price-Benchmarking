@@ -2,7 +2,7 @@
 
 Captured 2026-08-06 using a plain Node `https` client (no Playwright, no
 cookie jar) against `saudi.hardees.me`, reproduced formally by
-[`../../tools/probe-public-api.js`](../../tools/probe-public-api.js). Three
+[`../../../tools/probe-public-api.js`](../../../tools/probe-public-api.js). Three
 sequential, low-volume requests, ~1.5s apart. No values below are secret -
 the deviceid is a locally-generated random string discarded immediately
 after this probe, never reused.

@@ -1,5 +1,0 @@
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": "fastapi",
-  "buildCommand": "npm --prefix frontend ci && VITE_PLAYGROUND_STORAGE=local npm --prefix frontend run build"
-}

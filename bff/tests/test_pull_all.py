@@ -27,6 +27,7 @@ def _wait_for_completion(manager: PullManager) -> dict:
 def test_all_five_sources_are_configured() -> None:
     assert [target.id for target in TARGETS] == ["kudu", "kfc", "hardees", "burger-king", "herfy"]
     assert TARGETS[0].args == ("-m", "kudu.refresh")
+    assert all(target.args[:3] == ("manage.py", "collect", target.id) for target in TARGETS[1:])
     assert all("--channel=BOTH" in target.args for target in TARGETS[1:])
 
 
@@ -34,7 +35,10 @@ def test_all_six_hungerstation_restaurants_are_configured() -> None:
     assert [target.id for target in HUNGERSTATION_TARGETS] == [
         "kfc", "hardees", "burger-king", "herfy", "mcdonalds", "albaik",
     ]
-    assert all(target.args[:2] == ("run_hungerstation_collector.py", "--brand") for target in HUNGERSTATION_TARGETS)
+    assert all(
+        target.args[:4] == ("manage.py", "collect", "hungerstation", "--brand")
+        for target in HUNGERSTATION_TARGETS
+    )
 
 
 def test_hungerstation_targets_run_sequentially() -> None:

@@ -11,8 +11,8 @@ product_options extraction (Burger King's option tree has a different
 shape than KFC's flat `steps` list - see normalizer.extract_option_groups
 and research/api-map/api-map.md).
 
-This is the ONE function both run_collector.py (CLI), scheduler.py (the
-daily job), and dashboard/page.py's "Run Now" button all call - so there
+This is the ONE function run_collector.py (CLI), scheduler.py (the daily job),
+and the BFF collection trigger all call - so there
 is exactly one code path that can ever start a collection run, which is
 also where the concurrency lock lives.
 ---------------------------------------------------------------------
@@ -27,7 +27,7 @@ import time
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterator, Optional
+from typing import Any, Iterator
 
 from competitors.burger_king.backend import change_detector, config, database, models, normalizer, offer_parser, schema_validator
 

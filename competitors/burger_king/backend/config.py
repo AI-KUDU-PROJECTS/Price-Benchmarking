@@ -5,7 +5,7 @@ Central configuration for the Python half of the Burger King system
 (SQLite, change detection, React/BFF, Excel export, scheduler - see
 competitors/burger_king/README.md). Mirrors competitors/kfc/backend/
 config.py's shape exactly - every other backend/* module, plus
-run_collector.py/scheduler.py/dashboard/page.py, import settings from
+run_collector.py and scheduler.py, import settings from
 here rather than reading os.environ directly.
 
 PROJECT_ROOT is this competitor's own package root
@@ -62,9 +62,6 @@ TIMEZONE = os.environ.get("TIMEZONE", "Asia/Riyadh")
 
 # --- Data locations (all scoped inside competitors/burger_king/) ----------
 DB_PATH = PROJECT_ROOT / os.environ.get("BK_DB_PATH", "data/database/burger_king_monitor.db")
-DEPLOYMENT_DB_PATH = REPO_ROOT / "bff" / "data" / "snapshots" / "burger_king_monitor.db"
-if os.environ.get("VERCEL") and DEPLOYMENT_DB_PATH.exists():
-    DB_PATH = DEPLOYMENT_DB_PATH
 RAW_DATA_DIR = PROJECT_ROOT / os.environ.get("BK_RAW_DATA_DIR", "data/raw")
 SCREENSHOTS_DIR = PROJECT_ROOT / os.environ.get("BK_SCREENSHOTS_DIR", "data/screenshots")
 EXPORTS_DIR = PROJECT_ROOT / os.environ.get("BK_EXPORTS_DIR", "exports")

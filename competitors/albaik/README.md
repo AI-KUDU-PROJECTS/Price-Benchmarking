@@ -1,19 +1,19 @@
 # Albaik Price Intelligence
 
-**Status: Scaffold only.** No collector, API research, database, change
-detection, or dashboard logic exists yet for Albaik. This folder only
+**Status: Official-source scaffold only.** No official collector, API research,
+database, or change-detection logic exists yet for Albaik. This folder only
 holds the isolated structure future implementation will fill in - see
 root [README.md](../../README.md) for the multi-competitor architecture.
 
 ## Status of every competitor in this repo
 
 ```text
-KFC:          Implemented
-Hardee's:     Scaffold only
-McDonald's:   Scaffold only
-Burger King:  Scaffold only
-Herfy:        Scaffold only
-Albaik:       Scaffold only
+KFC:          Official source implemented
+Hardee's:     Official source implemented
+Burger King:  Official source implemented
+Herfy:        Official source implemented
+McDonald's:   HungerStation only
+Albaik:       HungerStation only
 ```
 
 ## What exists here today
@@ -25,9 +25,6 @@ competitors/albaik/
 ├── config/__init__.py    Empty - no configuration values yet
 ├── collector/README.md   Empty - will hold Node.js API bootstrap + collection code (see below)
 ├── backend/__init__.py   Empty - no storage/change-detection code yet
-├── dashboard/
-│   ├── __init__.py
-│   └── page.py           render() shows only a status placeholder - no product data
 ├── research/
 │   ├── pickup/           Empty - future Pickup-channel HAR captures / notes go here
 │   ├── delivery/         Empty - future Delivery-channel HAR captures / notes go here
@@ -73,7 +70,7 @@ When Albaik is implemented, the intended shape (mirroring
    `competitors/kfc/README.md` "Architecture" for the pattern to follow
    (not to copy verbatim - Albaik's endpoints are unresearched and will
    differ).
-3. Build the Python `backend/` (database, change detection, Excel
-   export) the same way, writing only to
+3. Build the Python `backend/` (database and change detection) the same way,
+   writing only to
    `competitors/albaik/data/database/albaik_monitor.db`.
 4. Add or configure a source adapter so the shared React/FastAPI application can expose the brand.

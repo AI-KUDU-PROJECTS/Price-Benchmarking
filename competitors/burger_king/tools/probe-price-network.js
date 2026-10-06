@@ -6,13 +6,13 @@
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
-const CONFIG = require('./competitors/burger_king/collector/config');
-const priceScraper = require('./competitors/burger_king/collector/price-scraper');
-const logger = require('./competitors/burger_king/collector/logger');
+const CONFIG = require('../collector/config');
+const priceScraper = require('../collector/price-scraper');
+const logger = require('../collector/logger');
 
 logger.init();
 
-const OUT = path.join(__dirname, 'competitors/burger_king/.artifacts/price-network-probe.json');
+const OUT = path.join(__dirname, '../.artifacts/price-network-probe.json');
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 
 function looksLikePricePayload(text) {

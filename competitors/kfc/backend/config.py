@@ -4,8 +4,8 @@ competitors/kfc/backend/config.py
 Central configuration for the Python half of the KFC system (SQLite,
 change detection, React/BFF, Excel export, scheduler - see
 competitors/kfc/README.md). Every other competitors/kfc/backend/* module,
-plus competitors/kfc/run_collector.py, competitors/kfc/scheduler.py, and
-competitors/kfc/dashboard/page.py, import settings from here rather than
+plus competitors/kfc/run_collector.py and competitors/kfc/scheduler.py,
+import settings from here rather than
 reading os.environ directly, mirroring collector/config.js's role on the
 Node side.
 
@@ -68,9 +68,6 @@ TIMEZONE = os.environ.get("TIMEZONE", "Asia/Riyadh")
 # required by the multi-competitor layout, e.g.
 # competitors/kfc/data/database/kfc_monitor.db) --------------------------
 DB_PATH = PROJECT_ROOT / os.environ.get("DB_PATH", "data/database/kfc_monitor.db")
-DEPLOYMENT_DB_PATH = REPO_ROOT / "bff" / "data" / "snapshots" / "kfc_monitor.db"
-if os.environ.get("VERCEL") and DEPLOYMENT_DB_PATH.exists():
-    DB_PATH = DEPLOYMENT_DB_PATH
 RAW_DATA_DIR = PROJECT_ROOT / os.environ.get("RAW_DATA_DIR", "data/raw")
 SCREENSHOTS_DIR = PROJECT_ROOT / os.environ.get("SCREENSHOTS_DIR", "data/screenshots")
 EXPORTS_DIR = PROJECT_ROOT / os.environ.get("EXPORTS_DIR", "exports")

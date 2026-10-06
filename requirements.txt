@@ -1,11 +1,11 @@
-# Production dependencies for the React/FastAPI deployment on Vercel.
-# Keep this file small: Vercel installs it into the Python function bundle.
-# For collectors, schedulers, and tests, install
-# requirements-local.txt instead.
-
+# Application, collector, scheduler, export, image, and test dependencies.
 python-dotenv==1.0.1
 fastapi==0.115.6
 uvicorn==0.32.1
 pydantic==2.10.4
 httpx==0.28.1
 openpyxl==3.1.5
+APScheduler==3.10.4
+pytz==2024.1
+Pillow==10.4.0
+pytest==8.3.3

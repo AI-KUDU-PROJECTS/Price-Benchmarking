@@ -16,7 +16,7 @@ product dict).
 from __future__ import annotations
 
 from competitors.burger_king.backend import schema_validator
-from competitors.burger_king.tests.test_change_detector import bump_run, ingest
+from competitors.burger_king.tests.test_change_detector import ingest
 
 
 def test_valid_channel_result_has_no_problems(delivery_result):

@@ -9,9 +9,8 @@ A local system that monitors Burger King Saudi's
 ([burgerking.com.sa](https://burgerking.com.sa/en/)) public menu, prices,
 and offers for **one fixed branch in Riyadh**, once a day, for **Pickup**
 and **Delivery** kept completely separate. It detects new products, price
-changes, removed/returned products between successful runs, shows the
-result in a local former dashboard dashboard, and exports daily/monthly/catalog
-Excel reports.
+changes, and removed/returned products between successful runs, then exposes
+the result through the shared React/FastAPI application and Excel export.
 
 It is a monitoring tool only: no login, no OTP, no payment, no order is
 ever placed - see [Security & compliance](#security--compliance).
@@ -49,12 +48,12 @@ API First (fully public, no auth, no session bootstrap needed at all)
   -> SQLite                                       (backend/database.py)
   -> Change Detection Engine                      (backend/change_detector.py)
   -> React/FastAPI Application                    (adapters + BFF + frontend)
-  -> Excel Export                                 (backend/excel_exporter.py)
+  -> Excel Export                                 (bff/excel_export.py)
 ```
 
 **Node.js** owns public API collection, storeMenu pricing, the DOM
-price-scrape fallback, and Playwright screenshots. **Python** owns SQLite, change detection, the
-dashboard, Excel export, and the scheduler. `backend/run_service.py` is
+price-scrape fallback, and Playwright screenshots. **Python** owns SQLite, change detection,
+BFF integration, Excel export, and the scheduler. `backend/run_service.py` is
 the only bridge between them - it invokes `collector/collect.js` and
 `collector/screenshot-capture.js` as subprocesses and reads back the JSON
 they write to `data/raw/<batch>/`. All paths below are relative to this
@@ -121,7 +120,6 @@ competitors/burger_king/
 │   ├── change_detector.py        The Change Detection Engine
 │   ├── schema_validator.py       Python-side response-shape validation
 │   ├── run_service.py            Orchestration: lock, subprocess calls, ingestion
-│   └── excel_exporter.py         Daily / Monthly / Catalog workbooks
 ├── research/
 │   └── api-map/
 │       ├── api-map.json          Machine-readable endpoint reference
@@ -148,12 +146,12 @@ folder (e.g. `cd competitors/burger_king && python run_collector.py` will
 fail on import). Always run from the repo root, using one of:
 
 ```bash
-# Root-level wrappers (recommended):
-python run_burger_king_collector.py
-python run_burger_king_collector.py --channel=PICKUP
-python run_burger_king_collector.py --channel=DELIVERY
-python run_burger_king_collector.py --no-screenshots
-python run_burger_king_scheduler.py
+# Management entry point (recommended):
+python manage.py collect burger-king
+python manage.py collect burger-king --channel=PICKUP
+python manage.py collect burger-king --channel=DELIVERY
+python manage.py collect burger-king --no-screenshots
+python manage.py schedule burger-king
 
 # Equivalent module invocations (also from the repo root):
 python -m competitors.burger_king.run_collector --channel=BOTH
@@ -167,22 +165,21 @@ subprocess by `backend/run_service.py`, or directly via the root
 
 ## Installation
 
-`package.json`, `requirements-local.txt`, `node_modules/`, and `.venv/` are all
+`package.json`, `requirements.txt`, `node_modules/`, and `.venv/` are all
 shared at the **repository root** (see root README.md), not duplicated
 per competitor. Install once, from the repo root:
 
 ```bash
 npm install
-npx playwright install chromium
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements-local.txt
+pip install -r requirements.txt
 cp .env.example .env
 ```
 
 Requires Node.js 18+ and Python 3.10+.
 
-> If `npx playwright install chromium` reports missing shared libraries on
+> If Chromium launch reports missing shared libraries on
 > Linux, run `sudo npx playwright install-deps` once (needed only for the
 > DOM price-scrape and screenshot steps, which use a real browser; every
 > API call in this collector needs no browser at all).
@@ -316,32 +313,15 @@ Missing in three consecutive complete successful runs: PRODUCT_REMOVED
 Reappears at any point before the third miss:        cancels the progression, PRODUCT_RETURNED
 ```
 
-The dashboard never uses the word "Discontinued" - the label is always
+The React application never uses the word "Discontinued" - the label is always
 **"Removed / Not observed for 3 successful runs"**.
 
 ## Excel exports
 
-Generated with `openpyxl` directly (full header styling in Burger King's
-brand red, frozen header row, auto-sized columns):
-
-| File | Trigger |
-|---|---|
-| `exports/BurgerKing_Daily_Changes_YYYY-MM-DD.xlsx` | "Export Daily Excel" button / `backend.excel_exporter.export_daily_report()` |
-| `exports/BurgerKing_Monthly_Comparison_YYYY-MM.xlsx` | "Export Monthly Excel" button / `export_monthly_report()` |
-| `exports/BurgerKing_Current_Catalog_YYYY-MM-DD.xlsx` | called directly from Python (not currently wired to a dashboard button, same as KFC) |
-
-Pickup and Delivery are always separate worksheets in every workbook - no
-worksheet ever mixes their prices in one table. The Offers sheets list
-this brand's "KING DAILY DEALS" combo products (see [Known
-limitations](#known-limitations--what-could-not-be-verified) for exactly
-what is and isn't tracked - there is no confirmed "before" price, so
-Original Price / Saving / Discount % stay blank even there). The
-**Legacy View** worksheet mirrors the existing Competitors Pricing shape
-(`Category | Item | Sandwich | Regular | Medium | Large`); Burger King's
-collected data carries at most a single `itemSize` string per product (not
-a multi-option size-variant list like KFC's), so in practice one size
-column is filled in per product and the other two are left blank rather
-than guessed.
+The supported workbook is generated by `bff/excel_export.py` from the shared
+BFF contract and served at `/api/v1/market/export.xlsx`. React links to
+that endpoint from Market Overview. Legacy per-brand workbook generators are
+not runtime entry points.
 
 ## React application
 
@@ -510,7 +490,3 @@ inside a browser) to confirm they truly need no session.
   site is a single-page app with no confirmed stable per-product route.
   `image_url` (a real, working Sanity CDN asset URL) is populated and used
   as the Excel "source link" fallback instead.
-- **The Current Full Catalog export is not wired to a dashboard button**,
-  same as KFC - `backend.excel_exporter.export_current_catalog()` is fully
-  implemented and covered by a test, call it directly from a Python shell
-  (or add a button) if you need it on demand.

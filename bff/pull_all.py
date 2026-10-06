@@ -34,23 +34,23 @@ class PullTarget:
     args: tuple[str, ...]
 
 
-# These are the five connected sources. The four competitor wrappers keep
-# their existing collection, database, and per-brand locking behavior.
+# These are the five connected sources. manage.py dispatches to each source's
+# existing collection, database, and per-brand locking behavior.
 TARGETS = (
     PullTarget("kudu", "KUDU", ("-m", "kudu.refresh")),
-    PullTarget("kfc", "KFC", ("run_kfc_collector.py", "--channel=BOTH", "--no-screenshots")),
-    PullTarget("hardees", "Hardee's", ("run_hardees_collector.py", "--channel=BOTH", "--no-screenshots")),
-    PullTarget("burger-king", "Burger King", ("run_burger_king_collector.py", "--channel=BOTH", "--no-screenshots")),
-    PullTarget("herfy", "Herfy", ("run_herfy_collector.py", "--channel=BOTH", "--no-screenshots")),
+    PullTarget("kfc", "KFC", ("manage.py", "collect", "kfc", "--channel=BOTH", "--no-screenshots")),
+    PullTarget("hardees", "Hardee's", ("manage.py", "collect", "hardees", "--channel=BOTH", "--no-screenshots")),
+    PullTarget("burger-king", "Burger King", ("manage.py", "collect", "burger-king", "--channel=BOTH", "--no-screenshots")),
+    PullTarget("herfy", "Herfy", ("manage.py", "collect", "herfy", "--channel=BOTH", "--no-screenshots")),
 )
 
 HUNGERSTATION_TARGETS = (
-    PullTarget("kfc", "KFC", ("run_hungerstation_collector.py", "--brand", "kfc")),
-    PullTarget("hardees", "Hardee's", ("run_hungerstation_collector.py", "--brand", "hardees")),
-    PullTarget("burger-king", "Burger King", ("run_hungerstation_collector.py", "--brand", "burger-king")),
-    PullTarget("herfy", "Herfy", ("run_hungerstation_collector.py", "--brand", "herfy")),
-    PullTarget("mcdonalds", "McDonald's", ("run_hungerstation_collector.py", "--brand", "mcdonalds")),
-    PullTarget("albaik", "AlBaik", ("run_hungerstation_collector.py", "--brand", "albaik")),
+    PullTarget("kfc", "KFC", ("manage.py", "collect", "hungerstation", "--brand", "kfc")),
+    PullTarget("hardees", "Hardee's", ("manage.py", "collect", "hungerstation", "--brand", "hardees")),
+    PullTarget("burger-king", "Burger King", ("manage.py", "collect", "hungerstation", "--brand", "burger-king")),
+    PullTarget("herfy", "Herfy", ("manage.py", "collect", "hungerstation", "--brand", "herfy")),
+    PullTarget("mcdonalds", "McDonald's", ("manage.py", "collect", "hungerstation", "--brand", "mcdonalds")),
+    PullTarget("albaik", "AlBaik", ("manage.py", "collect", "hungerstation", "--brand", "albaik")),
 )
 
 Runner = Callable[[PullTarget, str], tuple[str, str]]
@@ -184,7 +184,7 @@ class PullManager:
             output_text = log_path.read_text(encoding="utf-8", errors="replace")
             if result.returncode == 2 and "Refused to start" in output_text:
                 return "already_running", "A separate collection is already running for this brand."
-            if target.args and target.args[0] == "run_hungerstation_collector.py":
+            if target.args[:3] == ("manage.py", "collect", "hungerstation"):
                 match = re.search(
                     rf"HUNGERSTATION_RESULT brand={re.escape(target.id)} status=(SUCCESS|FAILED) products=(\d+)",
                     output_text,

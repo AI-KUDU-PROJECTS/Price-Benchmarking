@@ -9,9 +9,9 @@ A local system that monitors Hardee's Saudi's
 ([saudi.hardees.me](https://saudi.hardees.me)) public menu, prices, and
 offers for **one fixed branch in Riyadh**, once a day, for **Pickup** and
 **Delivery** kept completely separate. It detects new products/offers,
-price changes, removed/returned products between successful runs, shows
-the result in a local former dashboard dashboard, and exports daily/monthly/
-catalog Excel reports.
+price changes, and removed/returned products between successful runs, then
+exposes the result through the shared React/FastAPI application and Excel
+export.
 
 It is a monitoring tool only: no login, no OTP, no payment, no order is
 ever placed - see [Security & compliance](#security--compliance).
@@ -24,7 +24,6 @@ ever placed - see [Security & compliance](#security--compliance).
 - [Architecture](#architecture)
 - [Shared-platform discovery](#shared-platform-discovery)
 - [Folder structure](#folder-structure)
-- [Superseded research-phase code](#superseded-research-phase-code)
 - [Running this competitor](#running-this-competitor)
 - [Installation](#installation)
 - [Configuration](#configuration)
@@ -49,7 +48,7 @@ API First (Playwright guest-session bootstrap, then plain HTTPS calls)
   -> SQLite                                       (backend/database.py)
   -> Change Detection Engine                      (backend/change_detector.py)
   -> React/FastAPI Application                    (adapters + BFF + frontend)
-  -> Excel Export                                 (backend/excel_exporter.py)
+  -> Excel Export                                 (bff/excel_export.py)
 ```
 
 **Node.js** owns session bootstrap, public API collection, and Playwright
@@ -117,12 +116,10 @@ competitors/hardees/
 │   ├── change_detector.py        The Change Detection Engine
 │   ├── schema_validator.py       Python-side response-shape validation
 │   ├── run_service.py            Orchestration: lock, subprocess calls, ingestion
-│   └── excel_exporter.py         Daily / Monthly / Catalog workbooks
 ├── research/
 │   └── api-map/
 │       ├── api-map.json          Machine-readable endpoint reference
 │       └── api-map.md            Human-readable endpoint reference + verification log
-├── api/, services/, ui/, config/  Superseded research-phase code - see below, NOT imported by dashboard/page.py anymore
 ├── data/
 │   ├── database/hardees_monitor.db  SQLite database (generated)
 │   ├── raw/                      Per-run raw API JSON (generated, gitignored)
@@ -134,19 +131,6 @@ competitors/hardees/
 └── tests/                        pytest suite + fixtures (offline, no network)
 ```
 
-## Superseded research-phase code
-
-An earlier phase of this competitor (before the production
-collector/backend/dashboard architecture below existed) built a
-**live-API-preview-only** former dashboard page directly against
-`api/client.py` + `services/*.py` + `ui/*.py` + `config/` - no database,
-no change detection, no scheduler, no offline tests. That code is left in
-place for reference (it still works standalone) but **is no longer
-imported by `dashboard/page.py`**, which now reads from the real
-collector database like every other competitor. If you don't need it for
-reference, `api/`, `services/`, `ui/`, and the empty `config/` folder can
-be safely deleted.
-
 ## Running this competitor
 
 Because every module here imports via the fully-qualified
@@ -157,12 +141,12 @@ entry points cannot be run directly from inside this folder (e.g.
 Always run from the repo root, using one of:
 
 ```bash
-# Root-level wrappers (recommended):
-python run_hardees_collector.py
-python run_hardees_collector.py --channel=PICKUP
-python run_hardees_collector.py --channel=DELIVERY
-python run_hardees_collector.py --no-screenshots
-python run_hardees_scheduler.py
+# Management entry point (recommended):
+python manage.py collect hardees
+python manage.py collect hardees --channel=PICKUP
+python manage.py collect hardees --channel=DELIVERY
+python manage.py collect hardees --no-screenshots
+python manage.py schedule hardees
 
 # Equivalent module invocations (also from the repo root):
 python -m competitors.hardees.run_collector --channel=BOTH
@@ -172,16 +156,15 @@ python -m competitors.hardees.scheduler
 
 ## Installation
 
-`package.json`, `requirements-local.txt`, `node_modules/`, and `.venv/` are all
+`package.json`, `requirements.txt`, `node_modules/`, and `.venv/` are all
 shared at the **repository root** (see root README.md), not duplicated
 per competitor. Install once, from the repo root:
 
 ```bash
 npm install
-npx playwright install chromium
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements-local.txt
+pip install -r requirements.txt
 cp .env.example .env
 ```
 
@@ -316,27 +299,15 @@ Missing in three consecutive complete successful runs: PRODUCT_REMOVED
 Reappears at any point before the third miss:        cancels the progression, PRODUCT_RETURNED
 ```
 
-The dashboard never uses the word "Discontinued" - the label is always
+The React application never uses the word "Discontinued" - the label is always
 **"Removed / Not observed for 3 successful runs"**.
 
 ## Excel exports
 
-Generated with `openpyxl` directly (full header styling in Hardee's brand
-red, frozen header row, auto-sized columns):
-
-| File | Trigger |
-|---|---|
-| `exports/Hardees_Daily_Changes_YYYY-MM-DD.xlsx` | "Export Daily Excel" button / `backend.excel_exporter.export_daily_report()` |
-| `exports/Hardees_Monthly_Comparison_YYYY-MM.xlsx` | "Export Monthly Excel" button / `export_monthly_report()` |
-| `exports/Hardees_Current_Catalog_YYYY-MM-DD.xlsx` | called directly from Python (not currently wired to a dashboard button, same as KFC) |
-
-Pickup and Delivery are always separate worksheets in every workbook - no
-worksheet ever mixes their prices in one table. The Normalized sheet's
-"Sizes"/"Included Items"/etc. columns render each joined item as clean
-text (e.g. "Medium, Large"), never Python's raw dict repr - the same
-`_format_join_item()` fix already applied to KFC/Burger King/Herfy is
-included here from the start (see `tests/test_excel_exporter.py`'s
-regression test).
+The supported workbook is generated by `bff/excel_export.py` from the shared
+BFF contract and served at `/api/v1/market/export.xlsx`. React links to
+that endpoint from Market Overview. Legacy per-brand workbook generators are
+not runtime entry points.
 
 ## React application
 
@@ -403,7 +374,7 @@ discount/promo products present (Sunday Duo, Monday Double, Friday Feast,
 Super Night Deal, Foodie Mix, The Taster Mix, Double Treat Meal).
 
 **The full Python pipeline was also verified against the real, live site**
-(not just the Node CLI) via `python run_hardees_collector.py
+(not just the Node CLI) via `python manage.py collect hardees
 --channel=BOTH`, run twice in a row a few minutes apart. **Delivery**
 succeeded both times (110 products, 66 offers) - the second run's change
 detection correctly compared against the first run and reported **zero**
@@ -530,7 +501,3 @@ date.
   calorie/nutrition field or Arabic name field exists on the
   `getProductsByCategory` response this collector reads; this system
   stores `NULL` rather than guessing.
-- **The Current Full Catalog export is not wired to a dashboard button**,
-  same as KFC - `backend.excel_exporter.export_current_catalog()` is
-  fully implemented and covered by a test, call it directly from a Python
-  shell (or add a button) if you need it on demand.

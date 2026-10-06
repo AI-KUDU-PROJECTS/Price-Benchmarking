@@ -10,8 +10,8 @@ Start the Android emulator, sign in to HungerStation if required, and keep the
 configured Riyadh delivery location selected. From the repository root:
 
 ```bash
-.venv/bin/python run_hungerstation_collector.py --brand kfc
-.venv/bin/python run_hungerstation_collector.py --all
+.venv/bin/python manage.py collect hungerstation --brand kfc
+.venv/bin/python manage.py collect hungerstation --all
 ```
 
 Configured restaurants: KFC, Hardee's, Burger King, Herfy, McDonald's, and
@@ -63,7 +63,7 @@ storage) so images survive application redeployments.
 ## Daily scheduler
 
 ```bash
-.venv/bin/python run_hungerstation_scheduler.py
+.venv/bin/python manage.py schedule hungerstation
 ```
 
 The default time is 23:00 Asia/Riyadh. Configure it with

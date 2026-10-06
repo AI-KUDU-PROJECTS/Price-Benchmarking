@@ -63,9 +63,6 @@ TIMEZONE = os.environ.get("TIMEZONE", "Asia/Riyadh")
 
 # --- Data locations (all scoped inside competitors/hardees/) ---------------
 DB_PATH = PROJECT_ROOT / os.environ.get("HRD_DB_PATH", "data/database/hardees_monitor.db")
-DEPLOYMENT_DB_PATH = REPO_ROOT / "bff" / "data" / "snapshots" / "hardees_monitor.db"
-if os.environ.get("VERCEL") and DEPLOYMENT_DB_PATH.exists():
-    DB_PATH = DEPLOYMENT_DB_PATH
 RAW_DATA_DIR = PROJECT_ROOT / os.environ.get("HRD_RAW_DATA_DIR", "data/raw")
 SCREENSHOTS_DIR = PROJECT_ROOT / os.environ.get("HRD_SCREENSHOTS_DIR", "data/screenshots")
 EXPORTS_DIR = PROJECT_ROOT / os.environ.get("HRD_EXPORTS_DIR", "exports")
