@@ -222,7 +222,7 @@ def _ingest_channel(conn: sqlite3.Connection, batch_id: str, channel: str, out_d
 def _record_endpoint_health(conn: sqlite3.Connection, batch_id: str, out_dir: Path) -> None:
     """Best-effort population of the api_endpoints reference table from the
     raw per-call dumps collect.js wrote - purely informational for the
-    Streamlit "Run Logs"/"Sources" views."""
+    operations "Run Logs"/"Sources" views."""
     for channel_dir in out_dir.glob("raw/*"):
         if not channel_dir.is_dir():
             continue
@@ -333,7 +333,7 @@ def _run_screenshot_capture(conn: sqlite3.Connection, jobs: list[dict[str, Any]]
 def run_collection(channel: str = "BOTH", trigger: str = "MANUAL", enable_screenshots: bool = True) -> dict[str, Any]:
     """The single entry point for starting a collection run. `channel` is
     one of PICKUP / DELIVERY / BOTH. Raises RunAlreadyInProgressError if
-    another run is active - callers (CLI/scheduler/Streamlit) should catch
+    another run is active - callers (CLI/scheduler/BFF) should catch
     this and surface it, never retry-loop around it."""
     config.ensure_directories()
     channel = channel.upper()

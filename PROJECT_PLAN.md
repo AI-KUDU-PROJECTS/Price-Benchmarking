@@ -4,9 +4,9 @@
 
 Build a new unified React frontend that turns the existing competitor data into a clear pricing-intelligence product for the marketing team.
 
-The current restaurant collectors, databases, schedulers, normalization logic, and change-detection logic remain independent. The new work adds a thin BFF, one adapter per restaurant, and a shared presentation layer. It does not merge or rewrite the restaurant backends.
+The restaurant collectors keep their source-specific normalization and ingestion logic. Common runner, scheduler, model, validation, change-detection, and SQLite infrastructure is shared. A thin BFF and source adapters expose one contract to the React application.
 
-Streamlit dashboards remain the operations surface (Run Now, logs, Excel export). The React app is the marketing product.
+React is the only product and operations interface. It includes manual collection status and Excel export; the former Streamlit application has been removed.
 
 ## Current Implementation Scope
 
@@ -228,7 +228,7 @@ Do not promote `not_observed` events into this list until the third consecutive 
 
 Exit criteria:
 
-- a marketer can complete a daily KFC check-in from Market Overview without opening Streamlit;
+- a marketer can complete a daily KFC check-in from Market Overview;
 - every highlight and change row opens the underlying product or promotion history;
 - incomplete fields, especially prices or promotions, are visibly marked rather than guessed;
 - a disconnected brand does not make Market Overview look fully updated.
@@ -417,7 +417,7 @@ The following items are explicitly deferred and should not block or expand Phase
 - product matching/equivalency between brands;
 - automated alerts or notifications;
 - long-term market trends, price indices, and advanced analytics;
-- replacing Streamlit as the operations surface.
+- automated collector-log browsing and advanced operational diagnostics in React.
 
 These features require additional product decisions and, especially for comparison, a trusted classification and product-matching model. The current architecture should avoid preventing them, but no implementation should be added yet.
 
@@ -429,7 +429,7 @@ These features require additional product decisions and, especially for comparis
 - Market Overview, KFC Overview, KFC Menu, KFC Changes, KFC Promotions, and Product History work against live KFC data;
 - disconnected brands are explicit;
 - missing, stale, partial, and failed data states are explicit;
-- Streamlit and the KFC collector remain independently runnable.
+- React/FastAPI and each collector remain independently runnable.
 
 ### Current plan
 

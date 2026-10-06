@@ -12,10 +12,12 @@ from competitors.hungerstation.collector import (
     _find_location_recovery,
     _find_location_setup_action,
     _find_search_suggestion,
+    _has_android_app_error,
     _is_restaurant_menu,
     deduplicate,
     load_capture,
     parse_accessibility_label,
+    parse_split_accessibility_products,
     product_image_candidates,
     save_product_images,
 )
@@ -59,6 +61,31 @@ def test_accessibility_label_preserves_offer_price() -> None:
     assert item["regular_price"] == 32.73
     assert item["special_price"] == 18.0
     assert item["source_product_id"] == "HUNGERSTATION|mcdonalds|big-mac"
+
+
+def test_split_flutter_card_preserves_current_and_original_prices() -> None:
+    xml = """
+    <hierarchy>
+      <node class="android.widget.ScrollView" package="com.hungerstation.android.web">
+        <node clickable="true" bounds="[42,1300][431,1907]" />
+        <node content-desc="45%" bounds="[116,1329][168,1366]" />
+        <node content-desc="200+ orders" bounds="[85,1710][269,1747]" />
+        <node content-desc="New Wrap Combo" bounds="[42,1768][355,1813]" />
+        <node content-desc="§" bounds="[42,1823][69,1886]" />
+        <node content-desc="18" bounds="[74,1823][117,1886]" />
+        <node resource-id="menuItemActionSingleButtonAdd" bounds="[326,1584][410,1668]" />
+        <node content-desc="§" bounds="[138,1829][161,1881]" />
+        <node content-desc="32.73" bounds="[166,1829][254,1881]" />
+      </node>
+    </hierarchy>
+    """
+    items = parse_split_accessibility_products(xml, "kfc")
+    assert len(items) == 1
+    assert items[0]["name_en"] == "New Wrap Combo"
+    assert items[0]["effective_price"] == 18.0
+    assert items[0]["special_price"] == 18.0
+    assert items[0]["regular_price"] == 32.73
+    assert items[0]["discount_percentage"] == 45.0
 
 
 def test_deduplicate_uses_source_id_after_slug_normalization() -> None:
@@ -154,6 +181,16 @@ def test_out_of_range_location_recovery_button_is_found() -> None:
     </hierarchy>
     """
     assert _find_location_recovery(xml) == (540, 1319)
+
+
+def test_android_anr_dialog_is_detected_before_app_navigation() -> None:
+    xml = """
+    <hierarchy>
+      <node text="HungerStation isn't responding" resource-id="android:id/alertTitle" />
+      <node text="Close app" resource-id="android:id/aerr_close" clickable="true" />
+    </hierarchy>
+    """
+    assert _has_android_app_error(xml)
 
 
 def test_location_setup_opens_header_and_confirms_map() -> None:

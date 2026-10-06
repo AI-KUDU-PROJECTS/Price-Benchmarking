@@ -2,7 +2,7 @@
 competitors/kfc/backend/config.py
 ---------------------------------------------------------------------
 Central configuration for the Python half of the KFC system (SQLite,
-change detection, Streamlit, Excel export, scheduler - see
+change detection, React/BFF, Excel export, scheduler - see
 competitors/kfc/README.md). Every other competitors/kfc/backend/* module,
 plus competitors/kfc/run_collector.py, competitors/kfc/scheduler.py, and
 competitors/kfc/dashboard/page.py, import settings from here rather than

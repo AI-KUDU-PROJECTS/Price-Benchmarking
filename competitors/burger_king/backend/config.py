@@ -2,7 +2,7 @@
 competitors/burger_king/backend/config.py
 ---------------------------------------------------------------------
 Central configuration for the Python half of the Burger King system
-(SQLite, change detection, Streamlit, Excel export, scheduler - see
+(SQLite, change detection, React/BFF, Excel export, scheduler - see
 competitors/burger_king/README.md). Mirrors competitors/kfc/backend/
 config.py's shape exactly - every other backend/* module, plus
 run_collector.py/scheduler.py/dashboard/page.py, import settings from

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { RefreshCw } from "lucide-react";
+import { Download, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
 import { api } from "../api/client";
 import type { PullRun } from "../api/types";
@@ -119,6 +119,10 @@ export function MarketOverviewPage() {
               <RefreshCw size={18} aria-hidden="true" />
               Collect HungerStation
             </button>
+            <a className="btn btn-secondary" href="/api/v1/market/export.xlsx" download>
+              <Download size={18} aria-hidden="true" />
+              Export Excel
+            </a>
           </div>
         }
       />

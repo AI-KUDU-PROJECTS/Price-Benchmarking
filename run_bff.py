@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the marketing BFF (does not start Streamlit or collectors)."""
+"""Run the FastAPI BFF without starting collectors."""
 from __future__ import annotations
 
 import uvicorn

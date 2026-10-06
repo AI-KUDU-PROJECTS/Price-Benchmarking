@@ -10,17 +10,14 @@ A local system that monitors Hardee's Saudi's
 offers for **one fixed branch in Riyadh**, once a day, for **Pickup** and
 **Delivery** kept completely separate. It detects new products/offers,
 price changes, removed/returned products between successful runs, shows
-the result in a local Streamlit dashboard, and exports daily/monthly/
+the result in a local former dashboard dashboard, and exports daily/monthly/
 catalog Excel reports.
 
 It is a monitoring tool only: no login, no OTP, no payment, no order is
 ever placed - see [Security & compliance](#security--compliance).
 
-> **Isolation:** this folder never imports from `competitors/kfc/`,
-> `competitors/burger_king/`, or any other competitor, and nothing outside
-> `competitors/hardees/` imports its internals except
-> `pages/2_Hardees.py` at the repo root, which only calls `render()` - see
-> [Streamlit dashboard](#streamlit-dashboard) below.
+> **Application UI:** This collector exposes data through the shared BFF adapter
+> and React application. Reusable collector infrastructure lives in `competitors/shared/`.
 
 ## Table of contents
 
@@ -35,7 +32,6 @@ ever placed - see [Security & compliance](#security--compliance).
 - [Database](#database)
 - [Change Detection Engine](#change-detection-engine)
 - [Excel exports](#excel-exports)
-- [Streamlit dashboard](#streamlit-dashboard)
 - [Screenshots](#screenshots)
 - [Testing](#testing)
 - [Security & compliance](#security--compliance)
@@ -52,13 +48,12 @@ API First (Playwright guest-session bootstrap, then plain HTTPS calls)
                                                      only for NEW_PRODUCT/NEW_OFFER)
   -> SQLite                                       (backend/database.py)
   -> Change Detection Engine                      (backend/change_detector.py)
-  -> Streamlit Dashboard                          (dashboard/page.py, rendered by
-                                                     the repo-root pages/2_Hardees.py)
+  -> React/FastAPI Application                    (adapters + BFF + frontend)
   -> Excel Export                                 (backend/excel_exporter.py)
 ```
 
 **Node.js** owns session bootstrap, public API collection, and Playwright
-screenshots. **Python** owns SQLite, change detection, the dashboard,
+screenshots. **Python** owns SQLite, change detection, BFF integration,
 Excel export, and the scheduler. `backend/run_service.py` is the only
 bridge between them - it invokes `collector/collect.js` and
 `collector/screenshot-capture.js` as subprocesses and reads back the JSON
@@ -123,9 +118,6 @@ competitors/hardees/
 │   ├── schema_validator.py       Python-side response-shape validation
 │   ├── run_service.py            Orchestration: lock, subprocess calls, ingestion
 │   └── excel_exporter.py         Daily / Monthly / Catalog workbooks
-├── dashboard/
-│   ├── __init__.py
-│   └── page.py                   render() - the Streamlit UI; see "Streamlit dashboard"
 ├── research/
 │   └── api-map/
 │       ├── api-map.json          Machine-readable endpoint reference
@@ -146,7 +138,7 @@ competitors/hardees/
 
 An earlier phase of this competitor (before the production
 collector/backend/dashboard architecture below existed) built a
-**live-API-preview-only** Streamlit page directly against
+**live-API-preview-only** former dashboard page directly against
 `api/client.py` + `services/*.py` + `ui/*.py` + `config/` - no database,
 no change detection, no scheduler, no offline tests. That code is left in
 place for reference (it still works standalone) but **is no longer
@@ -176,9 +168,6 @@ python run_hardees_scheduler.py
 python -m competitors.hardees.run_collector --channel=BOTH
 python -m competitors.hardees.scheduler
 
-# Dashboard - the root Streamlit app, then open the "Hardees" page from
-# the sidebar (or it's pages/2_Hardees.py directly):
-streamlit run app.py
 ```
 
 ## Installation
@@ -349,26 +338,9 @@ text (e.g. "Medium, Large"), never Python's raw dict repr - the same
 included here from the start (see `tests/test_excel_exporter.py`'s
 regression test).
 
-## Streamlit dashboard
+## React application
 
-```bash
-streamlit run app.py     # from the repo root - see root README.md
-```
-
-then open the **Hardees** page from the sidebar (`pages/2_Hardees.py`, a
-two-line wrapper: `from competitors.hardees.dashboard.page import
-render; render()` - the dashboard code itself lives entirely in
-`dashboard/page.py` and is never duplicated in `pages/`).
-
-Local only, no login. Top section shows branch, last successful run, next
-scheduled run, and per-channel status; buttons for Run Now / Refresh /
-Export Daily Excel / Export Monthly Excel; summary cards for New Products
-/ New Offers / Price Increases / Price Decreases / Offers Ended / Not
-Observed; tabs for Overview, Pickup Products, Delivery Products, Pickup
-Offers, Delivery Offers, Pickup vs Delivery, Changes, and History/Logs
-(Price History / Run Logs / Monthly Comparison); sidebar filters for
-Category / Name-or-description / Offers Only / Channel / Status / Event
-Type / Date - identical layout/labels to KFC/Burger King/Herfy.
+The shared React/FastAPI application is the only UI. This collector is exposed through its adapter and can be started from Market Overview or from the collector CLI.
 
 ## Screenshots
 

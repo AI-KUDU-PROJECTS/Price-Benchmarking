@@ -1,0 +1,192 @@
+/* ==========================================================================
+   Product image
+   ========================================================================== */
+
+.thumb,
+.thumb-missing {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: var(--kudu-radius-control);
+  background: var(--kudu-surface-subtle);
+}
+
+.thumb-missing,
+.thumb-lg-missing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--kudu-text-muted);
+  font-size: 10px;
+  text-align: center;
+  padding: var(--kudu-space-1);
+}
+
+.thumb-lg,
+.thumb-lg-missing {
+  width: 100%;
+  height: 160px;
+  border-radius: var(--kudu-radius-panel) var(--kudu-radius-panel) 0 0;
+  object-fit: cover;
+  background: var(--kudu-surface-subtle);
+}
+
+/* ==========================================================================
+   Promo cards
+   Each promotion is a genuine independent unit - a card is justified here.
+   ========================================================================== */
+
+.grid.cards {
+  display: grid;
+  gap: var(--kudu-space-3);
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.promo-card {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--kudu-duration-fast) var(--kudu-ease-standard);
+}
+
+.promo-card:hover {
+  border-color: var(--kudu-border-brand);
+}
+
+.promo-card .body {
+  padding: var(--kudu-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--kudu-space-1);
+}
+
+.promo-card h3 {
+  font-size: var(--kudu-text-component-title-size);
+  font-weight: var(--kudu-font-weight-bold);
+  margin-top: 2px;
+}
+
+.promo-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sizes {
+  color: var(--kudu-text-secondary);
+  font-size: var(--kudu-text-small-size);
+}
+
+/* ==========================================================================
+   Responsive (draft boundaries: 640 / 1024 / 1440)
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .app-shell {
+    grid-template-columns: 216px 1fr;
+  }
+
+  .main {
+    padding: var(--kudu-space-6);
+  }
+
+  .kpi-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .panel-grid,
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    display: block;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    z-index: var(--kudu-z-sticky);
+    flex-direction: row;
+    align-items: center;
+    gap: var(--kudu-space-3);
+    padding: var(--kudu-space-3);
+    border-inline-end: 0;
+    border-bottom: 1px solid var(--kudu-border-subtle);
+    overflow-x: auto;
+  }
+
+  .sidebar-brand {
+    padding: 0;
+  }
+
+  .sidebar-brand span {
+    display: none;
+  }
+
+  .nav-group {
+    flex-direction: row;
+    flex: none;
+  }
+
+  .nav-group-label {
+    display: none;
+  }
+
+  .nav-link {
+    flex: 0 0 auto;
+    padding: var(--kudu-space-2);
+  }
+
+  .nav-link-status {
+    display: none;
+  }
+
+  .main {
+    padding: var(--kudu-space-4);
+  }
+
+  .page-header {
+    flex-direction: column;
+  }
+
+  .kpi-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .table-scroll table {
+    min-width: 640px;
+  }
+
+  .field-search .control {
+    min-width: 0;
+  }
+}
+
+/* Market Overview: one explicit action with compact per-source progress. */
+.pull-panel {
+  margin-bottom: var(--kudu-space-5);
+}
+
+.pull-panel-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--kudu-space-3);
+  flex-wrap: wrap;
+}
+
+.pull-panel-heading .panel-title {
+  margin-bottom: 0;
+}
+
+.pull-panel > .meta-text {
+  margin: var(--kudu-space-2) 0 var(--kudu-space-3);
+}

@@ -1,0 +1,197 @@
+/* ==========================================================================
+   App shell & sidebar
+   D09: light sidebar with restrained blue details - not a solid brand-color
+   fill. X01: no side-strip active state; active items use a soft selected
+   surface + blue text instead.
+   ========================================================================== */
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 248px 1fr;
+  min-height: 100%;
+}
+
+.sidebar {
+  background: var(--kudu-surface-primary);
+  border-inline-end: 1px solid var(--kudu-border-subtle);
+  padding: var(--kudu-space-6) var(--kudu-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--kudu-space-8);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--kudu-space-2);
+  padding: 0 var(--kudu-space-3);
+}
+
+.sidebar-logo {
+  height: 28px;
+  width: auto;
+  display: block;
+}
+
+.sidebar-brand span {
+  font-size: 11px;
+  font-weight: var(--kudu-font-weight-medium);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--kudu-text-muted);
+}
+
+.nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kudu-space-1);
+}
+
+.nav-group-label {
+  font-size: 11px;
+  font-weight: var(--kudu-font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--kudu-text-muted);
+  margin: 0 var(--kudu-space-3) var(--kudu-space-2);
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--kudu-space-2);
+  padding: var(--kudu-space-2) var(--kudu-space-3);
+  border-radius: var(--kudu-radius-control);
+  color: var(--kudu-text-secondary);
+  text-decoration: none;
+  font-size: var(--kudu-text-body-size);
+  font-weight: var(--kudu-font-weight-medium);
+  transition: background var(--kudu-duration-fast) var(--kudu-ease-standard),
+    color var(--kudu-duration-fast) var(--kudu-ease-standard);
+}
+
+.nav-link svg {
+  flex: none;
+  color: var(--kudu-text-muted);
+}
+
+.nav-link:hover {
+  background: var(--kudu-surface-hover);
+  color: var(--kudu-text-primary);
+}
+
+.nav-link.active {
+  background: var(--kudu-surface-selected);
+  color: var(--kudu-text-brand);
+}
+
+.nav-link.active svg {
+  color: var(--kudu-text-brand);
+}
+
+.nav-link.dim {
+  color: var(--kudu-text-muted);
+}
+
+.nav-link-status {
+  margin-inline-start: auto;
+  font-size: 11px;
+  font-weight: var(--kudu-font-weight-medium);
+  color: var(--kudu-text-muted);
+  white-space: nowrap;
+}
+
+.main {
+  padding: var(--kudu-space-8) var(--kudu-space-8) var(--kudu-space-16);
+  min-width: 0;
+  max-width: var(--kudu-content-wide);
+}
+
+/* ==========================================================================
+   Page header
+   D28: simple header - title, optional one-line description, primary action.
+   No side accent on the title block.
+   ========================================================================== */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--kudu-space-4);
+  margin-bottom: var(--kudu-space-6);
+}
+
+.page-header-back {
+  margin-bottom: var(--kudu-space-3);
+}
+
+.page-title {
+  font-size: var(--kudu-text-page-title-size);
+  font-weight: var(--kudu-font-weight-bold);
+  color: var(--kudu-text-primary);
+  line-height: var(--kudu-line-height-tight);
+}
+
+.page-subtitle {
+  margin-top: var(--kudu-space-1);
+  color: var(--kudu-text-secondary);
+  max-width: var(--kudu-content-reading);
+  font-size: var(--kudu-text-body-size);
+}
+
+.page-header-extra {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--kudu-space-2);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--kudu-space-1);
+  color: var(--kudu-text-secondary);
+  text-decoration: none;
+  font-size: var(--kudu-text-small-size);
+  font-weight: var(--kudu-font-weight-medium);
+  background: none;
+  border: none;
+  padding: var(--kudu-space-1) 0;
+  cursor: pointer;
+}
+
+.back-link:hover {
+  color: var(--kudu-text-brand);
+}
+
+/* ==========================================================================
+   Tabs (BrandTabs) - a bottom-border indicator is a workflow connector, not
+   a prohibited side strip (see decisions.md interpretive notes).
+   ========================================================================== */
+
+.tabs {
+  display: flex;
+  gap: var(--kudu-space-4);
+  flex-wrap: wrap;
+  margin: 0 0 var(--kudu-space-5);
+  border-bottom: 1px solid var(--kudu-border-subtle);
+}
+
+.tabs a {
+  text-decoration: none;
+  padding: var(--kudu-space-2) 0 var(--kudu-space-2);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  color: var(--kudu-text-secondary);
+  font-size: var(--kudu-text-body-size);
+  font-weight: var(--kudu-font-weight-medium);
+}
+
+.tabs a:hover {
+  color: var(--kudu-text-primary);
+}
+
+.tabs a.active {
+  color: var(--kudu-text-brand);
+  border-bottom-color: var(--kudu-text-brand);
+}

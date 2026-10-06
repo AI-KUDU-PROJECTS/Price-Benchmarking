@@ -2,7 +2,7 @@
 competitors/hardees/backend/config.py
 ---------------------------------------------------------------------
 Central configuration for the Python half of the Hardee's system
-(SQLite, change detection, Streamlit, Excel export, scheduler - see
+(SQLite, change detection, React/BFF, Excel export, scheduler - see
 competitors/hardees/README.md). Mirrors competitors/kfc/backend/
 config.py's shape exactly - Hardee's Saudi runs on the same
 Americana-operated platform as KFC (see research/api-map/api-map.md

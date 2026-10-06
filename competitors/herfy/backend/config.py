@@ -2,7 +2,7 @@
 competitors/herfy/backend/config.py
 ---------------------------------------------------------------------
 Central configuration for the Python half of the Herfy system (SQLite,
-change detection, Streamlit, Excel export, scheduler - see
+change detection, React/BFF, Excel export, scheduler - see
 competitors/herfy/README.md). Mirrors competitors/kfc's and
 competitors/burger_king's backend/config.py shape exactly - every other
 backend/* module, plus run_collector.py/scheduler.py/dashboard/page.py,

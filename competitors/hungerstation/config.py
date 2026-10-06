@@ -21,6 +21,16 @@ UPLOAD_TOKEN = os.environ.get("HUNGERSTATION_UPLOAD_TOKEN", "").strip()
 DAILY_RUN_TIME = os.environ.get("HUNGERSTATION_DAILY_RUN_TIME", "23:00")
 TIMEZONE = os.environ.get("TIMEZONE", "Asia/Riyadh")
 ENABLE_SCHEDULER = os.environ.get("HUNGERSTATION_ENABLE_SCHEDULER", "true").strip().lower() in {"1", "true", "yes", "on"}
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "").strip()
+ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-5-5").strip()
+ANTHROPIC_EFFORT = os.environ.get("ANTHROPIC_EFFORT", "medium").strip().lower()
+AI_NAVIGATION_ENABLED = (
+    os.environ.get("HUNGERSTATION_AI_NAVIGATION", "false").strip().lower()
+    in {"1", "true", "yes", "on"}
+    and bool(ANTHROPIC_API_KEY)
+)
+AI_MAX_ACTIONS = max(1, int(os.environ.get("HUNGERSTATION_AI_MAX_ACTIONS", "6")))
+ADB_COMMAND_TIMEOUT = max(5.0, float(os.environ.get("HUNGERSTATION_ADB_TIMEOUT", "30")))
 
 
 @dataclass(frozen=True)

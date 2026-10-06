@@ -78,6 +78,16 @@ def test_market_feeds_use_connected_adapters(client: TestClient) -> None:
     assert all(item["brandId"] == "kfc" for item in promotions.json()["items"])
 
 
+def test_market_excel_export_uses_connected_adapters(client: TestClient) -> None:
+    response = client.get("/api/v1/market/export.xlsx")
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith(
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    assert "KUDU_Price_Benchmark_" in response.headers["content-disposition"]
+    assert response.content.startswith(b"PK")
+
+
 def test_contract_uses_camel_case_and_riyadh(client: TestClient) -> None:
     brand = next(item for item in client.get("/api/v1/brands").json()["items"] if item["id"] == "kfc")
     assert "lastSuccessfulRunAt" in brand

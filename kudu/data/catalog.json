@@ -1,5 +1,5 @@
 {
-  "retrievedAtUtc": "2026-09-29T12:03:06+00:00",
+  "retrievedAtUtc": "2026-10-06T11:02:21+00:00",
   "templateId": 1,
   "services": {
     "delivery": [
@@ -22,7 +22,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:57:36.683Z"
+            "updatedAt": "2026-10-06T10:54:31.046Z"
           },
           {
             "itemId": 102600,
@@ -37,7 +37,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:17:47.583Z"
+            "updatedAt": "2026-10-05T14:01:01.280Z"
           },
           {
             "itemId": 102916,
@@ -52,7 +52,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:29:20.855Z"
+            "updatedAt": "2026-10-06T10:54:46.010Z"
           },
           {
             "itemId": 102918,
@@ -67,7 +67,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-28T20:04:16.229Z"
+            "updatedAt": "2026-10-06T06:34:23.467Z"
           },
           {
             "itemId": 102919,
@@ -79,10 +79,10 @@
             "descriptionEnglish": "Tortilla Sauce",
             "calories": 140,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:34:40.711Z"
+            "updatedAt": "2026-10-06T07:01:09.745Z"
           },
           {
             "itemId": 102979,
@@ -97,7 +97,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:01:16.946Z"
+            "updatedAt": "2026-10-06T11:00:03.144Z"
           },
           {
             "itemId": 103511,
@@ -112,7 +112,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:52:55.148Z"
+            "updatedAt": "2026-10-06T10:49:10.650Z"
           },
           {
             "itemId": 103513,
@@ -127,7 +127,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:29:21.957Z"
+            "updatedAt": "2026-10-06T10:11:34.822Z"
           }
         ]
       },
@@ -150,7 +150,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:01:05.488Z"
+            "updatedAt": "2026-10-06T11:01:49.462Z"
           },
           {
             "itemId": 102896,
@@ -165,22 +165,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:48:39.421Z"
-          },
-          {
-            "itemId": 103774,
-            "nameArabic": "ستريبس دجاج أطفال",
-            "nameEnglish": "Kids Chicken Strips",
-            "price": 19,
-            "itemImageUrl": "https://d15pngy0ricipl.cloudfront.net/1747746433897_GCD01.webp",
-            "descriptionArabic": "دلّع أطفالك بثلاثة ? قطع من ستريبس الدجاج تقدم مع بطاطس مقلية وبيبسي ، يمكنك إضافة ? ريال ليستمتعوا بعصير التفاح أو البرتقال.",
-            "descriptionEnglish": "Treat your kids with 3 pieces of chicken strips served with French fries and Pepsi. Add 2 SAR for them to enjoy apple or orange juice.",
-            "calories": 593,
-            "isAvailable": true,
-            "isPublish": true,
-            "isHidden": false,
-            "status": "active",
-            "updatedAt": "2026-09-29T11:51:51.770Z"
+            "updatedAt": "2026-10-06T11:01:07.342Z"
           },
           {
             "itemId": 104296,
@@ -195,7 +180,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:47:34.896Z"
+            "updatedAt": "2026-10-06T10:56:01.297Z"
           }
         ]
       },
@@ -218,7 +203,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:52:36.077Z"
+            "updatedAt": "2026-10-06T10:23:19.866Z"
           },
           {
             "itemId": 101878,
@@ -233,7 +218,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T05:22:47.332Z"
+            "updatedAt": "2026-10-04T10:53:11.776Z"
           },
           {
             "itemId": 102845,
@@ -248,7 +233,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:17:17.617Z"
+            "updatedAt": "2026-10-06T07:41:29.815Z"
           },
           {
             "itemId": 102846,
@@ -263,7 +248,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:08:39.456Z"
+            "updatedAt": "2026-10-06T06:14:57.107Z"
           },
           {
             "itemId": 102847,
@@ -278,7 +263,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:37:16.622Z"
+            "updatedAt": "2026-10-06T10:51:50.663Z"
           },
           {
             "itemId": 102848,
@@ -293,7 +278,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:41:26.399Z"
+            "updatedAt": "2026-10-06T07:33:59.963Z"
           },
           {
             "itemId": 102849,
@@ -308,7 +293,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:35:33.593Z"
+            "updatedAt": "2026-10-06T10:23:03.577Z"
           },
           {
             "itemId": 102850,
@@ -323,7 +308,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-28T21:23:28.513Z"
+            "updatedAt": "2026-10-06T07:23:18.251Z"
           }
         ]
       },
@@ -346,7 +331,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:58:44.424Z"
+            "updatedAt": "2026-10-06T11:01:07.342Z"
           },
           {
             "itemId": 102721,
@@ -358,10 +343,10 @@
             "descriptionEnglish": "Mouthwatering crisp fried nachos filled with rich melted cheese. ( 3 pcs)",
             "calories": 283,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:02:32.495Z"
+            "updatedAt": "2026-10-06T10:54:20.178Z"
           },
           {
             "itemId": 102724,
@@ -376,7 +361,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:37:12.497Z"
+            "updatedAt": "2026-10-06T10:58:27.240Z"
           },
           {
             "itemId": 102725,
@@ -391,7 +376,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:33:38.455Z"
+            "updatedAt": "2026-10-06T10:41:49.478Z"
           },
           {
             "itemId": 102727,
@@ -406,7 +391,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:02:29.225Z"
+            "updatedAt": "2026-10-06T10:33:08.763Z"
           },
           {
             "itemId": 102728,
@@ -421,7 +406,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:35:43.159Z"
+            "updatedAt": "2026-10-06T10:56:06.638Z"
           },
           {
             "itemId": 102974,
@@ -436,22 +421,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:51:51.770Z"
-          },
-          {
-            "itemId": 103013,
-            "nameArabic": "دجاج ستربس ديو",
-            "nameEnglish": "Chicken Strips Duo",
-            "price": 10,
-            "itemImageUrl": "https://d15pngy0ricipl.cloudfront.net/1747747403120_5H5LW.webp",
-            "descriptionArabic": "تلذذ بطعم الدجاج المقرمش مع قطعتين من دجاج ستربس الطري، يُقدم مع صوص المايونيز بالفلفل اللذيذ.",
-            "descriptionEnglish": "Savor the crispy goodness of 2 tender Chicken Strips, perfectly paired with flavorful pepper mayo sauce.",
-            "calories": 395,
-            "isAvailable": true,
-            "isPublish": true,
-            "isHidden": false,
-            "status": "active",
-            "updatedAt": "2026-09-29T11:53:23.017Z"
+            "updatedAt": "2026-10-06T10:54:31.046Z"
           },
           {
             "itemId": 104174,
@@ -463,10 +433,10 @@
             "descriptionEnglish": "Crunchy Sweet Chili nacho chips topped with a beef patty, cheddar cheese sauce, burrito sauce, jalape?os, and creamy guacamole.",
             "calories": 653,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:54:45.370Z"
+            "updatedAt": "2026-10-06T10:28:53.255Z"
           },
           {
             "itemId": 104177,
@@ -478,10 +448,10 @@
             "descriptionEnglish": "Crunchy Sweet Chili nacho chips topped with a beef patty, cheddar cheese sauce, burrito sauce, jalape?os, and creamy guacamole.",
             "calories": 1438,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:57:00.869Z"
+            "updatedAt": "2026-10-06T05:34:06.179Z"
           }
         ]
       },
@@ -504,7 +474,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:31:55.957Z"
+            "updatedAt": "2026-10-06T08:39:01.855Z"
           },
           {
             "itemId": 102700,
@@ -519,7 +489,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:23:08.517Z"
+            "updatedAt": "2026-10-06T08:26:03.767Z"
           },
           {
             "itemId": 102702,
@@ -534,7 +504,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:46:11.147Z"
+            "updatedAt": "2026-10-06T08:42:37.766Z"
           },
           {
             "itemId": 102704,
@@ -549,7 +519,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:13:02.241Z"
+            "updatedAt": "2026-10-06T08:17:24.515Z"
           },
           {
             "itemId": 102705,
@@ -564,7 +534,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:46:11.147Z"
+            "updatedAt": "2026-10-06T06:43:47.177Z"
           },
           {
             "itemId": 102706,
@@ -579,7 +549,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:13:07.879Z"
+            "updatedAt": "2026-10-06T08:25:51.163Z"
           },
           {
             "itemId": 102708,
@@ -594,7 +564,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:07:29.245Z"
+            "updatedAt": "2026-10-06T08:45:53.072Z"
           },
           {
             "itemId": 102710,
@@ -606,10 +576,10 @@
             "descriptionEnglish": "A traditional delicious waffle topped with maple syrup and butter .",
             "calories": 269,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:13:35.666Z"
+            "updatedAt": "2026-10-06T08:33:02.192Z"
           },
           {
             "itemId": 102714,
@@ -624,7 +594,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:45:06.226Z"
+            "updatedAt": "2026-10-06T08:33:02.192Z"
           },
           {
             "itemId": 103447,
@@ -639,7 +609,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:45:58.863Z"
+            "updatedAt": "2026-10-06T07:30:41.057Z"
           },
           {
             "itemId": 104096,
@@ -654,7 +624,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:13:47.278Z"
+            "updatedAt": "2026-10-06T07:48:32.360Z"
           },
           {
             "itemId": 104099,
@@ -669,7 +639,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:17:55.177Z"
+            "updatedAt": "2026-10-06T08:33:02.192Z"
           },
           {
             "itemId": 104197,
@@ -684,22 +654,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T07:55:54.140Z"
-          },
-          {
-            "itemId": 104200,
-            "nameArabic": "وجبة ساندويتش الدجاج بالبيض",
-            "nameEnglish": "Egg & Chicken Wrap Meal",
-            "price": 17,
-            "itemImageUrl": "https://d15pngy0ricipl.cloudfront.net/1770528827638_EnO1W.webp",
-            "descriptionArabic": "ساندويتش دجاج مقرمش مع بيض وجبن، يُقدَّم مع قطعة هاش براون  واختيارك من القهوة أو عصير البرتقال.",
-            "descriptionEnglish": "Wrap with crispy breaded chicken, egg, and cheese, served with one hash brown and your choice of coffee or orange juice.",
-            "calories": 939,
-            "isAvailable": true,
-            "isPublish": true,
-            "isHidden": false,
-            "status": "active",
-            "updatedAt": "2026-09-29T07:34:44.690Z"
+            "updatedAt": "2026-10-06T07:49:17.804Z"
           }
         ]
       },
@@ -722,7 +677,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:38:58.245Z"
+            "updatedAt": "2026-10-06T10:58:10.016Z"
           },
           {
             "itemId": 103844,
@@ -737,7 +692,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:34:08.510Z"
+            "updatedAt": "2026-10-06T10:44:35.845Z"
           }
         ]
       },
@@ -757,10 +712,10 @@
             "descriptionEnglish": "Kudu Chicken Combo with fresh vegetables, soy sauce, and mayonnaise in Kudu bread. Served with fries and a soft drink.",
             "calories": 1000,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:59:13.183Z"
+            "updatedAt": "2026-10-06T11:01:49.462Z"
           },
           {
             "itemId": 103291,
@@ -772,10 +727,10 @@
             "descriptionEnglish": "Kudu Beef Combo with yellow cheese, fresh vegetables, and mayonnaise in Kudu bread. Served with fries and a soft drink.",
             "calories": 1106,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:53:08.878Z"
+            "updatedAt": "2026-10-06T11:01:07.342Z"
           },
           {
             "itemId": 103293,
@@ -787,10 +742,10 @@
             "descriptionEnglish": "Chicken Burger Combo with lettuce and mayonnaise in sesame bun. Served with fries and a soft drink.",
             "calories": 990,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:01:05.488Z"
+            "updatedAt": "2026-10-06T10:58:27.240Z"
           },
           {
             "itemId": 103294,
@@ -802,10 +757,10 @@
             "descriptionEnglish": "Philly Steak Combo with mushroom, onion, and white cheese. Served with fries and a soft drink.",
             "calories": 1154,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:29:25.171Z"
+            "updatedAt": "2026-10-06T10:51:34.089Z"
           },
           {
             "itemId": 103295,
@@ -817,10 +772,10 @@
             "descriptionEnglish": "Large Club Sandwich combo with turkey slices, beef and chicken mortadella, white and yellow cheese, omelet, tomato, lettuce, pickles, and mayonnaise. Served with fries and a soft drink.",
             "calories": 1093,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:40:03.063Z"
+            "updatedAt": "2026-10-06T10:49:39.125Z"
           },
           {
             "itemId": 103296,
@@ -832,10 +787,10 @@
             "descriptionEnglish": "Lafino Chicken Combo burrito with yellow cheese and fresh vegetables in tortilla bread. Served with fries and a soft drink.",
             "calories": 966,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:55:29.540Z"
+            "updatedAt": "2026-10-06T10:54:20.178Z"
           },
           {
             "itemId": 103298,
@@ -847,10 +802,10 @@
             "descriptionEnglish": "Quattro Spicy Chicken combo fillet filled with lettuce, mayonnaise, and Thousand Island sauce. Served with fries and a soft drink.",
             "calories": 1088,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:01:16.946Z"
+            "updatedAt": "2026-10-06T11:01:09.590Z"
           },
           {
             "itemId": 103299,
@@ -862,10 +817,10 @@
             "descriptionEnglish": "Kudu Spicy Chicken Combo with white cheese and dynamite sauce. Served with fries and a soft drink.",
             "calories": 1081,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:01:05.488Z"
+            "updatedAt": "2026-10-06T10:50:57.163Z"
           },
           {
             "itemId": 103302,
@@ -877,10 +832,10 @@
             "descriptionEnglish": "Lafino Philly Steak Combo burrito with yellow cheese and mayonnaise sauce. Served with fries and a soft drink.",
             "calories": 1732,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:57:32.431Z"
+            "updatedAt": "2026-10-06T11:00:03.144Z"
           },
           {
             "itemId": 103303,
@@ -895,7 +850,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:02:29.225Z"
+            "updatedAt": "2026-10-06T11:01:24.334Z"
           },
           {
             "itemId": 103635,
@@ -907,10 +862,10 @@
             "descriptionEnglish": "Muthalatha Combo contains tortilla stuffed with chicken, mozzarella, Emmental, caramelized onion, and sriracha sauce. Served with fries and a soft drink.",
             "calories": 1189,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:05:04.885Z"
+            "updatedAt": "2026-10-06T10:54:31.046Z"
           },
           {
             "itemId": 103746,
@@ -922,10 +877,10 @@
             "descriptionEnglish": "Smokey Combo premium sandwich in potato bread with smoked Philly, mozzarella, and smoky sauce.",
             "calories": 1350,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:01:38.220Z"
+            "updatedAt": "2026-10-06T10:54:32.685Z"
           },
           {
             "itemId": 104163,
@@ -937,10 +892,10 @@
             "descriptionEnglish": "Crispy chicken fillet on a soft bun with lettuce, mayo, and island sauce. Served with crispy fries and a cold drink.",
             "calories": 1302,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:55:02.607Z"
+            "updatedAt": "2026-10-06T11:01:09.590Z"
           },
           {
             "itemId": 104169,
@@ -952,10 +907,10 @@
             "descriptionEnglish": "Extra spicy crispy chicken fillet with lettuce, chipotle sauce and jalapeno slices. Served with crispy fries and a cold drink.",
             "calories": 1111,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:34:51.662Z"
+            "updatedAt": "2026-10-06T10:49:34.668Z"
           },
           {
             "itemId": 104250,
@@ -967,25 +922,10 @@
             "descriptionEnglish": "Savory Philly beef with grilled red peppers, melted mozzarella and yellow cheese, drizzled with burrito sauce and wrapped in a soft white tortilla. Served with crispy fries, a refreshing drink, and a flavorful cilantro dip on the side.",
             "calories": 1423,
             "isAvailable": true,
-            "isPublish": true,
-            "isHidden": false,
-            "status": "active",
-            "updatedAt": "2026-09-29T11:41:57.776Z"
-          },
-          {
-            "itemId": 104267,
-            "nameArabic": "وجبة تشكن راب بلس",
-            "nameEnglish": "Chicken Wrap Plus Combo",
-            "price": 32,
-            "itemImageUrl": "https://d15pngy0ricipl.cloudfront.net/1783517185285_erKNS.webp",
-            "descriptionArabic": "دجاج كرسبي مقرمش مع الصوص الخاص وجبنة الشيدر وأعواد البطاطس المقرمشة، ملفوف داخل خبز التورتيلا. يُقدم مع البطاطس المقلية ومشروب.",
-            "descriptionEnglish": "Breaded crispy chicken with cheddar cheese sauce, special sauce, potato sticks, in a tortilla orange wrap with fires and a drink",
-            "calories": 1432,
-            "isAvailable": true,
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:41:03.300Z"
+            "updatedAt": "2026-10-06T10:44:19.106Z"
           }
         ]
       },
@@ -1005,10 +945,10 @@
             "descriptionEnglish": "Orange juice with no added sugar.",
             "calories": 101,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:39:55.393Z"
+            "updatedAt": "2026-10-06T07:23:18.251Z"
           },
           {
             "itemId": 100376,
@@ -1020,10 +960,10 @@
             "descriptionEnglish": "Apple juice with no added sugar.",
             "calories": 88,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:07:25.037Z"
+            "updatedAt": "2026-10-05T12:34:27.096Z"
           },
           {
             "itemId": 103215,
@@ -1038,7 +978,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:20:00.374Z"
+            "updatedAt": "2026-10-06T10:54:04.369Z"
           },
           {
             "itemId": 103216,
@@ -1053,7 +993,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:10:50.901Z"
+            "updatedAt": "2026-10-06T10:15:37.293Z"
           },
           {
             "itemId": 103217,
@@ -1068,7 +1008,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T04:11:19.111Z"
+            "updatedAt": "2026-10-06T11:00:04.371Z"
           },
           {
             "itemId": 103218,
@@ -1083,7 +1023,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:35:33.593Z"
+            "updatedAt": "2026-10-06T03:34:14.368Z"
           },
           {
             "itemId": 103219,
@@ -1098,7 +1038,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:31:00.910Z"
+            "updatedAt": "2026-10-06T10:29:48.917Z"
           },
           {
             "itemId": 103235,
@@ -1113,7 +1053,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:31:33.090Z"
+            "updatedAt": "2026-10-06T09:53:09.570Z"
           },
           {
             "itemId": 103241,
@@ -1128,7 +1068,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T06:04:28.155Z"
+            "updatedAt": "2026-10-05T12:34:28.123Z"
           },
           {
             "itemId": 103246,
@@ -1143,7 +1083,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-28T17:02:03.945Z"
+            "updatedAt": "2026-10-06T10:22:48.190Z"
           },
           {
             "itemId": 103251,
@@ -1158,7 +1098,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:54:47.209Z"
+            "updatedAt": "2026-10-06T11:00:04.371Z"
           },
           {
             "itemId": 103737,
@@ -1173,7 +1113,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:21:49.147Z"
+            "updatedAt": "2026-10-06T09:21:12.555Z"
           },
           {
             "itemId": 103990,
@@ -1188,7 +1128,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:20:10.488Z"
+            "updatedAt": "2026-10-06T10:19:43.168Z"
           },
           {
             "itemId": 103991,
@@ -1203,7 +1143,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T07:04:23.246Z"
+            "updatedAt": "2026-10-05T22:24:23.092Z"
           },
           {
             "itemId": 103998,
@@ -1218,7 +1158,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:35:33.593Z"
+            "updatedAt": "2026-10-06T10:23:03.577Z"
           },
           {
             "itemId": 104235,
@@ -1233,7 +1173,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T07:54:05.696Z"
+            "updatedAt": "2026-10-06T10:51:50.663Z"
           }
         ]
       },
@@ -1256,7 +1196,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:40:03.063Z"
+            "updatedAt": "2026-10-06T10:49:59.635Z"
           },
           {
             "itemId": 102608,
@@ -1271,7 +1211,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:49:32.331Z"
+            "updatedAt": "2026-10-05T20:00:27.780Z"
           },
           {
             "itemId": 102609,
@@ -1286,7 +1226,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:10:19.695Z"
+            "updatedAt": "2026-10-06T10:58:10.016Z"
           },
           {
             "itemId": 102611,
@@ -1301,7 +1241,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:37:16.622Z"
+            "updatedAt": "2026-10-06T10:54:22.548Z"
           },
           {
             "itemId": 102612,
@@ -1316,7 +1256,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:25:50.213Z"
+            "updatedAt": "2026-10-06T09:23:14.992Z"
           },
           {
             "itemId": 102614,
@@ -1331,7 +1271,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:44:56.862Z"
+            "updatedAt": "2026-10-06T10:23:46.535Z"
           },
           {
             "itemId": 102615,
@@ -1346,7 +1286,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:53:02.329Z"
+            "updatedAt": "2026-10-06T10:41:49.478Z"
           },
           {
             "itemId": 102616,
@@ -1361,7 +1301,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:58:04.460Z"
+            "updatedAt": "2026-10-06T10:48:44.577Z"
           },
           {
             "itemId": 102930,
@@ -1376,7 +1316,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:35:38.821Z"
+            "updatedAt": "2026-10-06T10:19:43.168Z"
           },
           {
             "itemId": 102997,
@@ -1388,10 +1328,10 @@
             "descriptionEnglish": "The soft Tortilla you love with crunchy breaded chicken and our special Tortilla sauce, fresh tomato and crisp lettuce. ",
             "calories": 847,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:25:15.001Z"
+            "updatedAt": "2026-10-06T11:00:45.146Z"
           },
           {
             "itemId": 103633,
@@ -1406,7 +1346,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:24:23.698Z"
+            "updatedAt": "2026-10-06T10:29:17.345Z"
           },
           {
             "itemId": 103743,
@@ -1421,7 +1361,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:02:32.495Z"
+            "updatedAt": "2026-10-06T07:57:58.029Z"
           },
           {
             "itemId": 104160,
@@ -1433,10 +1373,10 @@
             "descriptionEnglish": "Crispy chicken fillet on a soft bun with lettuce, mayo, and island sauce.",
             "calories": 911,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:17:13.480Z"
+            "updatedAt": "2026-10-06T10:23:54.766Z"
           },
           {
             "itemId": 104166,
@@ -1451,7 +1391,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:04:15.693Z"
+            "updatedAt": "2026-10-06T09:45:55.989Z"
           },
           {
             "itemId": 104247,
@@ -1466,22 +1406,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:05:04.307Z"
-          },
-          {
-            "itemId": 104264,
-            "nameArabic": "تشكن راب بلس",
-            "nameEnglish": "Chicken Wrap Plus Sandwich",
-            "price": 26,
-            "itemImageUrl": "https://d15pngy0ricipl.cloudfront.net/1783517424262_RezqX.webp",
-            "descriptionArabic": "دجاج كرسبي مقرمش مع الصوص الخاص وجبنة الشيدر، وأعواد البطاطس المقرمشة، ملفوف داخل خبز التورتيلا.",
-            "descriptionEnglish": "Breaded crispy chicken with cheddar cheese sauce, special sauce, potato sticks, in a tortilla orange wrap.",
-            "calories": 0,
-            "isAvailable": true,
-            "isPublish": false,
-            "isHidden": false,
-            "status": "active",
-            "updatedAt": "2026-09-29T11:59:10.426Z"
+            "updatedAt": "2026-10-06T10:25:28.020Z"
           }
         ]
       },
@@ -1504,7 +1429,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:14:17.258Z"
+            "updatedAt": "2026-10-06T10:54:04.369Z"
           },
           {
             "itemId": 102827,
@@ -1519,7 +1444,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:22:14.773Z"
+            "updatedAt": "2026-10-06T10:39:51.780Z"
           },
           {
             "itemId": 103288,
@@ -1531,10 +1456,10 @@
             "descriptionEnglish": "Crisp iceberg lettuce topped with grilled chicken, cherry tomato, cucumber, sauteed mushroom, diced tomato & onion mixed with yellow cheese sprinkles. Served with Italian dressing, toasted bread, crispy potato and diet soft drinks on the side.",
             "calories": 587,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:54:07.816Z"
+            "updatedAt": "2026-10-06T11:00:22.456Z"
           },
           {
             "itemId": 103289,
@@ -1549,7 +1474,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:52:36.077Z"
+            "updatedAt": "2026-10-06T10:57:19.776Z"
           },
           {
             "itemId": 103789,
@@ -1564,7 +1489,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:59:10.426Z"
+            "updatedAt": "2026-10-06T11:00:45.146Z"
           }
         ]
       },
@@ -1584,10 +1509,10 @@
             "descriptionEnglish": "Korean Kick Combo with cheesy nachos for a bold, satisfying bite.",
             "calories": 0,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:39:39.903Z"
+            "updatedAt": "2026-10-06T11:01:24.334Z"
           },
           {
             "itemId": 104325,
@@ -1599,10 +1524,10 @@
             "descriptionEnglish": "Legend Combo with cheesy nachos for a delicious, satisfying meal.",
             "calories": 0,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:57:36.683Z"
+            "updatedAt": "2026-10-06T10:59:28.110Z"
           }
         ]
       },
@@ -1625,7 +1550,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:35:43.159Z"
+            "updatedAt": "2026-10-06T10:10:14.533Z"
           },
           {
             "itemId": 103050,
@@ -1640,7 +1565,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:43:23.639Z"
+            "updatedAt": "2026-10-06T10:42:49.106Z"
           },
           {
             "itemId": 103297,
@@ -1655,7 +1580,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:43:42.064Z"
+            "updatedAt": "2026-10-06T10:30:20.572Z"
           },
           {
             "itemId": 103304,
@@ -1670,7 +1595,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:01:05.488Z"
+            "updatedAt": "2026-10-06T11:01:49.462Z"
           },
           {
             "itemId": 103306,
@@ -1685,7 +1610,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:00:23.810Z"
+            "updatedAt": "2026-10-06T10:56:06.638Z"
           },
           {
             "itemId": 104185,
@@ -1700,7 +1625,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:01:05.488Z"
+            "updatedAt": "2026-10-06T10:58:20.855Z"
           },
           {
             "itemId": 104187,
@@ -1712,10 +1637,10 @@
             "descriptionEnglish": "Junior Burger made with a soft bun, crispy chicken patty, fresh lettuce, and creamy mayonnaise, served with fries and a soft drink.",
             "calories": 666,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:48:39.421Z"
+            "updatedAt": "2026-10-06T10:56:01.297Z"
           }
         ]
       },
@@ -1735,25 +1660,10 @@
             "descriptionEnglish": "12 nachos topped with melted cheese, served with dynamite, and Kudu special sauces.",
             "calories": 1900,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:54:46.606Z"
-          },
-          {
-            "itemId": 103690,
-            "nameArabic": "سطل ستريبس دجاج",
-            "nameEnglish": "Chicken Strips Bucket",
-            "price": 49,
-            "itemImageUrl": "https://d15pngy0ricipl.cloudfront.net/1747746678033_Ae94j.webp",
-            "descriptionArabic": "10 قطع ستريبس دجاج مقرمشة مع تشكيلة صوصات",
-            "descriptionEnglish": "10pcs. chicken strips and assorted sauces.",
-            "calories": 1656,
-            "isAvailable": true,
-            "isPublish": true,
-            "isHidden": false,
-            "status": "active",
-            "updatedAt": "2026-09-29T10:29:21.957Z"
+            "updatedAt": "2026-10-06T10:47:54.022Z"
           },
           {
             "itemId": 103712,
@@ -1768,7 +1678,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:58:00.561Z"
+            "updatedAt": "2026-10-06T10:51:50.663Z"
           },
           {
             "itemId": 104144,
@@ -1783,7 +1693,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:58:24.564Z"
+            "updatedAt": "2026-10-06T11:00:04.371Z"
           }
         ]
       },
@@ -1806,7 +1716,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:58:58.167Z"
+            "updatedAt": "2026-10-06T10:54:44.321Z"
           },
           {
             "itemId": 103856,
@@ -1821,7 +1731,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:41:50.404Z"
+            "updatedAt": "2026-10-06T10:58:41.423Z"
           },
           {
             "itemId": 104194,
@@ -1836,7 +1746,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:54:07.816Z"
+            "updatedAt": "2026-10-06T10:58:20.855Z"
           }
         ]
       },
@@ -1863,10 +1773,10 @@
             "descriptionEnglish": "Crispy chicken with bold Korean inspired sauce, cheese, fresh lettuce, tomato, served on a soft potato bun.",
             "calories": 937,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:53:03.202Z"
+            "updatedAt": "2026-10-06T10:54:09.330Z"
           },
           {
             "itemId": 104282,
@@ -1878,10 +1788,10 @@
             "descriptionEnglish": "Crispy chicken with bold Korean inspired sauce, cheese, fresh lettuce, tomato, served on soft potato bun with fries and drink.",
             "calories": 1328,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:35:22.141Z"
+            "updatedAt": "2026-10-06T10:56:09.309Z"
           },
           {
             "itemId": 104285,
@@ -1893,10 +1803,10 @@
             "descriptionEnglish": "Crispy chicken with our famous KUDU sauce, cheese, fresh lettuce, tomato, served on a soft potato bun.",
             "calories": 1191,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:37:16.622Z"
+            "updatedAt": "2026-10-06T10:54:07.487Z"
           },
           {
             "itemId": 104288,
@@ -1908,10 +1818,10 @@
             "descriptionEnglish": "Crispy chicken with our famous KUDU sauce, cheese, fresh lettuce, tomato, served on soft potato bun with fries and drink.",
             "calories": 1582,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:55:02.607Z"
+            "updatedAt": "2026-10-06T10:56:12.603Z"
           }
         ]
       }
@@ -1933,10 +1843,10 @@
             "descriptionEnglish": "Kudu Chicken Combo with fresh vegetables, soy sauce, and mayonnaise in Kudu bread. Served with fries and a soft drink.",
             "calories": 1000,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:02:49.821Z"
+            "updatedAt": "2026-10-06T11:00:56.014Z"
           },
           {
             "itemId": 100054,
@@ -1948,10 +1858,10 @@
             "descriptionEnglish": "Kudu Beef Combo with yellow cheese, fresh vegetables, and mayonnaise in Kudu bread. Served with fries and a soft drink.",
             "calories": 1106,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:02:05.879Z"
+            "updatedAt": "2026-10-06T11:01:37.865Z"
           },
           {
             "itemId": 100057,
@@ -1963,10 +1873,10 @@
             "descriptionEnglish": "Chicken Burger Combo with lettuce and mayonnaise in sesame bun. Served with fries and a soft drink.",
             "calories": 990,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:49:03.057Z"
+            "updatedAt": "2026-10-06T11:02:00.310Z"
           },
           {
             "itemId": 100060,
@@ -1978,10 +1888,10 @@
             "descriptionEnglish": "Philly Steak Combo with mushroom, onion, and white cheese. Served with fries and a soft drink.",
             "calories": 1154,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:58:46.797Z"
+            "updatedAt": "2026-10-06T10:18:26.795Z"
           },
           {
             "itemId": 100274,
@@ -1993,10 +1903,10 @@
             "descriptionEnglish": "Lafino Chicken Combo burrito with yellow cheese and fresh vegetables in tortilla bread. Served with fries and a soft drink.",
             "calories": 966,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:02:52.919Z"
+            "updatedAt": "2026-10-06T11:01:33.985Z"
           },
           {
             "itemId": 100294,
@@ -2008,10 +1918,10 @@
             "descriptionEnglish": "Quattro Spicy Chicken combo fillet filled with lettuce, mayonnaise, and Thousand Island sauce. Served with fries and a soft drink.",
             "calories": 1088,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:01:34.681Z"
+            "updatedAt": "2026-10-06T11:00:21.415Z"
           },
           {
             "itemId": 100681,
@@ -2023,10 +1933,10 @@
             "descriptionEnglish": "Kudu Spicy Chicken Combo with white cheese and dynamite sauce. Served with fries and a soft drink.",
             "calories": 1081,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:58:12.573Z"
+            "updatedAt": "2026-10-06T10:48:27.350Z"
           },
           {
             "itemId": 102929,
@@ -2038,10 +1948,10 @@
             "descriptionEnglish": "Lafino Philly Steak Combo burrito with yellow cheese and mayonnaise sauce. Served with fries and a soft drink.",
             "calories": 1732,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:02:01.140Z"
+            "updatedAt": "2026-10-06T11:01:24.432Z"
           },
           {
             "itemId": 102996,
@@ -2053,10 +1963,10 @@
             "descriptionEnglish": "The soft Tortilla you love with crunchy breaded chicken and our special Tortilla sauce, fresh tomato and crisp lettuce. Served with fries and Pepsi  on the side.",
             "calories": 1238,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:02:48.984Z"
+            "updatedAt": "2026-10-06T10:59:16.165Z"
           },
           {
             "itemId": 103634,
@@ -2068,10 +1978,10 @@
             "descriptionEnglish": "Muthalatha Combo contains tortilla stuffed with chicken, mozzarella, emmental, caramelized onion, and sriracha sauce. Served with fries and a soft drink.",
             "calories": 1189,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:02:52.919Z"
+            "updatedAt": "2026-10-06T10:43:31.266Z"
           },
           {
             "itemId": 103744,
@@ -2083,10 +1993,10 @@
             "descriptionEnglish": "Smokey Combo premium sandwich in potato bread with smoked Philly, mozzarella, and smoky sauce.",
             "calories": 1350,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:49:18.761Z"
+            "updatedAt": "2026-10-06T10:59:57.791Z"
           },
           {
             "itemId": 104162,
@@ -2098,10 +2008,10 @@
             "descriptionEnglish": "Crispy chicken fillet on a soft bun with lettuce, mayo, and island sauce. Served with crispy fries and a cold drink.",
             "calories": 1302,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:58:29.696Z"
+            "updatedAt": "2026-10-06T10:48:02.320Z"
           },
           {
             "itemId": 104168,
@@ -2113,10 +2023,10 @@
             "descriptionEnglish": "Extra spicy crispy chicken fillet with lettuce, chipotle sauce and jalapeno slices. Served with crispy fries and a cold drink.",
             "calories": 1111,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:47:24.463Z"
+            "updatedAt": "2026-10-06T10:35:24.526Z"
           },
           {
             "itemId": 104249,
@@ -2128,25 +2038,10 @@
             "descriptionEnglish": "Savory Philly beef with grilled red peppers, melted mozzarella and yellow cheese, drizzled with burrito sauce and wrapped in a soft white tortilla. Served with crispy fries, a refreshing drink, and a flavorful cilantro dip on the side.",
             "calories": 1423,
             "isAvailable": true,
-            "isPublish": true,
-            "isHidden": false,
-            "status": "active",
-            "updatedAt": "2026-09-29T11:56:42.360Z"
-          },
-          {
-            "itemId": 104266,
-            "nameArabic": "وجبة تشكن راب بلس",
-            "nameEnglish": "Chicken Wrap Plus Combo",
-            "price": 21,
-            "itemImageUrl": "https://d15pngy0ricipl.cloudfront.net/1783517010831_8hAwe.webp",
-            "descriptionArabic": "دجاج كرسبي مقرمش مع الصوص الخاص وجبنة الشيدر وأعواد البطاطس المقرمشة، ملفوف داخل خبز التورتيلا. يُقدم مع البطاطس المقلية ومشروب.",
-            "descriptionEnglish": "Breaded crispy chicken with cheddar cheese sauce, special sauce, potato sticks, in a tortilla orange wrap with fires and a drink",
-            "calories": 1432,
-            "isAvailable": true,
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:53:29.250Z"
+            "updatedAt": "2026-10-06T10:52:57.418Z"
           }
         ]
       },
@@ -2169,7 +2064,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:56:26.963Z"
+            "updatedAt": "2026-10-06T11:01:19.069Z"
           },
           {
             "itemId": 101211,
@@ -2184,7 +2079,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:35:24.825Z"
+            "updatedAt": "2026-10-06T10:25:14.735Z"
           },
           {
             "itemId": 102115,
@@ -2199,7 +2094,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:19:42.356Z"
+            "updatedAt": "2026-10-06T10:20:07.646Z"
           },
           {
             "itemId": 102116,
@@ -2214,7 +2109,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:19:48.245Z"
+            "updatedAt": "2026-10-06T11:01:12.168Z"
           },
           {
             "itemId": 102664,
@@ -2229,7 +2124,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:43:23.045Z"
+            "updatedAt": "2026-10-06T10:12:20.046Z"
           },
           {
             "itemId": 102665,
@@ -2244,7 +2139,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:43:23.045Z"
+            "updatedAt": "2026-10-06T11:01:12.168Z"
           },
           {
             "itemId": 103843,
@@ -2259,7 +2154,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:48:55.496Z"
+            "updatedAt": "2026-10-06T10:08:06.258Z"
           }
         ]
       },
@@ -2282,7 +2177,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:20:52.784Z"
+            "updatedAt": "2026-10-06T10:53:00.458Z"
           },
           {
             "itemId": 100003,
@@ -2297,7 +2192,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:59:48.544Z"
+            "updatedAt": "2026-10-06T10:43:12.316Z"
           },
           {
             "itemId": 100004,
@@ -2312,7 +2207,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:54:46.345Z"
+            "updatedAt": "2026-10-06T10:54:39.976Z"
           },
           {
             "itemId": 100006,
@@ -2327,7 +2222,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:02:49.821Z"
+            "updatedAt": "2026-10-06T10:57:10.955Z"
           },
           {
             "itemId": 100015,
@@ -2342,7 +2237,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:01:02.311Z"
+            "updatedAt": "2026-10-06T10:11:28.010Z"
           },
           {
             "itemId": 100273,
@@ -2357,7 +2252,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:01:33.517Z"
+            "updatedAt": "2026-10-06T10:36:06.927Z"
           },
           {
             "itemId": 100293,
@@ -2372,7 +2267,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:02:43.163Z"
+            "updatedAt": "2026-10-06T11:00:21.415Z"
           },
           {
             "itemId": 100680,
@@ -2387,7 +2282,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:52:24.008Z"
+            "updatedAt": "2026-10-06T10:06:37.170Z"
           },
           {
             "itemId": 102928,
@@ -2402,7 +2297,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:28:42.482Z"
+            "updatedAt": "2026-10-06T10:54:38.077Z"
           },
           {
             "itemId": 102995,
@@ -2414,10 +2309,10 @@
             "descriptionEnglish": "The soft Tortilla you love with crunchy breaded chicken and our special Tortilla sauce, fresh tomato and crisp lettuce. ",
             "calories": 847,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:55:39.745Z"
+            "updatedAt": "2026-10-06T11:00:56.014Z"
           },
           {
             "itemId": 103632,
@@ -2432,7 +2327,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:49:07.128Z"
+            "updatedAt": "2026-10-06T10:36:06.927Z"
           },
           {
             "itemId": 103742,
@@ -2447,7 +2342,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:53:15.968Z"
+            "updatedAt": "2026-10-06T10:59:57.791Z"
           },
           {
             "itemId": 104159,
@@ -2459,10 +2354,10 @@
             "descriptionEnglish": "Crispy chicken fillet on a soft bun with lettuce, mayo, and island sauce.",
             "calories": 911,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:01:02.311Z"
+            "updatedAt": "2026-10-06T10:13:59.467Z"
           },
           {
             "itemId": 104165,
@@ -2477,7 +2372,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:39:39.890Z"
+            "updatedAt": "2026-10-06T11:00:21.289Z"
           },
           {
             "itemId": 104246,
@@ -2492,22 +2387,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:54:28.734Z"
-          },
-          {
-            "itemId": 104263,
-            "nameArabic": "تشكن راب بلس",
-            "nameEnglish": "Chicken Wrap Plus Sandwich",
-            "price": 21,
-            "itemImageUrl": "https://d15pngy0ricipl.cloudfront.net/1783517280646_1m691.webp",
-            "descriptionArabic": "دجاج كرسبي مقرمش مع الصوص الخاص وجبنة الشيدر، وأعواد البطاطس المقرمشة، ملفوف داخل خبز التورتيلا.",
-            "descriptionEnglish": "Breaded crispy chicken with cheddar cheese sauce, special sauce, potato sticks, in a tortilla orange wrap.",
-            "calories": 0,
-            "isAvailable": true,
-            "isPublish": false,
-            "isHidden": false,
-            "status": "active",
-            "updatedAt": "2026-09-29T11:56:38.074Z"
+            "updatedAt": "2026-10-06T09:59:29.179Z"
           }
         ]
       },
@@ -2530,7 +2410,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:46:29.502Z"
+            "updatedAt": "2026-10-06T08:23:30.849Z"
           },
           {
             "itemId": 100028,
@@ -2545,7 +2425,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:46:04.226Z"
+            "updatedAt": "2026-10-06T08:33:42.121Z"
           },
           {
             "itemId": 100029,
@@ -2560,7 +2440,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:43:56.364Z"
+            "updatedAt": "2026-10-06T08:45:25.422Z"
           },
           {
             "itemId": 100030,
@@ -2572,10 +2452,10 @@
             "descriptionEnglish": "Waffles with maple syrup and butter.",
             "calories": 269,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:43:56.364Z"
+            "updatedAt": "2026-10-06T08:22:48.642Z"
           },
           {
             "itemId": 100594,
@@ -2590,7 +2470,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:14:15.362Z"
+            "updatedAt": "2026-10-06T08:34:10.593Z"
           },
           {
             "itemId": 101273,
@@ -2605,7 +2485,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T07:49:04.913Z"
+            "updatedAt": "2026-10-06T08:27:48.659Z"
           },
           {
             "itemId": 102135,
@@ -2620,7 +2500,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:24:58.386Z"
+            "updatedAt": "2026-10-06T08:38:54.422Z"
           },
           {
             "itemId": 102136,
@@ -2635,7 +2515,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:45:09.670Z"
+            "updatedAt": "2026-10-06T08:37:53.743Z"
           },
           {
             "itemId": 102389,
@@ -2650,7 +2530,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:41:00.300Z"
+            "updatedAt": "2026-10-06T08:38:55.491Z"
           },
           {
             "itemId": 102582,
@@ -2665,7 +2545,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:38:56.814Z"
+            "updatedAt": "2026-10-06T08:38:55.491Z"
           },
           {
             "itemId": 103445,
@@ -2680,7 +2560,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:26:49.544Z"
+            "updatedAt": "2026-10-06T08:01:17.512Z"
           },
           {
             "itemId": 104095,
@@ -2695,7 +2575,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:43:56.364Z"
+            "updatedAt": "2026-10-06T08:43:13.667Z"
           },
           {
             "itemId": 104098,
@@ -2710,37 +2590,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:42:34.418Z"
-          },
-          {
-            "itemId": 104196,
-            "nameArabic": "ساندويتش الدجاج بالبيض",
-            "nameEnglish": "Egg & Chicken Wrap",
-            "price": 10,
-            "itemImageUrl": "https://d15pngy0ricipl.cloudfront.net/1770528724841_w8yDU.webp",
-            "descriptionArabic": "ساندويتش دجاج مقرمش مع بيض وجبن.",
-            "descriptionEnglish": "Wrap with crispy breaded chicken, egg, and cheese.",
-            "calories": 711,
-            "isAvailable": true,
-            "isPublish": true,
-            "isHidden": false,
-            "status": "active",
-            "updatedAt": "2026-09-29T08:43:13.184Z"
-          },
-          {
-            "itemId": 104199,
-            "nameArabic": "وجبة ساندويتش الدجاج بالبيض",
-            "nameEnglish": "Egg & Chicken Wrap Meal",
-            "price": 14,
-            "itemImageUrl": "https://d15pngy0ricipl.cloudfront.net/1778392439680_KCnZA.webp",
-            "descriptionArabic": "ساندويتش دجاج مقرمش مع بيض وجبن، يُقدَّم مع قطعة هاش براون  واختيارك من القهوة أو عصير البرتقال.",
-            "descriptionEnglish": "Wrap with crispy breaded chicken, egg, and cheese, served with one hash brown and your choice of coffee or orange juice.",
-            "calories": 939,
-            "isAvailable": true,
-            "isPublish": true,
-            "isHidden": false,
-            "status": "active",
-            "updatedAt": "2026-09-29T08:44:41.346Z"
+            "updatedAt": "2026-10-06T08:44:30.012Z"
           }
         ]
       },
@@ -2763,7 +2613,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:51:14.525Z"
+            "updatedAt": "2026-10-06T10:53:16.186Z"
           },
           {
             "itemId": 102201,
@@ -2778,7 +2628,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:56:27.766Z"
+            "updatedAt": "2026-10-06T10:36:42.093Z"
           },
           {
             "itemId": 103044,
@@ -2793,7 +2643,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:01:42.261Z"
+            "updatedAt": "2026-10-06T11:01:48.156Z"
           },
           {
             "itemId": 103046,
@@ -2808,7 +2658,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:24:46.726Z"
+            "updatedAt": "2026-10-06T10:29:26.233Z"
           },
           {
             "itemId": 103059,
@@ -2823,7 +2673,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:57:51.375Z"
+            "updatedAt": "2026-10-06T10:59:16.165Z"
           },
           {
             "itemId": 103060,
@@ -2838,7 +2688,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:49:21.722Z"
+            "updatedAt": "2026-10-06T10:46:26.935Z"
           },
           {
             "itemId": 104185,
@@ -2853,7 +2703,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:01:26.271Z"
+            "updatedAt": "2026-10-06T10:59:24.490Z"
           },
           {
             "itemId": 104186,
@@ -2865,10 +2715,10 @@
             "descriptionEnglish": "Junior Burger made with a soft bun, crispy chicken patty, fresh lettuce, and creamy mayonnaise, served with fries and a soft drink.",
             "calories": 666,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:01:03.418Z"
+            "updatedAt": "2026-10-06T10:53:16.186Z"
           }
         ]
       },
@@ -2891,7 +2741,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:47:57.361Z"
+            "updatedAt": "2026-10-06T11:02:00.310Z"
           },
           {
             "itemId": 100902,
@@ -2906,22 +2756,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:02:49.821Z"
-          },
-          {
-            "itemId": 103773,
-            "nameArabic": "وجبة أطفال ستربس الدجاج",
-            "nameEnglish": "Kids Chicken Strips",
-            "price": 16,
-            "itemImageUrl": "https://d15pngy0ricipl.cloudfront.net/1747746444011_a2IGk.webp",
-            "descriptionArabic": "3 قطع ستريبس دجاج للأطفال مع بطاطس ومشروب غازي.",
-            "descriptionEnglish": "Kids chicken meal: contains 3 chicken strips with fries and a soft drink.",
-            "calories": 593,
-            "isAvailable": true,
-            "isPublish": true,
-            "isHidden": false,
-            "status": "active",
-            "updatedAt": "2026-09-29T11:52:24.008Z"
+            "updatedAt": "2026-10-06T11:01:56.770Z"
           },
           {
             "itemId": 104295,
@@ -2936,7 +2771,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:34:24.862Z"
+            "updatedAt": "2026-10-06T10:42:09.846Z"
           }
         ]
       },
@@ -2956,10 +2791,10 @@
             "descriptionEnglish": "Kudu Grilled Chicken Meal with crispy fries, vegetables, and Italian dressing.",
             "calories": 587,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:02:21.117Z"
+            "updatedAt": "2026-10-06T10:55:55.699Z"
           },
           {
             "itemId": 100032,
@@ -2974,7 +2809,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:32:11.360Z"
+            "updatedAt": "2026-10-06T10:48:13.340Z"
           },
           {
             "itemId": 100040,
@@ -2989,7 +2824,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:56:06.202Z"
+            "updatedAt": "2026-10-06T10:55:56.794Z"
           },
           {
             "itemId": 100409,
@@ -3001,10 +2836,10 @@
             "descriptionEnglish": "Diet Grilled Chicken Kudu Meal with lettuce, vegetables, Italian dressing, and croutons.",
             "calories": 333,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:53:41.483Z"
+            "updatedAt": "2026-10-06T10:53:13.621Z"
           },
           {
             "itemId": 103788,
@@ -3019,7 +2854,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:01:58.716Z"
+            "updatedAt": "2026-10-06T11:00:21.289Z"
           }
         ]
       },
@@ -3042,7 +2877,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:58:02.454Z"
+            "updatedAt": "2026-10-06T11:01:04.391Z"
           },
           {
             "itemId": 102600,
@@ -3057,7 +2892,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:46:32.255Z"
+            "updatedAt": "2026-10-06T09:36:12.217Z"
           },
           {
             "itemId": 102916,
@@ -3072,7 +2907,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:57:13.117Z"
+            "updatedAt": "2026-10-06T10:04:29.492Z"
           },
           {
             "itemId": 102918,
@@ -3087,7 +2922,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T07:42:21.648Z"
+            "updatedAt": "2026-10-06T08:37:33.413Z"
           },
           {
             "itemId": 102919,
@@ -3099,10 +2934,10 @@
             "descriptionEnglish": "Tortilla Sauce",
             "calories": 140,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:53:08.168Z"
+            "updatedAt": "2026-10-06T10:35:49.203Z"
           },
           {
             "itemId": 102979,
@@ -3117,7 +2952,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:54:46.345Z"
+            "updatedAt": "2026-10-06T10:53:59.728Z"
           },
           {
             "itemId": 103511,
@@ -3132,7 +2967,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:01:58.716Z"
+            "updatedAt": "2026-10-06T10:36:35.303Z"
           },
           {
             "itemId": 103513,
@@ -3147,7 +2982,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:08:06.247Z"
+            "updatedAt": "2026-10-06T09:31:02.315Z"
           }
         ]
       },
@@ -3170,7 +3005,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:54:37.771Z"
+            "updatedAt": "2026-10-06T11:00:54.710Z"
           },
           {
             "itemId": 100037,
@@ -3185,7 +3020,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:59:26.085Z"
+            "updatedAt": "2026-10-06T10:11:28.010Z"
           },
           {
             "itemId": 100039,
@@ -3200,7 +3035,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:56:20.531Z"
+            "updatedAt": "2026-10-06T10:31:48.622Z"
           },
           {
             "itemId": 100042,
@@ -3212,10 +3047,10 @@
             "descriptionEnglish": "3 nachos stuffed with cheese. Served with tortilla sauce.",
             "calories": 283,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:02:49.821Z"
+            "updatedAt": "2026-10-06T11:01:12.168Z"
           },
           {
             "itemId": 100110,
@@ -3230,7 +3065,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:01:34.681Z"
+            "updatedAt": "2026-10-06T10:56:26.782Z"
           },
           {
             "itemId": 100591,
@@ -3245,7 +3080,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:28:35.031Z"
+            "updatedAt": "2026-10-06T11:01:33.985Z"
           },
           {
             "itemId": 102023,
@@ -3260,7 +3095,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:53:29.250Z"
+            "updatedAt": "2026-10-06T11:00:21.415Z"
           },
           {
             "itemId": 102348,
@@ -3275,7 +3110,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:58:02.454Z"
+            "updatedAt": "2026-10-06T11:00:21.289Z"
           },
           {
             "itemId": 102568,
@@ -3290,22 +3125,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:34:13.547Z"
-          },
-          {
-            "itemId": 103012,
-            "nameArabic": "دجاج ستربس ديو",
-            "nameEnglish": "Chicken Strips Duo",
-            "price": 8,
-            "itemImageUrl": "https://d15pngy0ricipl.cloudfront.net/1747747419190_QjRq7.webp",
-            "descriptionArabic": "تلذذ بطعم الدجاج المقرمش مع قطعتين من دجاج ستربس الطري، يُقدم مع صوص المايونيز بالفلفل اللذيذ.",
-            "descriptionEnglish": "Savor the crispy goodness of 2 tender Chicken Strips, perfectly paired with flavorful pepper mayo sauce.",
-            "calories": 395,
-            "isAvailable": true,
-            "isPublish": true,
-            "isHidden": false,
-            "status": "active",
-            "updatedAt": "2026-09-29T12:02:18.447Z"
+            "updatedAt": "2026-10-06T11:01:33.985Z"
           },
           {
             "itemId": 104173,
@@ -3317,10 +3137,10 @@
             "descriptionEnglish": "Crunchy Sweet Chili nacho chips topped with a beef patty, cheddar cheese sauce, burrito sauce, jalape?os, and creamy guacamole.",
             "calories": 653,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:58:46.797Z"
+            "updatedAt": "2026-10-06T10:53:59.728Z"
           },
           {
             "itemId": 104176,
@@ -3332,10 +3152,10 @@
             "descriptionEnglish": "Crunchy Sweet Chili nacho chips topped with a beef patty, cheddar cheese sauce, burrito sauce, jalape?os, and creamy guacamole.",
             "calories": 1438,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:59:11.349Z"
+            "updatedAt": "2026-10-06T10:02:06.483Z"
           }
         ]
       },
@@ -3345,21 +3165,6 @@
         "titleEnglish": "Special Offers",
         "displayOrder": 39,
         "items": [
-          {
-            "itemId": 104274,
-            "nameArabic": "2 تورتيلا",
-            "nameEnglish": "2 TORTILLAS",
-            "price": 25,
-            "itemImageUrl": "https://d15pngy0ricipl.cloudfront.net/1785160093959_aDz9t.webp",
-            "descriptionArabic": "استمتع بـ 2 تورتيلا بسعر 25 ريال فقط. حصري عبر التطبيق (الاستلام).",
-            "descriptionEnglish": "Enjoy 2 Tortillas for only 25 SAR. App Exclusive (NHD).",
-            "calories": 1694,
-            "isAvailable": true,
-            "isPublish": true,
-            "isHidden": false,
-            "status": "active",
-            "updatedAt": "2026-09-29T12:00:51.942Z"
-          },
           {
             "itemId": 104277,
             "nameArabic": "بان كيك مع أمريكانوعادي",
@@ -3373,7 +3178,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:19:46.935Z"
+            "updatedAt": "2026-10-06T08:09:14.293Z"
           },
           {
             "itemId": 104326,
@@ -3385,10 +3190,10 @@
             "descriptionEnglish": "Korean Kick Combo with 6 chicken nuggets for an extra tasty bite.",
             "calories": 0,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:53:53.660Z"
+            "updatedAt": "2026-10-06T10:33:10.272Z"
           },
           {
             "itemId": 104327,
@@ -3400,10 +3205,10 @@
             "descriptionEnglish": "Legend Combo with 6 chicken nuggets for a complete, satisfying meal.",
             "calories": 0,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:59:11.349Z"
+            "updatedAt": "2026-10-06T10:58:38.140Z"
           },
           {
             "itemId": 104328,
@@ -3415,10 +3220,10 @@
             "descriptionEnglish": "A hearty Club Breakfast Combo for a delicious start to your day.",
             "calories": 0,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:54:41.694Z"
+            "updatedAt": "2026-10-06T10:59:57.791Z"
           }
         ]
       },
@@ -3438,10 +3243,10 @@
             "descriptionEnglish": "Orange juice with no added sugar.",
             "calories": 101,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:05:21.265Z"
+            "updatedAt": "2026-10-06T10:22:50.995Z"
           },
           {
             "itemId": 100376,
@@ -3453,10 +3258,10 @@
             "descriptionEnglish": "Apple juice with no added sugar.",
             "calories": 88,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-28T18:21:19.031Z"
+            "updatedAt": "2026-10-06T09:40:59.387Z"
           },
           {
             "itemId": 101872,
@@ -3471,7 +3276,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:54:54.689Z"
+            "updatedAt": "2026-10-06T10:50:29.378Z"
           },
           {
             "itemId": 101878,
@@ -3486,7 +3291,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T07:31:15.972Z"
+            "updatedAt": "2026-10-06T10:08:06.258Z"
           },
           {
             "itemId": 102845,
@@ -3501,7 +3306,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:23:31.863Z"
+            "updatedAt": "2026-10-06T10:47:17.300Z"
           },
           {
             "itemId": 102846,
@@ -3516,7 +3321,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:36:11.021Z"
+            "updatedAt": "2026-10-06T09:19:59.144Z"
           },
           {
             "itemId": 102847,
@@ -3531,7 +3336,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:54:54.689Z"
+            "updatedAt": "2026-10-06T10:25:22.490Z"
           },
           {
             "itemId": 102848,
@@ -3546,7 +3351,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:49:03.801Z"
+            "updatedAt": "2026-10-06T10:58:03.319Z"
           },
           {
             "itemId": 102849,
@@ -3561,7 +3366,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:31:02.841Z"
+            "updatedAt": "2026-10-06T10:40:57.809Z"
           },
           {
             "itemId": 102850,
@@ -3576,7 +3381,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:16:12.288Z"
+            "updatedAt": "2026-10-06T10:58:03.319Z"
           },
           {
             "itemId": 103200,
@@ -3591,7 +3396,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:30:28.677Z"
+            "updatedAt": "2026-10-06T10:47:21.486Z"
           },
           {
             "itemId": 103201,
@@ -3606,7 +3411,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:18:27.476Z"
+            "updatedAt": "2026-10-06T10:02:06.483Z"
           },
           {
             "itemId": 103202,
@@ -3621,7 +3426,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T09:39:57.512Z"
+            "updatedAt": "2026-10-06T08:21:42.550Z"
           },
           {
             "itemId": 103203,
@@ -3636,7 +3441,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:00:51.942Z"
+            "updatedAt": "2026-10-06T10:10:45.698Z"
           },
           {
             "itemId": 103204,
@@ -3651,7 +3456,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:48:22.515Z"
+            "updatedAt": "2026-10-06T10:41:43.642Z"
           },
           {
             "itemId": 103235,
@@ -3666,7 +3471,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:54:35.636Z"
+            "updatedAt": "2026-10-06T11:01:12.168Z"
           },
           {
             "itemId": 103240,
@@ -3681,7 +3486,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:59:48.544Z"
+            "updatedAt": "2026-10-06T11:00:26.671Z"
           },
           {
             "itemId": 103241,
@@ -3696,7 +3501,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:31:02.841Z"
+            "updatedAt": "2026-10-06T10:20:14.241Z"
           },
           {
             "itemId": 103246,
@@ -3711,7 +3516,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T08:34:43.343Z"
+            "updatedAt": "2026-10-06T10:47:09.010Z"
           },
           {
             "itemId": 103251,
@@ -3726,7 +3531,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-28T18:30:45.287Z"
+            "updatedAt": "2026-10-05T14:36:02.915Z"
           },
           {
             "itemId": 103736,
@@ -3741,7 +3546,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:56:20.531Z"
+            "updatedAt": "2026-10-06T09:57:11.642Z"
           },
           {
             "itemId": 103997,
@@ -3756,7 +3561,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:56:38.074Z"
+            "updatedAt": "2026-10-06T10:11:07.082Z"
           },
           {
             "itemId": 104234,
@@ -3771,7 +3576,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:45:47.668Z"
+            "updatedAt": "2026-10-06T10:38:54.570Z"
           }
         ]
       },
@@ -3791,25 +3596,10 @@
             "descriptionEnglish": "12 nachos topped with melted cheese, served with dynamite, and Kudu special sauces.",
             "calories": 1900,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T10:54:22.063Z"
-          },
-          {
-            "itemId": 103689,
-            "nameArabic": "سطل ستريبس دجاج",
-            "nameEnglish": "Chicken Strips Bucket",
-            "price": 45,
-            "itemImageUrl": "https://d15pngy0ricipl.cloudfront.net/1747746687598_0qtLU.webp",
-            "descriptionArabic": "10 قطع ستريبس دجاج مقرمشة مع تشكيلة صوصات",
-            "descriptionEnglish": "10pcs. chicken strips and assorted sauces.",
-            "calories": 1656,
-            "isAvailable": true,
-            "isPublish": true,
-            "isHidden": false,
-            "status": "active",
-            "updatedAt": "2026-09-29T11:11:19.260Z"
+            "updatedAt": "2026-10-05T19:15:48.769Z"
           },
           {
             "itemId": 103709,
@@ -3824,7 +3614,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:24:24.461Z"
+            "updatedAt": "2026-10-06T10:34:12.859Z"
           },
           {
             "itemId": 104143,
@@ -3839,7 +3629,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T12:01:49.770Z"
+            "updatedAt": "2026-10-06T10:42:32.203Z"
           }
         ]
       },
@@ -3862,7 +3652,7 @@
             "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:53:10.641Z"
+            "updatedAt": "2026-10-06T10:53:13.207Z"
           },
           {
             "itemId": 103855,
@@ -3877,7 +3667,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:49:49.306Z"
+            "updatedAt": "2026-10-06T10:42:42.892Z"
           },
           {
             "itemId": 104193,
@@ -3892,7 +3682,7 @@
             "isPublish": true,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:58:51.685Z"
+            "updatedAt": "2026-10-06T10:58:03.500Z"
           }
         ]
       },
@@ -3919,10 +3709,10 @@
             "descriptionEnglish": "Crispy chicken with bold Korean inspired sauce, cheese, fresh lettuce, tomato, served on a soft potato bun.",
             "calories": 937,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:13:19.012Z"
+            "updatedAt": "2026-10-06T09:49:19.727Z"
           },
           {
             "itemId": 104281,
@@ -3934,10 +3724,10 @@
             "descriptionEnglish": "Crispy chicken with bold Korean inspired sauce, cheese, fresh lettuce, tomato, served on soft potato bun with fries and drink.",
             "calories": 1328,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:58:46.797Z"
+            "updatedAt": "2026-10-06T10:52:06.085Z"
           },
           {
             "itemId": 104284,
@@ -3949,10 +3739,10 @@
             "descriptionEnglish": "Crispy chicken with our famous KUDU sauce, cheese, fresh lettuce, tomato, served on a soft potato bun.",
             "calories": 1191,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:31:12.089Z"
+            "updatedAt": "2026-10-06T10:50:41.207Z"
           },
           {
             "itemId": 104287,
@@ -3964,10 +3754,10 @@
             "descriptionEnglish": "Crispy chicken with our famous KUDU sauce, cheese, fresh lettuce, tomato, served on soft potato bun with fries and drink.",
             "calories": 1582,
             "isAvailable": true,
-            "isPublish": true,
+            "isPublish": false,
             "isHidden": false,
             "status": "active",
-            "updatedAt": "2026-09-29T11:58:46.797Z"
+            "updatedAt": "2026-10-06T10:47:22.076Z"
           }
         ]
       }

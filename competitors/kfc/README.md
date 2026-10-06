@@ -10,17 +10,14 @@ public menu, prices, and offers for **one fixed branch in Riyadh**, once a
 day, for **Pickup** and **Delivery** kept completely separate. It detects
 new products, new offers, price changes, offer changes, removed/returned
 products, and ended/returned offers between successful runs, shows the
-result in a local Streamlit dashboard, and exports daily/monthly/catalog
+result in a local former dashboard dashboard, and exports daily/monthly/catalog
 Excel reports.
 
 It is a monitoring tool only: no login, no OTP, no payment, no order is
 ever placed - see [Security & compliance](#security--compliance).
 
-> **Isolation:** this folder never imports from `competitors/hardees/`,
-> `competitors/mcdonalds/`, or any other competitor, and nothing outside
-> `competitors/kfc/` imports its internals except `pages/1_KFC.py` at the
-> repo root, which only calls `render()` - see [Streamlit
-> dashboard](#streamlit-dashboard) below.
+> **Application UI:** This collector exposes data through the shared BFF adapter
+> and React application. Reusable collector infrastructure lives in `competitors/shared/`.
 
 ## Table of contents
 
@@ -33,7 +30,6 @@ ever placed - see [Security & compliance](#security--compliance).
 - [Database](#database)
 - [Change Detection Engine](#change-detection-engine)
 - [Excel exports](#excel-exports)
-- [Streamlit dashboard](#streamlit-dashboard)
 - [Screenshots](#screenshots)
 - [Testing](#testing)
 - [Security & compliance](#security--compliance)
@@ -51,13 +47,12 @@ API First
                                                    only for NEW_PRODUCT / NEW_OFFER)
   -> SQLite                                      (backend/database.py)
   -> Change Detection Engine                     (backend/change_detector.py)
-  -> Streamlit Dashboard                         (dashboard/page.py, rendered by
-                                                   the repo-root pages/1_KFC.py)
+  -> React/FastAPI Application                    (adapters + BFF + frontend)
   -> Excel Export                                (backend/excel_exporter.py)
 ```
 
 **Node.js** owns API bootstrap, public API collection, and Playwright
-screenshots. **Python** owns SQLite, change detection, the dashboard,
+screenshots. **Python** owns SQLite, change detection, BFF integration,
 Excel export, and the scheduler. `backend/run_service.py` is the only
 bridge between them - it invokes `collector/collect.js` and
 `collector/screenshot-capture.js` as subprocesses and reads back the JSON
@@ -115,9 +110,6 @@ competitors/kfc/
 │   ├── schema_validator.py       Python-side response-shape validation
 │   ├── run_service.py            Orchestration: lock, subprocess calls, ingestion
 │   └── excel_exporter.py         Daily / Monthly / Catalog workbooks
-├── dashboard/
-│   ├── __init__.py
-│   └── page.py                   render() - the Streamlit UI; see "Streamlit dashboard"
 ├── research/
 │   └── api-map/
 │       ├── api-map.json          Machine-readable endpoint reference
@@ -158,9 +150,6 @@ python run_kfc_scheduler.py
 python -m competitors.kfc.run_collector --channel=BOTH
 python -m competitors.kfc.scheduler
 
-# Dashboard - the root Streamlit app, then open the "KFC" page from the
-# sidebar (or it's pages/1_KFC.py directly):
-streamlit run app.py
 ```
 
 ### HungerStation mobile channel
@@ -375,27 +364,9 @@ if a product has no size variant, those columns are left blank rather than
 guessed, and the full, unguessed value stays visible in the corresponding
 Normalized worksheet.
 
-## Streamlit dashboard
+## React application
 
-```bash
-streamlit run app.py     # from the repo root - see root README.md
-```
-
-then open the **KFC** page from the sidebar (`pages/1_KFC.py`, which is a
-two-line wrapper: `from competitors.kfc.dashboard.page import render;
-render()` - the dashboard code itself lives entirely in
-`dashboard/page.py` and is never duplicated in `pages/`).
-
-Local only, no login (`st.set_page_config(page_title="KFC Price
-Intelligence", layout="wide")`, called inside `render()`). Top section
-shows branch, last successful run, next scheduled run, and per-channel
-status; buttons for Run Now / Refresh / Export Daily Excel / Export
-Monthly Excel; summary cards for New Products / New Offers / Price
-Increases / Price Decreases / Offers Ended / Not Observed; tabs for
-Overview, Pickup Products, Pickup Offers, Delivery Products, Delivery
-Offers, Daily Changes, Monthly Comparison, Price History, and Run Logs;
-sidebar filters for Date / Channel / Category / Status / Event Type /
-Product Name / Offers Only.
+The shared React/FastAPI application is the only UI. This collector is exposed through its adapter and can be started from Market Overview or from the collector CLI.
 
 ## Screenshots
 

@@ -10,17 +10,14 @@ A local system that monitors Burger King Saudi's
 and offers for **one fixed branch in Riyadh**, once a day, for **Pickup**
 and **Delivery** kept completely separate. It detects new products, price
 changes, removed/returned products between successful runs, shows the
-result in a local Streamlit dashboard, and exports daily/monthly/catalog
+result in a local former dashboard dashboard, and exports daily/monthly/catalog
 Excel reports.
 
 It is a monitoring tool only: no login, no OTP, no payment, no order is
 ever placed - see [Security & compliance](#security--compliance).
 
-> **Isolation:** this folder never imports from `competitors/kfc/`,
-> `competitors/mcdonalds/`, or any other competitor, and nothing outside
-> `competitors/burger_king/` imports its internals except
-> `pages/4_Burger_King.py` at the repo root, which only calls `render()` -
-> see [Streamlit dashboard](#streamlit-dashboard) below.
+> **Application UI:** This collector exposes data through the shared BFF adapter
+> and React application. Reusable collector infrastructure lives in `competitors/shared/`.
 
 ## Table of contents
 
@@ -33,7 +30,6 @@ ever placed - see [Security & compliance](#security--compliance).
 - [Database](#database)
 - [Change Detection Engine](#change-detection-engine)
 - [Excel exports](#excel-exports)
-- [Streamlit dashboard](#streamlit-dashboard)
 - [Screenshots](#screenshots)
 - [Testing](#testing)
 - [Security & compliance](#security--compliance)
@@ -52,8 +48,7 @@ API First (fully public, no auth, no session bootstrap needed at all)
                                                     only for NEW_PRODUCT events)
   -> SQLite                                       (backend/database.py)
   -> Change Detection Engine                      (backend/change_detector.py)
-  -> Streamlit Dashboard                          (dashboard/page.py, rendered by
-                                                    the repo-root pages/4_Burger_King.py)
+  -> React/FastAPI Application                    (adapters + BFF + frontend)
   -> Excel Export                                 (backend/excel_exporter.py)
 ```
 
@@ -127,9 +122,6 @@ competitors/burger_king/
 │   ├── schema_validator.py       Python-side response-shape validation
 │   ├── run_service.py            Orchestration: lock, subprocess calls, ingestion
 │   └── excel_exporter.py         Daily / Monthly / Catalog workbooks
-├── dashboard/
-│   ├── __init__.py
-│   └── page.py                   render() - the Streamlit UI; see "Streamlit dashboard"
 ├── research/
 │   └── api-map/
 │       ├── api-map.json          Machine-readable endpoint reference
@@ -167,9 +159,6 @@ python run_burger_king_scheduler.py
 python -m competitors.burger_king.run_collector --channel=BOTH
 python -m competitors.burger_king.scheduler
 
-# Dashboard - the root Streamlit app, then open the "Burger King" page from
-# the sidebar (or it's pages/4_Burger_King.py directly):
-streamlit run app.py
 ```
 
 The Node collector itself has no such restriction (it's invoked as a
@@ -354,29 +343,9 @@ a multi-option size-variant list like KFC's), so in practice one size
 column is filled in per product and the other two are left blank rather
 than guessed.
 
-## Streamlit dashboard
+## React application
 
-```bash
-streamlit run app.py     # from the repo root - see root README.md
-```
-
-then open the **Burger King** page from the sidebar
-(`pages/4_Burger_King.py`, a two-line wrapper: `from
-competitors.burger_king.dashboard.page import render; render()` - the
-dashboard code itself lives entirely in `dashboard/page.py` and is never
-duplicated in `pages/`).
-
-Local only, no login. Top section shows branch, last successful run, next
-scheduled run, and per-channel status; buttons for Run Now / Refresh /
-Export Daily Excel / Export Monthly Excel; summary cards for New Products
-/ New Offers / Price Increases / Price Decreases / Offers Ended / Not
-Observed (New Offers / Offers Ended reflect "KING DAILY DEALS" combo
-churn - see Known limitations for what's still never populated: Special
-Price and any "before" price on an offer); tabs for Overview, Pickup
-Products, Delivery Products, Pickup Offers, Delivery Offers, Pickup vs
-Delivery, Changes, and History/Logs (Price History / Run Logs / Monthly
-Comparison); sidebar filters for Category / Name-or-description / Offers
-Only / Channel / Status / Event Type / Date.
+The shared React/FastAPI application is the only UI. This collector is exposed through its adapter and can be started from Market Overview or from the collector CLI.
 
 ## Screenshots
 

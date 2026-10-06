@@ -11,17 +11,14 @@ A local system that monitors Herfy's
 offers for **one fixed branch in Riyadh**, once a day, for **Pickup** and
 **Delivery** kept completely separate. It detects new products, new
 offers, price changes, removed/returned products, offer lifecycle changes
-between successful runs, shows the result in a local Streamlit dashboard,
+between successful runs, serves the result through the React/FastAPI application,
 and exports daily/monthly/catalog Excel reports.
 
 It is a monitoring tool only: no login, no OTP, no payment, no order is
 ever placed - see [Security & compliance](#security--compliance).
 
-> **Isolation:** this folder never imports from `competitors/kfc/`,
-> `competitors/burger_king/`, or any other competitor, and nothing outside
-> `competitors/herfy/` imports its internals except
-> `pages/5_Herfy.py` at the repo root, which only calls `render()` - see
-> [Streamlit dashboard](#streamlit-dashboard) below.
+> **Application UI:** This collector exposes data through the shared BFF adapter
+> and React application. Reusable collector infrastructure lives in `competitors/shared/`.
 
 ## Table of contents
 
@@ -34,7 +31,6 @@ ever placed - see [Security & compliance](#security--compliance).
 - [Database](#database)
 - [Change Detection Engine](#change-detection-engine)
 - [Excel exports](#excel-exports)
-- [Streamlit dashboard](#streamlit-dashboard)
 - [Screenshots](#screenshots)
 - [Testing](#testing)
 - [Security & compliance](#security--compliance)
@@ -50,8 +46,7 @@ API First (fully public REST + a static CDN JSON, no login/session needed)
   -> Playwright Screenshot Capture (NEW_PRODUCT/NEW_OFFER only)      (collector/screenshot-capture.js)
   -> SQLite                                                          (backend/database.py)
   -> Change Detection Engine                                         (backend/change_detector.py)
-  -> Streamlit Dashboard (dashboard/page.py, rendered by the
-     repo-root pages/5_Herfy.py)
+  -> React/FastAPI Application                    (adapters + BFF + frontend)
   -> Excel Export                                                    (backend/excel_exporter.py)
 ```
 
@@ -117,9 +112,6 @@ competitors/herfy/
 │   ├── schema_validator.py       Python-side response-shape validation
 │   ├── run_service.py            Orchestration: lock, subprocess calls, ingestion
 │   └── excel_exporter.py         Daily / Monthly / Catalog workbooks
-├── dashboard/
-│   ├── __init__.py
-│   └── page.py                   render() - the Streamlit UI; see "Streamlit dashboard"
 ├── research/
 │   └── api-map/
 │       ├── api-map.json          Machine-readable endpoint reference
@@ -157,9 +149,6 @@ python run_herfy_scheduler.py
 python -m competitors.herfy.run_collector --channel=BOTH
 python -m competitors.herfy.scheduler
 
-# Dashboard - the root Streamlit app, then open the "Herfy" page from
-# the sidebar (or it's pages/5_Herfy.py directly):
-streamlit run app.py
 ```
 
 The Node collector itself has no such restriction (it's invoked as a
@@ -336,26 +325,9 @@ Medium=32, Large=34 SAR, confirmed live) - the best size-price coverage
 of any competitor in this repo so far; a product with no confirmed
 "Sizes" option group leaves every size column blank rather than guessed.
 
-## Streamlit dashboard
+## React application
 
-```bash
-streamlit run app.py     # from the repo root - see root README.md
-```
-
-then open the **Herfy** page from the sidebar (`pages/5_Herfy.py`, a
-two-line wrapper: `from competitors.herfy.dashboard.page import render;
-render()` - the dashboard code itself lives entirely in
-`dashboard/page.py` and is never duplicated in `pages/`).
-
-Local only, no login. Top section shows branch, last successful run, next
-scheduled run, and per-channel status; buttons for Run Now / Refresh /
-Export Daily Excel / Export Monthly Excel; summary cards for New Products
-/ New Offers / Price Increases / Price Decreases / Offers Ended / Not
-Observed; tabs for Overview, Pickup Products, Delivery Products, Pickup
-Offers, Delivery Offers, Pickup vs Delivery, Changes, and History/Logs
-(Price History / Run Logs / Monthly Comparison); sidebar filters for
-Category / Name-or-description / Offers Only / Channel / Status / Event
-Type / Date.
+The shared React/FastAPI application is the only UI. This collector is exposed through its adapter and can be started from Market Overview or from the collector CLI.
 
 ## Screenshots
 
