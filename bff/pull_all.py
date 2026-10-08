@@ -193,6 +193,23 @@ class PullManager:
                 if confirmed == "success":
                     count = int(match.group(2))
                     return "success", f"Collected {count} products from HungerStation."
+                failure = re.search(
+                    rf"^HUNGERSTATION_ERROR brand={re.escape(target.id)} "
+                    r"code=([A-Z0-9_]+) message=(.+)$",
+                    output_text,
+                    re.MULTILINE,
+                )
+                if failure:
+                    code, message = failure.groups()
+                    last_failure = (
+                        f"{message.strip()} Error code: {code}. "
+                        "Previous complete data kept."
+                    )
+                else:
+                    last_failure = (
+                        "HungerStation collection failed without a structured reason. "
+                        "Check the saved collection log; previous complete data kept."
+                    )
             elif target.id == "kudu":
                 confirmed = "success" if "KUDU catalog updated:" in output_text else None
             else:
@@ -207,7 +224,7 @@ class PullManager:
                 last_failure = best_partial
             elif result.returncode == 0 and confirmed is None:
                 last_failure = "Collector exited without confirming completion."
-            else:
+            elif target.args[:3] != ("manage.py", "collect", "hungerstation"):
                 last_failure = f"Collector failed (exit {result.returncode}); previous complete data kept."
             if attempt + 1 < attempts:
                 time.sleep(8)

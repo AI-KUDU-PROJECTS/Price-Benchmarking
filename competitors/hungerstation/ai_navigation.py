@@ -20,6 +20,18 @@ from competitors.hungerstation import config
 
 ANTHROPIC_MESSAGES_URL = "https://api.anthropic.com/v1/messages"
 ANTHROPIC_VERSION = "2023-06-01"
+BLOCKER_CODES = (
+    "LOGIN_REQUIRED",
+    "VERIFICATION_REQUIRED",
+    "UPDATE_REQUIRED",
+    "LOCATION_BLOCKED",
+    "PERMISSION_REQUIRED",
+    "NETWORK_ERROR",
+    "RESTAURANT_UNAVAILABLE",
+    "APP_ERROR",
+    "UNKNOWN_SCREEN",
+    "NO_SAFE_ACTION",
+)
 
 
 @dataclass(frozen=True)
@@ -127,13 +139,32 @@ def _tools(width: int, height: int) -> list[dict[str, Any]]:
             "description": "Restart HungerStation only when it is crashed, blank, or stuck outside the app.",
             "input_schema": {"type": "object", "properties": {}, "additionalProperties": False},
         },
+        {
+            "name": "report_blocker",
+            "description": (
+                "Stop and report a clearly visible blocker only when no provided safe action can "
+                "advance the collector. Describe the concrete screen evidence, not a guess."
+            ),
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "code": {"type": "string", "enum": list(BLOCKER_CODES)},
+                    "detail": {"type": "string", "minLength": 1, "maxLength": 240},
+                },
+                "required": ["code", "detail"],
+                "additionalProperties": False,
+            },
+        },
     ]
 
 
 def _validated_action(block: dict[str, Any], width: int, height: int) -> NavigationAction | None:
     name = block.get("name")
     arguments = block.get("input")
-    if name not in {"tap", "search_restaurant", "swipe", "back", "wait", "restart_app"}:
+    if name not in {
+        "tap", "search_restaurant", "swipe", "back", "wait", "restart_app",
+        "report_blocker",
+    }:
         return None
     if not isinstance(arguments, dict):
         return None
@@ -149,6 +180,15 @@ def _validated_action(block: dict[str, Any], width: int, height: int) -> Navigat
         if direction not in {"up", "down"}:
             return None
         return NavigationAction(name, {"direction": direction})
+    if name == "report_blocker":
+        code = arguments.get("code")
+        detail = arguments.get("detail")
+        if code not in BLOCKER_CODES or not isinstance(detail, str):
+            return None
+        detail = " ".join(detail.split())[:240]
+        if not detail:
+            return None
+        return NavigationAction(name, {"code": code, "detail": detail})
     return NavigationAction(name, {})
 
 
@@ -192,7 +232,11 @@ class AnthropicNavigator:
             "order, alter an account, sign out, or interact with payment controls. Prefer visible "
             "labelled controls. Use wait for active loading, back for a wrong screen or modal, and "
             "restart_app only for a blank, crashed, or clearly stuck app. Do not extract or invent "
-            "menu data or prices."
+            "menu data or prices. The action history includes changed/no_change outcomes. Never "
+            "repeat an action marked no_change on the same screen; choose a different safe action "
+            "or wait only when a loading indicator is visibly active. Use report_blocker only for "
+            "a concrete visible blocker that the safe actions cannot resolve, and cite what is "
+            "visible on the screen in its detail."
         )
         task = (
             f"Target restaurant: {restaurant_name}\n"

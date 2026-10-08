@@ -190,3 +190,8 @@
 .pull-panel > .meta-text {
   margin: var(--kudu-space-2) 0 var(--kudu-space-3);
 }
+
+.collection-result {
+  min-width: 18rem;
+  white-space: normal;
+}

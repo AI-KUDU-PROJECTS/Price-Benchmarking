@@ -159,7 +159,7 @@ export function MarketOverviewPage() {
           </div>
           <p className="meta-text">Started {formatRiyadhDateTime(hungerstationRun.startedAt)} · Finished {formatRiyadhDateTime(hungerstationRun.completedAt)}</p>
           <DataTable caption="HungerStation collection status by restaurant">
-            <thead><tr><th>Restaurant</th><th>Status</th><th>Started</th><th>Finished</th><th>Result</th></tr></thead>
+            <thead><tr><th>Restaurant</th><th>Status</th><th>Started</th><th>Finished</th><th>Result / failure reason</th></tr></thead>
             <tbody>
               {hungerstationRun.brands.map((brand) => (
                 <tr key={brand.id}>
@@ -167,7 +167,7 @@ export function MarketOverviewPage() {
                   <td><Badge value={brand.status} /></td>
                   <td className="nowrap">{formatRiyadhDateTime(brand.startedAt)}</td>
                   <td className="nowrap">{formatRiyadhDateTime(brand.completedAt)}</td>
-                  <td>{brand.message || "—"}</td>
+                  <td className="collection-result" aria-live="polite">{brand.message || "—"}</td>
                 </tr>
               ))}
             </tbody>

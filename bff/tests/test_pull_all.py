@@ -167,6 +167,25 @@ def test_partial_collection_retries_and_can_recover(tmp_path, monkeypatch) -> No
     assert len(calls) == 2
 
 
+def test_hungerstation_failure_reason_reaches_pull_status(tmp_path, monkeypatch) -> None:
+    def fake_run(*args, **kwargs):
+        kwargs["stdout"].write(
+            "HUNGERSTATION_RESULT brand=kfc status=FAILED products=0\n"
+            "HUNGERSTATION_ERROR brand=kfc code=AI_UPDATE_REQUIRED "
+            "message=Sonnet identified a blocking Update now screen.\n"
+        )
+        return SimpleNamespace(returncode=1)
+
+    monkeypatch.setattr(pull_all, "LOG_DIR", tmp_path)
+    monkeypatch.setattr(pull_all.subprocess, "run", fake_run)
+    monkeypatch.setattr(pull_all.time, "sleep", lambda seconds: None)
+    status, message = PullManager._run_subprocess(HUNGERSTATION_TARGETS[0], "hs-failure")
+    assert status == "failed"
+    assert "blocking Update now screen" in message
+    assert "Error code: AI_UPDATE_REQUIRED" in message
+    assert "Previous complete data kept" in message
+
+
 def test_server_restart_marks_unfinished_run_and_keeps_completed_source(tmp_path) -> None:
     path = tmp_path / "latest.json"
     targets = (PullTarget("kudu", "KUDU", ()), PullTarget("kfc", "KFC", ()))

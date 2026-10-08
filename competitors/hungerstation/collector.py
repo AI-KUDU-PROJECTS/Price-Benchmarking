@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import io
 import json
 import os
@@ -25,6 +26,15 @@ from competitors.hungerstation.uploader import upload
 PACKAGE = "com.hungerstation.android.web"
 MAIN_ACTIVITY = f"{PACKAGE}/.hungeractivities.MainActivity"
 CURRENCY_LABELS = {"§", "SAR", "ر.س"}
+
+
+class CollectionFailure(RuntimeError):
+    """A stable machine code plus a safe, user-facing failure explanation."""
+
+    def __init__(self, code: str, message: str) -> None:
+        self.code = code
+        self.user_message = " ".join(message.split())[:500]
+        super().__init__(self.user_message)
 
 
 def utc_now() -> str:
@@ -58,11 +68,11 @@ class AndroidDevice:
     def __init__(self, adb: Path, serial: str) -> None:
         self.adb = adb
         self.serial = serial
+        self._screen_size: tuple[int, int] | None = None
 
-    def run(self, *args: str) -> str:
+    def run(self, *args: str, attempts: int = 3) -> str:
         last_error: subprocess.SubprocessError | None = None
-        max_attempts = 6
-        for attempt in range(max_attempts):
+        for attempt in range(max(1, attempts)):
             try:
                 completed = subprocess.run(
                     [str(self.adb), "-s", self.serial, *args],
@@ -80,9 +90,42 @@ class AndroidDevice:
         assert last_error is not None
         raise last_error
 
-    def run_bytes(self, *args: str) -> bytes:
+    def wait_until_ready(self) -> None:
+        """Fail early when ADB is connected but Android has not finished booting."""
+        last_state = "unknown"
+        for attempt in range(12):
+            try:
+                last_state = self.run("get-state", attempts=1).strip()
+                booted = self.run(
+                    "shell", "getprop", "sys.boot_completed", attempts=1
+                ).strip()
+                if last_state == "device" and booted == "1":
+                    return
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as error:
+                stderr = getattr(error, "stderr", "") or ""
+                last_state = stderr.strip() or type(error).__name__
+            time.sleep(min(0.5 * (attempt + 1), 2.0))
+        raise RuntimeError(
+            f"Android emulator {self.serial} is not ready (last state: {last_state})."
+        )
+
+    def screen_size(self) -> tuple[int, int]:
+        """Return the current device dimensions instead of assuming 1080x2400."""
+        if self._screen_size is not None:
+            return self._screen_size
+        output = self.run("shell", "wm", "size")
+        matches = re.findall(r"(?:Physical|Override) size:\s*(\d+)x(\d+)", output)
+        if matches:
+            width, height = map(int, matches[-1])
+        else:
+            with Image.open(io.BytesIO(self.screenshot())) as opened:
+                width, height = opened.size
+        self._screen_size = (width, height)
+        return self._screen_size
+
+    def run_bytes(self, *args: str, attempts: int = 3) -> bytes:
         last_error: subprocess.SubprocessError | None = None
-        for attempt in range(3):
+        for attempt in range(max(1, attempts)):
             try:
                 completed = subprocess.run(
                     [str(self.adb), "-s", self.serial, *args],
@@ -173,22 +216,26 @@ class AndroidDevice:
         return False
 
     def start_app(self) -> None:
+        self.wait_until_ready()
         if self.serial.startswith("emulator-"):
             try:
                 self.run(
                     "shell", "appops", "set", "io.appium.settings",
                     "android:mock_location", "allow",
+                    attempts=1,
                 )
                 self.run(
                     "shell", "am", "start-foreground-service",
                     "-n", "io.appium.settings/.LocationService",
                     "--es", "longitude", str(config.LONGITUDE),
                     "--es", "latitude", str(config.LATITUDE),
+                    attempts=1,
                 )
-            except subprocess.CalledProcessError:
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
                 self.run(
                     "emu", "geo", "fix",
                     str(config.LONGITUDE), str(config.LATITUDE),
+                    attempts=2,
                 )
             time.sleep(0.5)
         self.run("shell", "am", "force-stop", PACKAGE)
@@ -225,6 +272,20 @@ def _find_search_input(xml: str) -> tuple[int, int] | None:
             box = _bounds(node.attrib.get("bounds", ""))
             if box:
                 return ((box[0] + box[2]) // 2, (box[1] + box[3]) // 2)
+    return None
+
+
+def _find_menu_search_close(xml: str) -> tuple[int, int] | None:
+    """Find the close control for the restaurant menu's internal search overlay."""
+    if "menuSearchInput" not in xml:
+        return None
+    root = ET.fromstring(xml)
+    for node in root.iter("node"):
+        if node.attrib.get("resource-id") != "menuSearchCloseButton":
+            continue
+        box = _bounds(node.attrib.get("bounds", ""))
+        if box:
+            return ((box[0] + box[2]) // 2, (box[1] + box[3]) // 2)
     return None
 
 
@@ -408,18 +469,17 @@ def _is_restaurant_menu(xml: str, restaurant: Restaurant) -> bool:
         is not None
         for node in root.iter("node")
     )
-    return (
-        "android.widget.ScrollView" in xml
-        and matches_brand
-        and ("Min. Order" in xml or has_product)
-    )
+    # Flutter has changed the root scrollable class between releases. Product
+    # evidence plus the target brand in the header is a stronger invariant
+    # than a particular Android widget implementation.
+    return matches_brand and ("Min. Order" in xml or has_product)
 
 
 def _is_active_menu_page(xml: str, brand_id: str) -> bool:
-    if PACKAGE not in xml or "android.widget.ScrollView" not in xml:
+    if PACKAGE not in xml:
         return False
     root = ET.fromstring(xml)
-    return "Min. Order" in xml or bool(parse_split_accessibility_products(xml, brand_id)) or any(
+    has_product = bool(parse_split_accessibility_products(xml, brand_id)) or any(
         parse_accessibility_label(
             node.attrib.get("content-desc", ""),
             brand_id,
@@ -427,6 +487,9 @@ def _is_active_menu_page(xml: str, brand_id: str) -> bool:
         )
         is not None
         for node in root.iter("node")
+    )
+    return has_product or (
+        "Min. Order" in xml and "android.widget.ScrollView" in xml
     )
 
 
@@ -499,6 +562,26 @@ def _apply_ai_action(
         device.start_app()
 
 
+def _ui_signature(xml: str) -> str:
+    """Stable-enough fingerprint used to tell Claude whether an action worked."""
+    if not xml:
+        return "unavailable"
+    evidence = re.sub(r'\b(?:bounds|index)="[^"]*"', "", xml)
+    return hashlib.sha256(evidence.encode("utf-8", errors="replace")).hexdigest()[:12]
+
+
+def _is_black_screen(screenshot: bytes) -> bool:
+    """Detect the unusable Flutter black frame seen when rendering stalls."""
+    with Image.open(io.BytesIO(screenshot)) as opened:
+        grayscale = opened.convert("L")
+        grayscale.thumbnail((90, 200))
+        pixels = list(grayscale.getdata())
+    if not pixels:
+        return False
+    dark_ratio = sum(value < 18 for value in pixels) / len(pixels)
+    return dark_ratio >= 0.90
+
+
 def _ai_recover(
     device: AndroidDevice,
     restaurant: Restaurant,
@@ -507,7 +590,7 @@ def _ai_recover(
     ready: Callable[[str], bool],
     initial_xml: str = "",
 ) -> str | None:
-    """Use bounded vision actions only after deterministic navigation fails."""
+    """Use bounded vision actions and report the outcome of every action."""
     if not config.AI_NAVIGATION_ENABLED:
         return None
     navigator = AnthropicNavigator()
@@ -516,9 +599,24 @@ def _ai_recover(
 
     xml = initial_xml
     action_history: list[str] = []
+    unchanged_actions: dict[tuple[str, str], int] = {}
+    black_screen_recoveries = 0
     for _ in range(config.AI_MAX_ACTIONS):
         if xml and ready(xml):
             return xml
+        menu_search_close = _find_menu_search_close(xml) if xml else None
+        if menu_search_close is not None:
+            print(
+                f"HUNGERSTATION_ANDROID_RECOVERY phase={phase} "
+                "reason=menu-search-overlay action=close"
+            )
+            device.tap(*menu_search_close)
+            action_history.append("system_close_menu_search")
+            try:
+                xml = device.dump()
+            except RuntimeError:
+                xml = ""
+            continue
         if device.has_app_error():
             print(
                 f"HUNGERSTATION_ANDROID_RECOVERY phase={phase} "
@@ -533,6 +631,33 @@ def _ai_recover(
             continue
         try:
             screenshot = device.screenshot()
+            if _is_black_screen(screenshot):
+                black_screen_recoveries += 1
+                if black_screen_recoveries == 1:
+                    print(
+                        f"HUNGERSTATION_ANDROID_RECOVERY phase={phase} "
+                        "reason=black-screen action=back"
+                    )
+                    device.key("4")
+                    action_history.append("system_back:black_screen")
+                elif black_screen_recoveries == 2:
+                    print(
+                        f"HUNGERSTATION_ANDROID_RECOVERY phase={phase} "
+                        "reason=black-screen action=restart-app"
+                    )
+                    device.start_app()
+                    action_history.append("system_restart_app:black_screen")
+                else:
+                    raise CollectionFailure(
+                        "APP_BLACK_SCREEN",
+                        f"HungerStation stayed on a black screen during {phase} after "
+                        "closing the keyboard and restarting the app.",
+                    )
+                try:
+                    xml = device.dump()
+                except RuntimeError:
+                    xml = ""
+                continue
             with Image.open(io.BytesIO(screenshot)) as opened:
                 width, height = opened.size
             action = navigator.choose_action(
@@ -543,15 +668,34 @@ def _ai_recover(
                 phase=phase,
                 action_history=action_history,
             )
+        except CollectionFailure:
+            raise
         except Exception as error:
+            detail = " ".join(str(error).split())[:240] or type(error).__name__
             print(
                 f"HUNGERSTATION_AI_WARNING phase={phase} "
-                f"error={type(error).__name__}: {error}"
+                f"error={type(error).__name__}: {detail}"
             )
-            return None
+            raise CollectionFailure(
+                "AI_NAVIGATION_UNAVAILABLE",
+                f"Sonnet navigation was unavailable during {phase}: {detail}",
+            ) from error
         if action is None:
-            print(f"HUNGERSTATION_AI_WARNING phase={phase} error=no-safe-action")
-            return None
+            raise CollectionFailure(
+                "AI_NO_SAFE_ACTION",
+                f"Sonnet could not identify a safe next step during {phase}.",
+            )
+        if action.name == "report_blocker":
+            detail = action.arguments["detail"]
+            code = action.arguments["code"]
+            print(
+                f"HUNGERSTATION_AI_BLOCKER phase={phase} code={code} detail={detail}"
+            )
+            raise CollectionFailure(
+                f"AI_{code}",
+                f"Sonnet identified a blocking screen during {phase}: {detail}",
+            )
+        before = _ui_signature(xml)
         print(f"HUNGERSTATION_AI_ACTION phase={phase} action={action.name}")
         _apply_ai_action(
             device,
@@ -560,11 +704,20 @@ def _ai_recover(
             width=width,
             height=height,
         )
-        action_history.append(action.name)
         try:
-            xml = device.dump()
+            updated_xml = device.dump()
         except RuntimeError:
-            xml = ""
+            updated_xml = ""
+        after = _ui_signature(updated_xml)
+        outcome = "changed" if after != before else "no_change"
+        action_history.append(f"{action.name}:{outcome}")
+        key = (action.name, before)
+        unchanged_actions[key] = unchanged_actions.get(key, 0) + (outcome == "no_change")
+        if unchanged_actions[key] >= 2:
+            action_history.append(
+                f"blocked:{action.name} already repeated on this unchanged screen; choose another action"
+            )
+        xml = updated_xml
     # A restaurant menu can finish rendering just after the final bounded AI
     # action. Poll without issuing more actions so a successful late
     # transition is not reported as "restaurant not found".
@@ -578,7 +731,13 @@ def _ai_recover(
             xml = ""
         if device.has_app_error():
             break
-    return xml if xml and ready(xml) else None
+    if xml and ready(xml):
+        return xml
+    raise CollectionFailure(
+        "AI_ACTION_LIMIT",
+        f"Sonnet could not reach the expected screen during {phase} after "
+        f"{config.AI_MAX_ACTIONS} adaptive actions.",
+    )
 
 
 def open_restaurant(device: AndroidDevice, restaurant: Restaurant) -> str:
@@ -603,9 +762,16 @@ def open_restaurant(device: AndroidDevice, restaurant: Restaurant) -> str:
                 initial_xml=xml,
             )
             if recovered is None:
-                raise
+                raise CollectionFailure(
+                    "UI_HIERARCHY_UNAVAILABLE",
+                    "Android did not return a readable HungerStation screen hierarchy.",
+                )
             xml = recovered
-    for _ in range(10):
+    # When vision recovery is available, do not spend tens of seconds polling
+    # an unknown layout before asking it to adapt. Known location/setup states
+    # are still handled locally without API cost.
+    startup_checks = 4 if config.AI_NAVIGATION_ENABLED else 10
+    for _ in range(startup_checks):
         if _has_android_app_error(xml):
             print("HUNGERSTATION_ANDROID_RECOVERY reason=app-error-dialog action=restart-app")
             device.start_app()
@@ -649,12 +815,18 @@ def open_restaurant(device: AndroidDevice, restaurant: Restaurant) -> str:
             initial_xml=xml,
         )
         if recovered is None:
-            raise RuntimeError("Could not reach the HungerStation restaurant search screen")
+            raise CollectionFailure(
+                "SEARCH_SCREEN_UNREACHABLE",
+                "HungerStation did not reach the restaurant search screen.",
+            )
         xml = recovered
 
     point = _find_search_input(xml)
     if point is None:
-        raise RuntimeError("HungerStation search input was not found")
+        raise CollectionFailure(
+            "SEARCH_INPUT_NOT_FOUND",
+            "The HungerStation search field was not available on the current screen.",
+        )
     device.tap(*point)
     time.sleep(1.5)
     xml = device.dump()
@@ -672,7 +844,8 @@ def open_restaurant(device: AndroidDevice, restaurant: Restaurant) -> str:
         device.key("66")
     result: tuple[int, int, str] | None = None
     search_shortcut_tapped = False
-    for _ in range(10):
+    result_checks = 4 if config.AI_NAVIGATION_ENABLED else 10
+    for _ in range(result_checks):
         time.sleep(1.2)
         xml = device.dump()
         if _is_restaurant_menu(xml, restaurant):
@@ -700,10 +873,14 @@ def open_restaurant(device: AndroidDevice, restaurant: Restaurant) -> str:
         )
         if recovered is not None:
             return restaurant.name
-        raise RuntimeError(f"{restaurant.name} was not found for the configured HungerStation location")
+        raise CollectionFailure(
+            "RESTAURANT_NOT_FOUND",
+            f"{restaurant.name} was not found for the configured HungerStation location.",
+        )
     device.tap(result[0], result[1])
 
-    for _ in range(12):
+    menu_checks = 4 if config.AI_NAVIGATION_ENABLED else 12
+    for _ in range(menu_checks):
         time.sleep(0.8)
         xml = device.dump()
         if _is_restaurant_menu(xml, restaurant):
@@ -717,7 +894,10 @@ def open_restaurant(device: AndroidDevice, restaurant: Restaurant) -> str:
     )
     if recovered is not None:
         return result[2]
-    raise RuntimeError(f"Opened result did not resolve to the {restaurant.name} menu")
+    raise CollectionFailure(
+        "MENU_NOT_OPENED",
+        f"HungerStation opened a result, but it did not resolve to the {restaurant.name} menu.",
+    )
 
 
 def _slug(value: str) -> str:
@@ -985,8 +1165,12 @@ def save_product_images(
 
 
 def collect_menu(device: AndroidDevice, brand_id: str, *, max_pages: int = 45) -> tuple[list[dict[str, Any]], list[list[str]]]:
+    width, height = device.screen_size()
+    center = width // 2
+    top = max(1, int(height * 0.25))
+    bottom = min(height - 1, int(height * 0.80))
     for _ in range(8):
-        device.swipe(540, 650, 540, 1950, 350)
+        device.swipe(center, top, center, bottom, 350)
     pages: list[list[str]] = []
     labels: list[tuple[str, str]] = []
     split_items: dict[str, dict[str, Any]] = {}
@@ -997,9 +1181,30 @@ def collect_menu(device: AndroidDevice, brand_id: str, *, max_pages: int = 45) -
     for _ in range(max_pages):
         xml = device.dump()
         if not _is_active_menu_page(xml, brand_id):
-            raise RuntimeError(
-                f"{config.RESTAURANT_BY_ID[brand_id].name} menu closed before collection completed"
-            )
+            restaurant = config.RESTAURANT_BY_ID[brand_id]
+            menu_search_close = _find_menu_search_close(xml)
+            if menu_search_close is not None:
+                print(
+                    f"HUNGERSTATION_ANDROID_RECOVERY brand={brand_id} "
+                    "reason=menu-search-overlay action=close"
+                )
+                device.tap(*menu_search_close)
+                time.sleep(1.0)
+                xml = device.dump()
+            if not _is_active_menu_page(xml, brand_id):
+                recovered = _ai_recover(
+                    device,
+                    restaurant,
+                    phase="return_to_menu_during_collection",
+                    ready=lambda candidate: _is_active_menu_page(candidate, brand_id),
+                    initial_xml=xml,
+                )
+                if recovered is None:
+                    raise CollectionFailure(
+                        "MENU_CLOSED_DURING_COLLECTION",
+                        f"{restaurant.name} menu closed before collection completed.",
+                    )
+                xml = recovered
         page_labels = _labels(ET.fromstring(xml))
         page_split_items = parse_split_accessibility_products(xml, brand_id)
         for item in page_split_items:
@@ -1039,7 +1244,7 @@ def collect_menu(device: AndroidDevice, brand_id: str, *, max_pages: int = 45) -
         if repeated >= 2:
             break
         previous_signature = signature
-        device.swipe(540, 1910, 540, 610, 600)
+        device.swipe(center, bottom, center, top, 600)
     items_by_source = {item["source_product_id"]: item for item in deduplicate(labels, brand_id)}
     for source_id, item in split_items.items():
         items_by_source.setdefault(source_id, item)
@@ -1085,6 +1290,82 @@ def load_capture(path: Path, brand_id: str) -> list[dict[str, Any]]:
     return deduplicate(labels, brand_id)
 
 
+def _capture_failure_evidence(
+    device: AndroidDevice,
+    restaurant: Restaurant,
+    run_id: str,
+) -> str | None:
+    """Persist one bounded screen snapshot so UI changes are diagnosable."""
+    destination = config.RAW_DIR / restaurant.id / "failures" / run_id
+    saved = False
+    try:
+        destination.mkdir(parents=True, exist_ok=True)
+        device.run(
+            "shell", "uiautomator", "dump",
+            "/data/local/tmp/hungerstation-failure.xml",
+            attempts=1,
+        )
+        xml = device.run(
+            "exec-out", "cat", "/data/local/tmp/hungerstation-failure.xml",
+            attempts=1,
+        )
+        if xml.strip():
+            (destination / "screen.xml").write_text(xml, encoding="utf-8")
+            saved = True
+    except (OSError, subprocess.SubprocessError):
+        pass
+    try:
+        screenshot = device.run_bytes("exec-out", "screencap", "-p", attempts=1)
+        if screenshot:
+            (destination / "screen.png").write_bytes(screenshot)
+            saved = True
+    except (OSError, subprocess.SubprocessError):
+        pass
+    if saved:
+        print(
+            f"HUNGERSTATION_FAILURE_ARTIFACTS brand={restaurant.id} "
+            f"path={destination}"
+        )
+        return str(destination)
+    return None
+
+
+def _failure_details(error: Exception) -> tuple[str, str]:
+    """Translate internal exceptions into stable, actionable UI diagnostics."""
+    if isinstance(error, CollectionFailure):
+        return error.code, error.user_message
+    if isinstance(error, subprocess.TimeoutExpired):
+        return (
+            "ADB_COMMAND_TIMEOUT",
+            "The Android emulator did not answer an ADB command before the timeout.",
+        )
+    if isinstance(error, subprocess.CalledProcessError):
+        command = [str(part) for part in (error.cmd or [])]
+        raw_detail = getattr(error, "stderr", "") or getattr(error, "stdout", "") or ""
+        detail = " ".join(str(raw_detail).split())[:240]
+        lowered = detail.casefold()
+        if "offline" in lowered:
+            return "ADB_DEVICE_OFFLINE", "The Android emulator is connected but offline."
+        if "unauthorized" in lowered:
+            return "ADB_DEVICE_UNAUTHORIZED", "ADB is not authorized to control the Android emulator."
+        if "not found" in lowered or "no devices" in lowered:
+            return "ADB_DEVICE_NOT_FOUND", "The configured Android emulator was not found by ADB."
+        if command[-3:-1] == ["geo", "fix"] or "geo" in command and "fix" in command:
+            message = "ADB could not set the configured Riyadh location on the Android emulator."
+            return "ADB_LOCATION_FAILED", f"{message} {detail}".strip()
+        action = " ".join(command[3:7]) if len(command) > 3 else "unknown command"
+        message = f"ADB command failed while running: {action}."
+        return "ADB_COMMAND_FAILED", f"{message} {detail}".strip()
+    if isinstance(error, FileNotFoundError):
+        return "ADB_NOT_INSTALLED", "ADB could not be found in the configured Android SDK."
+    message = " ".join(str(error).split())[:500]
+    if "not ready" in message and "emulator" in message:
+        return "ADB_DEVICE_NOT_READY", message
+    if "incomplete UI hierarchy" in message:
+        return "UI_HIERARCHY_UNAVAILABLE", message
+    return "COLLECTION_FAILED", message or type(error).__name__
+
+
 def collect_restaurant(
     restaurant: Restaurant,
     *,
@@ -1116,8 +1397,10 @@ def collect_restaurant(
             key=lambda item: item.get("name_en", "").casefold(),
         )
         if len(items) < restaurant.minimum_products:
-            raise RuntimeError(
-                f"Only {len(items)} products were found; expected at least {restaurant.minimum_products}"
+            raise CollectionFailure(
+                "PRODUCT_COUNT_TOO_LOW",
+                f"Only {len(items)} products were found for {restaurant.name}; expected at "
+                f"least {restaurant.minimum_products}.",
             )
         finished_at = utc_now()
         stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
@@ -1154,6 +1437,10 @@ def collect_restaurant(
             "uploaded": uploaded,
         }
     except Exception as error:
+        error_code, user_message = _failure_details(error)
+        evidence_path = None
+        if not from_capture:
+            evidence_path = _capture_failure_evidence(device, restaurant, run_id)
         database.save_failure(
             run_id=run_id,
             batch_id=batch_id,
@@ -1161,17 +1448,21 @@ def collect_restaurant(
             restaurant_name=restaurant.name,
             started_at=started_at,
             finished_at=utc_now(),
-            error=str(error),
+            error=f"[{error_code}] {user_message}",
             path=db_path,
         )
-        return {
+        result = {
             "brand_id": restaurant.id,
             "name": restaurant.name,
             "status": "failed",
             "run_id": run_id,
             "product_count": 0,
-            "error": str(error),
+            "error_code": error_code,
+            "error": user_message,
         }
+        if evidence_path:
+            result["evidence_path"] = evidence_path
+        return result
 
 
 def main() -> int:
@@ -1204,7 +1495,10 @@ def main() -> int:
             f"products={result['product_count']}"
         )
         if result.get("error"):
-            print(f"HUNGERSTATION_ERROR brand={restaurant.id} message={result['error']}")
+            print(
+                f"HUNGERSTATION_ERROR brand={restaurant.id} "
+                f"code={result['error_code']} message={result['error']}"
+            )
     print(json.dumps({"results": results}, ensure_ascii=False))
     return 0 if all(result["status"] == "success" for result in results) else 1
 
