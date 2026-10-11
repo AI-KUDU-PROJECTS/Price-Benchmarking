@@ -99,6 +99,23 @@ function schemaCheck(result, requiredPaths, arrayPaths = []) {
 // --- Endpoint wrappers, one per api-map.json entry ------------------------
 
 async function getStoreList(session, logger) {
+  // api-bootstrap captured the SPA's own successful first-party response.
+  // Consume it once for the mandatory branch verification instead of racing
+  // the edge/blob layer with an immediate duplicate request.
+  if (session.bootstrapStoreList) {
+    const cached = session.bootstrapStoreList;
+    session.bootstrapStoreList = null;
+    const result = {
+      ok: true,
+      status: cached.status,
+      data: cached.data,
+      raw: JSON.stringify(cached.data),
+      error: null,
+    };
+    const schema = schemaCheck(result, ['data'], ['data']);
+    if (logger) logger.success('[API] getStoreList: using successful response captured during browser bootstrap');
+    return { ...result, schema };
+  }
   const payload = { payload: { path: session.blob.jsonBase, country: 'ksa', subPath: session.blob.sasToken } };
   const result = await call(session, { method: 'POST', path: '/api/getStoreList', payload, logger, label: 'getStoreList' });
   const schema = schemaCheck(result, ['data'], ['data']);

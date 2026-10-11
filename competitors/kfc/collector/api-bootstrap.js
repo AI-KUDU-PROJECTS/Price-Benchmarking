@@ -63,6 +63,8 @@ async function bootstrapSession(logger) {
     const capturedHeaders = {};
     let blob = null;
     let guestLoginSeen = false;
+    let bootstrapStoreList = null;
+    let storeListHeaders = null;
 
     page.on('response', async (res) => {
       const url = res.url();
@@ -80,6 +82,20 @@ async function bootstrapSession(logger) {
             const body = await res.json().catch(() => null);
             const b = body && body.data && body.data.blobBaseUrl;
             if (b && b.SASToken && b.jsonBase) blob = { jsonBase: b.jsonBase, sasToken: b.SASToken };
+          }
+        }
+        // The edge occasionally rejects an immediate server-side replay even
+        // though the SPA's own getStoreList request succeeds.  Keep that
+        // already-validated first-party response for the initial branch check,
+        // and use the exact headers from the same request for later API calls.
+        if (url.includes('/api/getStoreList') && res.status() >= 200 && res.status() < 300) {
+          const ct = res.headers()['content-type'] || '';
+          if (ct.includes('json')) {
+            const body = await res.json().catch(() => null);
+            if (body && Array.isArray(body.data)) {
+              bootstrapStoreList = { status: res.status(), data: body };
+              storeListHeaders = headers;
+            }
           }
         }
       } catch (e) {
@@ -111,15 +127,15 @@ async function bootstrapSession(logger) {
         }
 
         const deadline = Date.now() + perAttemptPollMs;
-        while (Date.now() < deadline && (!guestLoginSeen || !blob || !capturedHeaders.deviceid)) {
+        while (Date.now() < deadline && (!guestLoginSeen || !blob || !capturedHeaders.deviceid || !bootstrapStoreList)) {
           await page.waitForTimeout(500);
         }
-        if (guestLoginSeen && blob && capturedHeaders.deviceid) {
+        if (guestLoginSeen && blob && capturedHeaders.deviceid && bootstrapStoreList) {
           ready = true;
           break;
         }
         lastError = new Error(
-          `Guest session bootstrap traffic did not complete within ${perAttemptPollMs}ms (guestLoginSeen=${guestLoginSeen}, blob=${!!blob}, deviceid=${!!capturedHeaders.deviceid})`
+          `Guest session bootstrap traffic did not complete within ${perAttemptPollMs}ms (guestLoginSeen=${guestLoginSeen}, blob=${!!blob}, deviceid=${!!capturedHeaders.deviceid}, storeList=${!!bootstrapStoreList})`
         );
       } catch (e) {
         lastError = e;
@@ -138,15 +154,24 @@ async function bootstrapSession(logger) {
     const headers = {};
     for (const name of HEADER_NAMES_TO_CAPTURE) {
       if (SENSITIVE_HEADER_NAMES.has(name)) continue;
-      if (capturedHeaders[name] !== undefined) headers[name] = capturedHeaders[name];
+      const value = storeListHeaders && storeListHeaders[name] !== undefined
+        ? storeListHeaders[name]
+        : capturedHeaders[name];
+      if (value !== undefined) headers[name] = value;
     }
     // authorization/refreshtoken are session-sensitive but are still needed
     // in-memory to make authenticated-as-guest calls; they are kept only on
     // the returned object (never logged, never serialized to api-map.*).
-    if (capturedHeaders.authorization) headers.authorization = capturedHeaders.authorization;
-    if (capturedHeaders.refreshtoken !== undefined) headers.refreshtoken = capturedHeaders.refreshtoken;
+    const authorization = storeListHeaders && storeListHeaders.authorization !== undefined
+      ? storeListHeaders.authorization
+      : capturedHeaders.authorization;
+    const refreshtoken = storeListHeaders && storeListHeaders.refreshtoken !== undefined
+      ? storeListHeaders.refreshtoken
+      : capturedHeaders.refreshtoken;
+    if (authorization) headers.authorization = authorization;
+    if (refreshtoken !== undefined) headers.refreshtoken = refreshtoken;
 
-    return { cookies, headers, blob };
+    return { cookies, headers, blob, bootstrapStoreList };
   } finally {
     await browser.close();
   }
