@@ -14,7 +14,7 @@ schema_validator itself is fully brand-agnostic (checks for the generic
 from __future__ import annotations
 
 from competitors.herfy.backend import schema_validator
-from competitors.herfy.tests.test_change_detector import bump_run, ingest
+from competitors.herfy.tests.test_change_detector import ingest
 
 
 def test_valid_channel_result_has_no_problems(delivery_result):

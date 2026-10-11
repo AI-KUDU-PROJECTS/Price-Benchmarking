@@ -3,11 +3,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from adapters.shared_sqlite import SharedSQLiteAdapter
+from adapters.sqlite_monitor import SQLiteMonitorAdapter
 from competitors.burger_king.backend import config as burger_king_config
 
 
-class BurgerKingAdapter(SharedSQLiteAdapter):
+class BurgerKingAdapter(SQLiteMonitorAdapter):
     def __init__(self, db_path: Path | None = None) -> None:
         super().__init__(
             brand_id="burger-king",

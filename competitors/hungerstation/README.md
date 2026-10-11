@@ -10,8 +10,8 @@ Start the Android emulator, sign in to HungerStation if required, and keep the
 configured Riyadh delivery location selected. From the repository root:
 
 ```bash
-.venv/bin/python run_hungerstation_collector.py --brand kfc
-.venv/bin/python run_hungerstation_collector.py --all
+.venv/bin/python manage.py collect hungerstation --brand kfc
+.venv/bin/python manage.py collect hungerstation --all
 ```
 
 Configured restaurants: KFC, Hardee's, Burger King, Herfy, McDonald's, and
@@ -28,6 +28,47 @@ For Android emulators, the collector sets the configured Riyadh GPS position
 before launching HungerStation. Override it with `HUNGERSTATION_LATITUDE` and
 `HUNGERSTATION_LONGITUDE` when another fixed delivery area is required.
 
+### Adaptive Claude navigation recovery
+
+The collector normally navigates with deterministic Android accessibility
+selectors. If those rules cannot reach search or identify a restaurant result,
+Claude Sonnet is invoked early instead of repeatedly polling an unknown screen.
+It inspects the current screenshot and compact UI hierarchy and requests one
+bounded ADB action at a time. Every action is followed by a fresh observation;
+Claude is told whether the screen changed and is instructed not to repeat an
+action that made no progress. It cannot type arbitrary text, run shell commands,
+extract prices, add items to a cart, or place an order. The deterministic parser
+still validates and stores all menu data.
+
+The collector waits for Android to finish booting, uses the emulator's actual
+screen dimensions for swipes, and accepts semantic product/menu evidence rather
+than depending on one Flutter scroll widget class. When a live run still fails,
+the last screenshot and accessibility hierarchy are saved under
+`data/raw/<brand>/failures/<run-id>/` so a new application state can be diagnosed
+without reproducing it blindly.
+
+Failures are emitted with a stable `HUNGERSTATION_ERROR` code and a user-facing
+message. A visible blocker that Sonnet cannot safely resolve is reported through
+the bounded `report_blocker` action (for example, required verification, an app
+update, or an unavailable restaurant). The pull manager preserves that exact
+reason and exposes it in the Market Overview status table instead of replacing
+it with a generic subprocess error.
+
+Configure the fallback in the local `.env` file:
+
+```dotenv
+ANTHROPIC_API_KEY=
+ANTHROPIC_MODEL=claude-sonnet-5-5
+ANTHROPIC_EFFORT=medium
+HUNGERSTATION_AI_NAVIGATION=true
+HUNGERSTATION_AI_MAX_ACTIONS=6
+```
+
+The key is optional and `.env` is excluded from Git. When the key or feature
+flag is absent, collection behaves exactly as before. AI recovery actions are
+logged as `HUNGERSTATION_AI_ACTION`; API failures fall back to the existing
+collector error without replacing the last complete snapshot.
+
 Each live run also captures the product artwork shown inside the HungerStation
 menu card. Images are stored under `data/images/<brand>/`, exposed by the BFF
 at `/hungerstation-images/<brand>/<product>.jpg`, and reused by both menu and
@@ -38,7 +79,7 @@ storage) so images survive application redeployments.
 ## Daily scheduler
 
 ```bash
-.venv/bin/python run_hungerstation_scheduler.py
+.venv/bin/python manage.py schedule hungerstation
 ```
 
 The default time is 23:00 Asia/Riyadh. Configure it with

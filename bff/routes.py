@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query, Response
+from fastapi.responses import StreamingResponse
 
 from bff.contract import (
     BrandOverview,
@@ -29,8 +30,19 @@ from bff.playground import (
 )
 from bff.registry import all_brands, connected_adapters, get_adapter
 from bff.pull_all import hungerstation_pull_manager, pull_manager
+from bff.excel_export import build_market_workbook
 
 router = APIRouter()
+
+
+@router.get("/market/export.xlsx")
+def export_market_excel() -> StreamingResponse:
+    filename = f"KUDU_Price_Benchmark_{now_riyadh_iso()[:10]}.xlsx"
+    return StreamingResponse(
+        build_market_workbook(connected_adapters()),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
 
 
 @router.post("/market/pull", status_code=202)

@@ -30,9 +30,7 @@ import copy
 import json
 from pathlib import Path
 
-import pytest
-
-from competitors.herfy.backend import change_detector, models, run_service
+from competitors.herfy.backend import models, run_service
 
 
 def ingest(conn, tmp_path: Path, batch_id: str, channel: str, result: dict) -> dict:

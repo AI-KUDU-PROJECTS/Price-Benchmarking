@@ -4,10 +4,16 @@
   "description": "Node.js collector code for the multi-competitor Price Intelligence repo. KFC (competitors/kfc/collector/ - Playwright session bootstrap, direct public-API collection for Pickup + Delivery kept fully separate, and Playwright screenshot capture for new products/offers), Burger King (competitors/burger_king/collector/ - fully public/unauthenticated API collection, no session bootstrap needed, plus a Playwright DOM price-scrape fallback and screenshot capture for new products), Herfy (competitors/herfy/collector/ - a minimal, non-interactive Playwright app-bootstrap step plus fully public REST/CDN collection, real prices with no DOM-scrape fallback needed, and Playwright screenshot capture for new products/offers), and Hardee's (competitors/hardees/collector/ - Playwright guest-session bootstrap and direct public-API collection, same shared Americana platform as KFC, plus Playwright screenshot capture for new products/offers) are implemented. McDonald's and Albaik are scaffolded only - see their competitors/<name>/collector/README.md. This package.json and node_modules/ are shared at the repo root; each competitor's collector code stays isolated inside its own competitors/<name>/collector/ folder. See root README.md.",
   "main": "competitors/kfc/collector/collect.js",
   "private": true,
+  "workspaces": [
+    "frontend"
+  ],
   "engines": {
     "node": ">=18"
   },
   "scripts": {
+    "dev": "npm --workspace frontend run dev",
+    "build": "npm --workspace frontend run build",
+    "test": "npm --workspace frontend test -- --run",
     "collect": "node competitors/kfc/collector/collect.js",
     "collect:pickup": "node competitors/kfc/collector/collect.js --channel=PICKUP",
     "collect:delivery": "node competitors/kfc/collector/collect.js --channel=DELIVERY",

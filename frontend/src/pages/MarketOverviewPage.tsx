@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { RefreshCw } from "lucide-react";
+import { Download, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
 import { api } from "../api/client";
 import type { PullRun } from "../api/types";
@@ -119,6 +119,10 @@ export function MarketOverviewPage() {
               <RefreshCw size={18} aria-hidden="true" />
               Collect HungerStation
             </button>
+            <a className="btn btn-secondary" href="/api/v1/market/export.xlsx" download>
+              <Download size={18} aria-hidden="true" />
+              Export Excel
+            </a>
           </div>
         }
       />
@@ -155,7 +159,7 @@ export function MarketOverviewPage() {
           </div>
           <p className="meta-text">Started {formatRiyadhDateTime(hungerstationRun.startedAt)} · Finished {formatRiyadhDateTime(hungerstationRun.completedAt)}</p>
           <DataTable caption="HungerStation collection status by restaurant">
-            <thead><tr><th>Restaurant</th><th>Status</th><th>Started</th><th>Finished</th><th>Result</th></tr></thead>
+            <thead><tr><th>Restaurant</th><th>Status</th><th>Started</th><th>Finished</th><th>Result / failure reason</th></tr></thead>
             <tbody>
               {hungerstationRun.brands.map((brand) => (
                 <tr key={brand.id}>
@@ -163,7 +167,7 @@ export function MarketOverviewPage() {
                   <td><Badge value={brand.status} /></td>
                   <td className="nowrap">{formatRiyadhDateTime(brand.startedAt)}</td>
                   <td className="nowrap">{formatRiyadhDateTime(brand.completedAt)}</td>
-                  <td>{brand.message || "—"}</td>
+                  <td className="collection-result" aria-live="polite">{brand.message || "—"}</td>
                 </tr>
               ))}
             </tbody>

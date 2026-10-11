@@ -1,21 +1,26 @@
 from __future__ import annotations
 
 import io
+import subprocess
 from pathlib import Path
 
 from PIL import Image
 
 from adapters.hungerstation import HungerstationOverlayAdapter, _match_image
-from competitors.hungerstation import database
+from competitors.hungerstation import collector, database
 from competitors.hungerstation.collector import (
     _find_first_restaurant_card,
     _find_location_recovery,
     _find_location_setup_action,
+    _find_menu_search_close,
     _find_search_suggestion,
+    _has_android_app_error,
     _is_restaurant_menu,
+    collect_menu,
     deduplicate,
     load_capture,
     parse_accessibility_label,
+    parse_split_accessibility_products,
     product_image_candidates,
     save_product_images,
 )
@@ -59,6 +64,31 @@ def test_accessibility_label_preserves_offer_price() -> None:
     assert item["regular_price"] == 32.73
     assert item["special_price"] == 18.0
     assert item["source_product_id"] == "HUNGERSTATION|mcdonalds|big-mac"
+
+
+def test_split_flutter_card_preserves_current_and_original_prices() -> None:
+    xml = """
+    <hierarchy>
+      <node class="android.widget.ScrollView" package="com.hungerstation.android.web">
+        <node clickable="true" bounds="[42,1300][431,1907]" />
+        <node content-desc="45%" bounds="[116,1329][168,1366]" />
+        <node content-desc="200+ orders" bounds="[85,1710][269,1747]" />
+        <node content-desc="New Wrap Combo" bounds="[42,1768][355,1813]" />
+        <node content-desc="§" bounds="[42,1823][69,1886]" />
+        <node content-desc="18" bounds="[74,1823][117,1886]" />
+        <node resource-id="menuItemActionSingleButtonAdd" bounds="[326,1584][410,1668]" />
+        <node content-desc="§" bounds="[138,1829][161,1881]" />
+        <node content-desc="32.73" bounds="[166,1829][254,1881]" />
+      </node>
+    </hierarchy>
+    """
+    items = parse_split_accessibility_products(xml, "kfc")
+    assert len(items) == 1
+    assert items[0]["name_en"] == "New Wrap Combo"
+    assert items[0]["effective_price"] == 18.0
+    assert items[0]["special_price"] == 18.0
+    assert items[0]["regular_price"] == 32.73
+    assert items[0]["discount_percentage"] == 45.0
 
 
 def test_deduplicate_uses_source_id_after_slug_normalization() -> None:
@@ -156,6 +186,16 @@ def test_out_of_range_location_recovery_button_is_found() -> None:
     assert _find_location_recovery(xml) == (540, 1319)
 
 
+def test_android_anr_dialog_is_detected_before_app_navigation() -> None:
+    xml = """
+    <hierarchy>
+      <node text="HungerStation isn't responding" resource-id="android:id/alertTitle" />
+      <node text="Close app" resource-id="android:id/aerr_close" clickable="true" />
+    </hierarchy>
+    """
+    assert _has_android_app_error(xml)
+
+
 def test_location_setup_opens_header_and_confirms_map() -> None:
     home = """
     <hierarchy>
@@ -194,6 +234,90 @@ def test_menu_validation_requires_brand_name_in_header() -> None:
     </hierarchy>
     """
     assert not _is_restaurant_menu(wrong_brand, RESTAURANT_BY_ID["herfy"])
+
+
+def test_menu_validation_survives_flutter_scroll_widget_change() -> None:
+    changed_widget = """
+    <hierarchy>
+      <node package="com.hungerstation.android.web" class="android.view.View">
+        <node content-desc="KFC" bounds="[0,50][1080,200]" />
+        <node content-desc="Zinger Meal&#10;§&#10;25" bounds="[0,900][1080,1300]" />
+      </node>
+    </hierarchy>
+    """
+    assert _is_restaurant_menu(changed_widget, RESTAURANT_BY_ID["kfc"])
+
+
+def test_menu_scrolling_adapts_to_device_dimensions() -> None:
+    xml = """
+    <hierarchy>
+      <node package="com.hungerstation.android.web" class="android.view.View">
+        <node content-desc="Zinger Meal&#10;§&#10;25" bounds="[0,600][720,1000]" />
+      </node>
+    </hierarchy>
+    """
+
+    class FakeDevice:
+        swipes: list[tuple[int, int, int, int, int]] = []
+
+        def screen_size(self) -> tuple[int, int]:
+            return (720, 1600)
+
+        def swipe(self, x1: int, y1: int, x2: int, y2: int, duration: int) -> None:
+            self.swipes.append((x1, y1, x2, y2, duration))
+
+        def dump(self) -> str:
+            return xml
+
+    device = FakeDevice()
+    items, _pages = collect_menu(device, "kfc", max_pages=5)  # type: ignore[arg-type]
+    assert [item["name_en"] for item in items] == ["Zinger Meal"]
+    assert device.swipes[0] == (360, 400, 360, 1280, 350)
+    assert device.swipes[-1] == (360, 1280, 360, 400, 600)
+
+
+def test_internal_menu_search_is_closed_and_collection_resumes(monkeypatch) -> None:
+    search_overlay = """
+    <hierarchy>
+      <node package="com.hungerstation.android.web">
+        <node resource-id="menuSearchCloseButton" clickable="true"
+              bounds="[42,126][147,231]" />
+        <node resource-id="menuSearchInput" class="android.widget.EditText"
+              bounds="[129,297][993,360]" />
+      </node>
+    </hierarchy>
+    """
+    active_menu = """
+    <hierarchy>
+      <node package="com.hungerstation.android.web" class="android.view.View">
+        <node content-desc="Super Star&#10;§&#10;31" bounds="[0,600][720,1000]" />
+      </node>
+    </hierarchy>
+    """
+
+    class FakeDevice:
+        closed = False
+        taps: list[tuple[int, int]] = []
+
+        def screen_size(self) -> tuple[int, int]:
+            return (720, 1600)
+
+        def swipe(self, *_args) -> None:
+            pass
+
+        def tap(self, x: int, y: int) -> None:
+            self.taps.append((x, y))
+            self.closed = True
+
+        def dump(self) -> str:
+            return active_menu if self.closed else search_overlay
+
+    monkeypatch.setattr(collector.time, "sleep", lambda _seconds: None)
+    device = FakeDevice()
+    assert _find_menu_search_close(search_overlay) == (94, 178)
+    items, _pages = collect_menu(device, "hardees", max_pages=3)  # type: ignore[arg-type]
+    assert [item["name_en"] for item in items] == ["Super Star"]
+    assert device.taps == [(94, 178)]
 
 
 def test_deduplicate_uses_database_source_id() -> None:
@@ -284,3 +408,15 @@ def test_failed_run_keeps_last_successful_menu(tmp_path: Path) -> None:
     )
     assert len(adapter.list_products(channel="hungerstation")) == 1
     assert adapter.get_overview().runs[0].status == "failed"
+
+
+def test_adb_location_failure_gets_actionable_user_reason() -> None:
+    error = subprocess.CalledProcessError(
+        1,
+        ["adb", "-s", "emulator-5554", "emu", "geo", "fix", "46.6", "24.7"],
+        stderr="error: emulator console is unavailable",
+    )
+    code, message = collector._failure_details(error)
+    assert code == "ADB_LOCATION_FAILED"
+    assert "Riyadh location" in message
+    assert "console is unavailable" in message

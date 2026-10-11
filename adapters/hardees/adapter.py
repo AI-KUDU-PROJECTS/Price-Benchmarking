@@ -3,11 +3,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from adapters.shared_sqlite import SharedSQLiteAdapter
+from adapters.sqlite_monitor import SQLiteMonitorAdapter
 from competitors.hardees.backend import config as hardees_config
 
 
-class HardeesAdapter(SharedSQLiteAdapter):
+class HardeesAdapter(SQLiteMonitorAdapter):
     def __init__(self, db_path: Path | None = None) -> None:
         super().__init__(
             brand_id="hardees",

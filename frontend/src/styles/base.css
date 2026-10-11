@@ -1,0 +1,131 @@
+/* ==========================================================================
+   Reset & base
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background: var(--kudu-surface-app);
+  color: var(--kudu-text-primary);
+  font-family: var(--kudu-font-en);
+  font-size: var(--kudu-text-body-size);
+  font-weight: var(--kudu-font-weight-regular);
+  line-height: var(--kudu-line-height-default);
+  -webkit-font-smoothing: antialiased;
+}
+
+:where([dir="rtl"]) body {
+  font-family: var(--kudu-font-ar);
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Full-perimeter keyboard focus. Not a side strip: X01 only prohibits
+   decorative one-edge accent borders on cards/panels/alerts/nav items. */
+:focus-visible {
+  outline: var(--kudu-border-width-focus) solid var(--kudu-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--kudu-radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   Utilities
+   ========================================================================== */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  white-space: nowrap;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+/* Caps a cell's contribution to table auto-layout so one unusually long
+   value (e.g. a raw source payload string) can't blow out a whole column;
+   the full value stays available as a title tooltip. */
+.cell-clip {
+  display: inline-block;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.meta-text {
+  color: var(--kudu-text-muted);
+  font-size: var(--kudu-text-small-size);
+  line-height: var(--kudu-line-height-relaxed);
+}
+
+.linkish {
+  color: var(--kudu-text-brand);
+  font-weight: var(--kudu-font-weight-medium);
+  text-decoration: none;
+}
+
+.linkish:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

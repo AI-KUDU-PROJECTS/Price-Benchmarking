@@ -1,19 +1,19 @@
 # Albaik Price Intelligence
 
-**Status: Scaffold only.** No collector, API research, database, change
-detection, or dashboard logic exists yet for Albaik. This folder only
+**Status: Official-source scaffold only.** No official collector, API research,
+database, or change-detection logic exists yet for Albaik. This folder only
 holds the isolated structure future implementation will fill in - see
 root [README.md](../../README.md) for the multi-competitor architecture.
 
 ## Status of every competitor in this repo
 
 ```text
-KFC:          Implemented
-Hardee's:     Scaffold only
-McDonald's:   Scaffold only
-Burger King:  Scaffold only
-Herfy:        Scaffold only
-Albaik:       Scaffold only
+KFC:          Official source implemented
+Hardee's:     Official source implemented
+Burger King:  Official source implemented
+Herfy:        Official source implemented
+McDonald's:   HungerStation only
+Albaik:       HungerStation only
 ```
 
 ## What exists here today
@@ -25,9 +25,6 @@ competitors/albaik/
 ├── config/__init__.py    Empty - no configuration values yet
 ├── collector/README.md   Empty - will hold Node.js API bootstrap + collection code (see below)
 ├── backend/__init__.py   Empty - no storage/change-detection code yet
-├── dashboard/
-│   ├── __init__.py
-│   └── page.py           render() shows only a status placeholder - no product data
 ├── research/
 │   ├── pickup/           Empty - future Pickup-channel HAR captures / notes go here
 │   ├── delivery/         Empty - future Delivery-channel HAR captures / notes go here
@@ -50,29 +47,14 @@ implementation.**
 ## Isolation
 
 - `competitors/albaik/` never imports from `competitors/kfc/` or any other
-  competitor folder, and nothing else imports from here except
-  `pages/6_Albaik.py` at the repo root.
+  competitor folder. Shared access is provided only through the BFF adapter contract.
 - Once implemented, Albaik's database will live at
   `competitors/albaik/data/database/albaik_monitor.db` - its own file, never
   shared with or written to by another competitor's collector.
 
-## Streamlit page
+## React application
 
-`pages/6_Albaik.py` (repo root) calls this folder's `dashboard/page.py`:
-
-```python
-from competitors.albaik.dashboard.page import render
-
-render()
-```
-
-`render()` currently only shows:
-
-```text
-Albaik Price Intelligence
-Status: Collector not implemented yet.
-Folder structure is ready for future development.
-```
+There is no brand-specific UI or official-source collector yet. When a HungerStation snapshot is available, the shared HungerStation adapter exposes this brand through the React/FastAPI application.
 
 ## Adding the real implementation later
 
@@ -88,9 +70,7 @@ When Albaik is implemented, the intended shape (mirroring
    `competitors/kfc/README.md` "Architecture" for the pattern to follow
    (not to copy verbatim - Albaik's endpoints are unresearched and will
    differ).
-3. Build the Python `backend/` (database, change detection, Excel
-   export) the same way, writing only to
+3. Build the Python `backend/` (database and change detection) the same way,
+   writing only to
    `competitors/albaik/data/database/albaik_monitor.db`.
-4. Replace `dashboard/page.py`'s placeholder `render()` with a real
-   dashboard, keeping the same `from competitors.albaik.dashboard.page
-   import render` contract so `pages/6_Albaik.py` never needs to change.
+4. Add or configure a source adapter so the shared React/FastAPI application can expose the brand.

@@ -11,17 +11,14 @@ A local system that monitors Herfy's
 offers for **one fixed branch in Riyadh**, once a day, for **Pickup** and
 **Delivery** kept completely separate. It detects new products, new
 offers, price changes, removed/returned products, offer lifecycle changes
-between successful runs, shows the result in a local Streamlit dashboard,
+between successful runs, serves the result through the React/FastAPI application,
 and exports daily/monthly/catalog Excel reports.
 
 It is a monitoring tool only: no login, no OTP, no payment, no order is
 ever placed - see [Security & compliance](#security--compliance).
 
-> **Isolation:** this folder never imports from `competitors/kfc/`,
-> `competitors/burger_king/`, or any other competitor, and nothing outside
-> `competitors/herfy/` imports its internals except
-> `pages/5_Herfy.py` at the repo root, which only calls `render()` - see
-> [Streamlit dashboard](#streamlit-dashboard) below.
+> **Application UI:** This collector exposes data through the shared BFF adapter
+> and React application. Reusable collector infrastructure lives in `competitors/shared/`.
 
 ## Table of contents
 
@@ -34,7 +31,6 @@ ever placed - see [Security & compliance](#security--compliance).
 - [Database](#database)
 - [Change Detection Engine](#change-detection-engine)
 - [Excel exports](#excel-exports)
-- [Streamlit dashboard](#streamlit-dashboard)
 - [Screenshots](#screenshots)
 - [Testing](#testing)
 - [Security & compliance](#security--compliance)
@@ -50,14 +46,13 @@ API First (fully public REST + a static CDN JSON, no login/session needed)
   -> Playwright Screenshot Capture (NEW_PRODUCT/NEW_OFFER only)      (collector/screenshot-capture.js)
   -> SQLite                                                          (backend/database.py)
   -> Change Detection Engine                                         (backend/change_detector.py)
-  -> Streamlit Dashboard (dashboard/page.py, rendered by the
-     repo-root pages/5_Herfy.py)
-  -> Excel Export                                                    (backend/excel_exporter.py)
+  -> React/FastAPI Application                    (adapters + BFF + frontend)
+  -> Excel Export                                                    (bff/excel_export.py)
 ```
 
 **Node.js** owns the one-time app-bootstrap, direct REST/CDN collection,
-and Playwright screenshots. **Python** owns SQLite, change detection, the
-dashboard, Excel export, and the scheduler. `backend/run_service.py` is
+and Playwright screenshots. **Python** owns SQLite, change detection,
+BFF integration, Excel export, and the scheduler. `backend/run_service.py` is
 the only bridge between them - it invokes `collector/collect.js` and
 `collector/screenshot-capture.js` as subprocesses and reads back the JSON
 they write to `data/raw/<batch>/`. All paths below are relative to this
@@ -116,10 +111,6 @@ competitors/herfy/
 │   ├── change_detector.py        The Change Detection Engine
 │   ├── schema_validator.py       Python-side response-shape validation
 │   ├── run_service.py            Orchestration: lock, subprocess calls, ingestion
-│   └── excel_exporter.py         Daily / Monthly / Catalog workbooks
-├── dashboard/
-│   ├── __init__.py
-│   └── page.py                   render() - the Streamlit UI; see "Streamlit dashboard"
 ├── research/
 │   └── api-map/
 │       ├── api-map.json          Machine-readable endpoint reference
@@ -146,20 +137,17 @@ competitors/herfy && python run_collector.py` will fail on import).
 Always run from the repo root, using one of:
 
 ```bash
-# Root-level wrappers (recommended):
-python run_herfy_collector.py
-python run_herfy_collector.py --channel=PICKUP
-python run_herfy_collector.py --channel=DELIVERY
-python run_herfy_collector.py --no-screenshots
-python run_herfy_scheduler.py
+# Management entry point (recommended):
+python manage.py collect herfy
+python manage.py collect herfy --channel=PICKUP
+python manage.py collect herfy --channel=DELIVERY
+python manage.py collect herfy --no-screenshots
+python manage.py schedule herfy
 
 # Equivalent module invocations (also from the repo root):
 python -m competitors.herfy.run_collector --channel=BOTH
 python -m competitors.herfy.scheduler
 
-# Dashboard - the root Streamlit app, then open the "Herfy" page from
-# the sidebar (or it's pages/5_Herfy.py directly):
-streamlit run app.py
 ```
 
 The Node collector itself has no such restriction (it's invoked as a
@@ -168,22 +156,21 @@ subprocess by `backend/run_service.py`, or directly via the root
 
 ## Installation
 
-`package.json`, `requirements-local.txt`, `node_modules/`, and `.venv/` are all
+`package.json`, `requirements.txt`, `node_modules/`, and `.venv/` are all
 shared at the **repository root** (see root README.md), not duplicated
 per competitor. Install once, from the repo root:
 
 ```bash
 npm install
-npx playwright install chromium
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements-local.txt
+pip install -r requirements.txt
 cp .env.example .env
 ```
 
 Requires Node.js 18+ and Python 3.10+.
 
-> If `npx playwright install chromium` reports missing shared libraries on
+> If Chromium launch reports missing shared libraries on
 > Linux, run `sudo npx playwright install-deps` once (needed only for the
 > one-time app-bootstrap page load and the screenshot-capture step; every
 > menu/branch API call in this collector needs no browser at all).
@@ -312,50 +299,19 @@ Missing in three consecutive complete successful runs: PRODUCT_REMOVED
 Reappears at any point before the third miss:        cancels the progression, PRODUCT_RETURNED
 ```
 
-The dashboard never uses the word "Discontinued" - the label is always
+The React application never uses the word "Discontinued" - the label is always
 **"Removed / Not observed for 3 successful runs"**.
 
 ## Excel exports
 
-Generated with `openpyxl` directly (full header styling in Herfy's brand
-red, frozen header row, auto-sized columns):
+The supported workbook is generated by `bff/excel_export.py` from the shared
+BFF contract and served at `/api/v1/market/export.xlsx`. React links to
+that endpoint from Market Overview. Legacy per-brand workbook generators are
+not runtime entry points.
 
-| File | Trigger |
-|---|---|
-| `exports/Herfy_Daily_Changes_YYYY-MM-DD.xlsx` | "Export Daily Excel" button / `backend.excel_exporter.export_daily_report()` |
-| `exports/Herfy_Monthly_Comparison_YYYY-MM.xlsx` | "Export Monthly Excel" button / `export_monthly_report()` |
-| `exports/Herfy_Current_Catalog_YYYY-MM-DD.xlsx` | called directly from Python (not currently wired to a dashboard button, same as every other competitor) |
+## React application
 
-Pickup and Delivery are always separate worksheets in every workbook - no
-worksheet ever mixes their prices in one table. The Offers sheets
-genuinely populate for this brand (see "Known limitations"). The
-**Legacy View** worksheet mirrors the existing Competitors Pricing shape
-(`Category | Item | Sandwich | Regular | Medium | Large`) with **real,
-CMS-sourced per-size prices** (e.g. Beef Tortilla Meal: Regular=29,
-Medium=32, Large=34 SAR, confirmed live) - the best size-price coverage
-of any competitor in this repo so far; a product with no confirmed
-"Sizes" option group leaves every size column blank rather than guessed.
-
-## Streamlit dashboard
-
-```bash
-streamlit run app.py     # from the repo root - see root README.md
-```
-
-then open the **Herfy** page from the sidebar (`pages/5_Herfy.py`, a
-two-line wrapper: `from competitors.herfy.dashboard.page import render;
-render()` - the dashboard code itself lives entirely in
-`dashboard/page.py` and is never duplicated in `pages/`).
-
-Local only, no login. Top section shows branch, last successful run, next
-scheduled run, and per-channel status; buttons for Run Now / Refresh /
-Export Daily Excel / Export Monthly Excel; summary cards for New Products
-/ New Offers / Price Increases / Price Decreases / Offers Ended / Not
-Observed; tabs for Overview, Pickup Products, Delivery Products, Pickup
-Offers, Delivery Offers, Pickup vs Delivery, Changes, and History/Logs
-(Price History / Run Logs / Monthly Comparison); sidebar filters for
-Category / Name-or-description / Offers Only / Channel / Status / Event
-Type / Date.
+The shared React/FastAPI application is the only UI. This collector is exposed through its adapter and can be started from Market Overview or from the collector CLI.
 
 ## Screenshots
 
@@ -490,8 +446,3 @@ one non-sensitive `solo-app` header.
   the full menu at verification time) - kept in `raw_api_json` for
   forensic reference, never used to compute anything, per the same
   "don't guess" rule applied everywhere else in this project.
-- **The Current Full Catalog export is not wired to a dashboard button**,
-  same as every other competitor -
-  `backend.excel_exporter.export_current_catalog()` is fully implemented
-  and covered by a test, call it directly from a Python shell (or add a
-  button) if you need it on demand.

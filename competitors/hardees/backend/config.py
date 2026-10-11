@@ -2,7 +2,7 @@
 competitors/hardees/backend/config.py
 ---------------------------------------------------------------------
 Central configuration for the Python half of the Hardee's system
-(SQLite, change detection, Streamlit, Excel export, scheduler - see
+(SQLite, change detection, React/BFF, Excel export, scheduler - see
 competitors/hardees/README.md). Mirrors competitors/kfc/backend/
 config.py's shape exactly - Hardee's Saudi runs on the same
 Americana-operated platform as KFC (see research/api-map/api-map.md
@@ -63,9 +63,6 @@ TIMEZONE = os.environ.get("TIMEZONE", "Asia/Riyadh")
 
 # --- Data locations (all scoped inside competitors/hardees/) ---------------
 DB_PATH = PROJECT_ROOT / os.environ.get("HRD_DB_PATH", "data/database/hardees_monitor.db")
-DEPLOYMENT_DB_PATH = REPO_ROOT / "bff" / "data" / "snapshots" / "hardees_monitor.db"
-if os.environ.get("VERCEL") and DEPLOYMENT_DB_PATH.exists():
-    DB_PATH = DEPLOYMENT_DB_PATH
 RAW_DATA_DIR = PROJECT_ROOT / os.environ.get("HRD_RAW_DATA_DIR", "data/raw")
 SCREENSHOTS_DIR = PROJECT_ROOT / os.environ.get("HRD_SCREENSHOTS_DIR", "data/screenshots")
 EXPORTS_DIR = PROJECT_ROOT / os.environ.get("HRD_EXPORTS_DIR", "exports")

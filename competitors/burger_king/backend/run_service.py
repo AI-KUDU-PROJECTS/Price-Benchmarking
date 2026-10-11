@@ -11,8 +11,8 @@ product_options extraction (Burger King's option tree has a different
 shape than KFC's flat `steps` list - see normalizer.extract_option_groups
 and research/api-map/api-map.md).
 
-This is the ONE function both run_collector.py (CLI), scheduler.py (the
-daily job), and dashboard/page.py's "Run Now" button all call - so there
+This is the ONE function run_collector.py (CLI), scheduler.py (the daily job),
+and the BFF collection trigger all call - so there
 is exactly one code path that can ever start a collection run, which is
 also where the concurrency lock lives.
 ---------------------------------------------------------------------
@@ -27,7 +27,7 @@ import time
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterator, Optional
+from typing import Any, Iterator
 
 from competitors.burger_king.backend import change_detector, config, database, models, normalizer, offer_parser, schema_validator
 
@@ -219,7 +219,7 @@ def _ingest_channel(conn: sqlite3.Connection, batch_id: str, channel: str, out_d
 def _record_endpoint_health(conn: sqlite3.Connection, batch_id: str, out_dir: Path) -> None:
     """Best-effort population of the api_endpoints reference table from the
     raw per-call dumps collect.js wrote - purely informational for the
-    Streamlit "Run Logs"/"Sources" views."""
+    operations "Run Logs"/"Sources" views."""
     for channel_dir in out_dir.glob("raw/*"):
         if not channel_dir.is_dir():
             continue
@@ -328,7 +328,7 @@ def _run_screenshot_capture(conn: sqlite3.Connection, jobs: list[dict[str, Any]]
 def run_collection(channel: str = "BOTH", trigger: str = "MANUAL", enable_screenshots: bool = True) -> dict[str, Any]:
     """The single entry point for starting a collection run. `channel` is
     one of PICKUP / DELIVERY / BOTH. Raises RunAlreadyInProgressError if
-    another run is active - callers (CLI/scheduler/Streamlit) should catch
+    another run is active - callers (CLI/scheduler/BFF) should catch
     this and surface it, never retry-loop around it."""
     config.ensure_directories()
     channel = channel.upper()

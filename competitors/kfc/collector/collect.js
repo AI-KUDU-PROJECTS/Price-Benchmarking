@@ -7,7 +7,7 @@
  * CLI entry point for the Node half of the collection pipeline. Invoked by
  * backend/run_service.py as a subprocess (per the required Node/Python
  * split: "Node.js: API bootstrap, public API collection, Playwright
- * screenshots / Python: SQLite, change detection, Streamlit, Excel
+ * screenshots / Python: SQLite, change detection, React/BFF, Excel
  * export, scheduler").
  *
  * Usage:

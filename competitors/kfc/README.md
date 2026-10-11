@@ -1,26 +1,20 @@
 # KFC Price Intelligence
 
-**Status: Implemented.** The only competitor with a working collector,
-database, change-detection engine, dashboard, and Excel exports in this
-repo. See the root [README.md](../../README.md) for the multi-competitor
-architecture this folder is isolated inside of.
+**Status: Implemented.** See the root [README.md](../../README.md) for the
+multi-competitor architecture this folder is isolated inside of.
 
 A local system that monitors KFC Saudi's ([saudi.kfc.me](https://saudi.kfc.me))
 public menu, prices, and offers for **one fixed branch in Riyadh**, once a
 day, for **Pickup** and **Delivery** kept completely separate. It detects
 new products, new offers, price changes, offer changes, removed/returned
-products, and ended/returned offers between successful runs, shows the
-result in a local Streamlit dashboard, and exports daily/monthly/catalog
-Excel reports.
+products, and ended/returned offers between successful runs, then exposes the
+result through the shared React/FastAPI application and Excel export.
 
 It is a monitoring tool only: no login, no OTP, no payment, no order is
 ever placed - see [Security & compliance](#security--compliance).
 
-> **Isolation:** this folder never imports from `competitors/hardees/`,
-> `competitors/mcdonalds/`, or any other competitor, and nothing outside
-> `competitors/kfc/` imports its internals except `pages/1_KFC.py` at the
-> repo root, which only calls `render()` - see [Streamlit
-> dashboard](#streamlit-dashboard) below.
+> **Application UI:** This collector exposes data through the shared BFF adapter
+> and React application. Reusable collector infrastructure lives in `competitors/shared/`.
 
 ## Table of contents
 
@@ -33,7 +27,6 @@ ever placed - see [Security & compliance](#security--compliance).
 - [Database](#database)
 - [Change Detection Engine](#change-detection-engine)
 - [Excel exports](#excel-exports)
-- [Streamlit dashboard](#streamlit-dashboard)
 - [Screenshots](#screenshots)
 - [Testing](#testing)
 - [Security & compliance](#security--compliance)
@@ -51,13 +44,12 @@ API First
                                                    only for NEW_PRODUCT / NEW_OFFER)
   -> SQLite                                      (backend/database.py)
   -> Change Detection Engine                     (backend/change_detector.py)
-  -> Streamlit Dashboard                         (dashboard/page.py, rendered by
-                                                   the repo-root pages/1_KFC.py)
-  -> Excel Export                                (backend/excel_exporter.py)
+  -> React/FastAPI Application                    (adapters + BFF + frontend)
+  -> Excel Export                                (bff/excel_export.py)
 ```
 
 **Node.js** owns API bootstrap, public API collection, and Playwright
-screenshots. **Python** owns SQLite, change detection, the dashboard,
+screenshots. **Python** owns SQLite, change detection, BFF integration,
 Excel export, and the scheduler. `backend/run_service.py` is the only
 bridge between them - it invokes `collector/collect.js` and
 `collector/screenshot-capture.js` as subprocesses and reads back the JSON
@@ -114,10 +106,6 @@ competitors/kfc/
 │   ├── change_detector.py        The Change Detection Engine
 │   ├── schema_validator.py       Python-side response-shape validation
 │   ├── run_service.py            Orchestration: lock, subprocess calls, ingestion
-│   └── excel_exporter.py         Daily / Monthly / Catalog workbooks
-├── dashboard/
-│   ├── __init__.py
-│   └── page.py                   render() - the Streamlit UI; see "Streamlit dashboard"
 ├── research/
 │   └── api-map/
 │       ├── api-map.json          Machine-readable endpoint reference
@@ -145,37 +133,32 @@ competitors/kfc && python run_collector.py` will fail on import). Always
 run from the repo root, using one of:
 
 ```bash
-# Root-level wrappers (recommended - identical behavior to the old
-# single-competitor commands):
-python run_kfc_collector.py
-python run_kfc_collector.py --channel=PICKUP
-python run_kfc_collector.py --channel=DELIVERY
-python run_kfc_collector.py --no-screenshots
-python run_hungerstation_collector.py
-python run_kfc_scheduler.py
+# Management entry point (recommended):
+python manage.py collect kfc
+python manage.py collect kfc --channel=PICKUP
+python manage.py collect kfc --channel=DELIVERY
+python manage.py collect kfc --no-screenshots
+python manage.py collect hungerstation
+python manage.py schedule kfc
 
 # Equivalent module invocations (also from the repo root):
 python -m competitors.kfc.run_collector --channel=BOTH
 python -m competitors.kfc.scheduler
 
-# Dashboard - the root Streamlit app, then open the "KFC" page from the
-# sidebar (or it's pages/1_KFC.py directly):
-streamlit run app.py
 ```
 
 ### HungerStation mobile channel
 
 Start the Android emulator and leave the KFC restaurant menu open in the
-HungerStation app, then run `python run_hungerstation_collector.py` from the
+HungerStation app, then run `python manage.py collect hungerstation` from the
 repository root. The collector reads the Android accessibility hierarchy,
 stores a historical snapshot, exposes the data as the `hungerstation`
 channel, creates promotions for discounted products, and reuses KFC images
 from Pickup or Delivery when the normalized product name matches.
 
-The daily KFC scheduler also runs this mobile collection when
-`KFC_HUNGERSTATION_ENABLED=true`. The emulator must stay running and the KFC
-menu must remain available. Set `KFC_HUNGERSTATION_ADB_SERIAL` when the device
-serial is different from `emulator-5554`.
+The HungerStation scheduler is independent from the KFC official-source
+scheduler. The emulator must stay running; set `HUNGERSTATION_ADB_SERIAL` when
+the device serial is different from `emulator-5554`.
 
 The Node collector itself has no such restriction (it's invoked as a
 subprocess by `backend/run_service.py`, or directly via the root
@@ -183,16 +166,15 @@ subprocess by `backend/run_service.py`, or directly via the root
 
 ## Installation
 
-`package.json`, `requirements-local.txt`, `node_modules/`, and `.venv/` are all
+`package.json`, `requirements.txt`, `node_modules/`, and `.venv/` are all
 shared at the **repository root** (see root README.md), not duplicated
 per competitor. Install once, from the repo root:
 
 ```bash
 npm install
-npx playwright install chromium
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements-local.txt
+pip install -r requirements.txt
 cp .env.example .env
 ```
 
@@ -200,16 +182,15 @@ cp .env.example .env
 
 ```bat
 npm install
-npx playwright install chromium
 python -m venv .venv
 .venv\Scripts\activate
-pip install -r requirements-local.txt
+pip install -r requirements.txt
 copy .env.example .env
 ```
 
 Requires Node.js 18+ and Python 3.10+.
 
-> If `npx playwright install chromium` reports missing shared libraries on
+> If Chromium launch reports missing shared libraries on
 > Linux, run `sudo npx playwright install-deps` once.
 
 ## Configuration
@@ -352,50 +333,19 @@ Missing in three consecutive complete successful runs: PRODUCT_REMOVED
 Reappears at any point before the third miss:        cancels the progression, PRODUCT_RETURNED
 ```
 
-The dashboard never uses the word "Discontinued" - the label is always
+The React application never uses the word "Discontinued" - the label is always
 **"Removed / Not observed for 3 successful runs"**.
 
 ## Excel exports
 
-Generated with `openpyxl` directly (full header styling, frozen header
-row, auto-sized columns):
+The supported workbook is generated by `bff/excel_export.py` from the shared
+BFF contract and served at `/api/v1/market/export.xlsx`. React links to
+that endpoint from Market Overview. Legacy per-brand workbook generators are
+not runtime entry points.
 
-| File | Trigger |
-|---|---|
-| `exports/KFC_Daily_Changes_YYYY-MM-DD.xlsx` | "Export Daily Excel" button / `backend.excel_exporter.export_daily_report()` |
-| `exports/KFC_Monthly_Comparison_YYYY-MM.xlsx` | "Export Monthly Excel" button / `export_monthly_report()` |
-| `exports/KFC_Current_Catalog_YYYY-MM-DD.xlsx` | called directly from Python (not currently wired to a dashboard button - see "What could not be verified") |
+## React application
 
-Pickup and Delivery are always separate worksheets in every workbook - no
-worksheet ever mixes their prices in one table. The **Legacy View**
-worksheet mirrors the existing Competitors Pricing shape
-(`Category | Item | Sandwich | Regular | Medium | Large`); a size is only
-ever filled in from `variants[].options[]` data with `isSelected=true` -
-if a product has no size variant, those columns are left blank rather than
-guessed, and the full, unguessed value stays visible in the corresponding
-Normalized worksheet.
-
-## Streamlit dashboard
-
-```bash
-streamlit run app.py     # from the repo root - see root README.md
-```
-
-then open the **KFC** page from the sidebar (`pages/1_KFC.py`, which is a
-two-line wrapper: `from competitors.kfc.dashboard.page import render;
-render()` - the dashboard code itself lives entirely in
-`dashboard/page.py` and is never duplicated in `pages/`).
-
-Local only, no login (`st.set_page_config(page_title="KFC Price
-Intelligence", layout="wide")`, called inside `render()`). Top section
-shows branch, last successful run, next scheduled run, and per-channel
-status; buttons for Run Now / Refresh / Export Daily Excel / Export
-Monthly Excel; summary cards for New Products / New Offers / Price
-Increases / Price Decreases / Offers Ended / Not Observed; tabs for
-Overview, Pickup Products, Pickup Offers, Delivery Products, Delivery
-Offers, Daily Changes, Monthly Comparison, Price History, and Run Logs;
-sidebar filters for Date / Channel / Category / Status / Event Type /
-Product Name / Offers Only.
+The shared React/FastAPI application is the only UI. This collector is exposed through its adapter and can be started from Market Overview or from the collector CLI.
 
 ## Screenshots
 
@@ -497,12 +447,6 @@ a real live run - both documents explain exactly what changed and why.
   is stored as `NULL` rather than a guessed link; `image_url` (a real,
   working asset URL) is populated and used as the Excel "source link"
   fallback instead.
-- **The Current Full Catalog export is not wired to a dashboard button.**
-  `backend.excel_exporter.export_current_catalog()` is fully implemented
-  and covered by a test, but `dashboard/page.py`'s button row only exposes
-  Daily and Monthly exports per the literal button list in the spec ("Run
-  Now / Refresh / Export Daily Excel / Export Monthly Excel") - call it
-  directly from a Python shell (or add a button) if you need it on demand.
 - **A live end-to-end Pickup run outside the branch's operating hours will
   correctly show FAILED** (see "Branch verification" above) - this was
   observed directly during development and is expected/correct behavior,

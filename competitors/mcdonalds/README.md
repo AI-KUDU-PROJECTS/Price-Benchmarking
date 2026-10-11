@@ -1,8 +1,8 @@
 # McDonald's Price Intelligence
 
 **Status: Blocked - site unreachable from this environment (see below).**
-No collector, API research, database, change detection, or dashboard
-logic exists yet for McDonald's. This folder only holds the isolated
+No official collector, API research, database, or change-detection logic
+exists yet for McDonald's. This folder only holds the isolated
 structure future implementation will fill in - see root
 [README.md](../../README.md) for the multi-competitor architecture.
 
@@ -53,9 +53,6 @@ competitors/mcdonalds/
 ├── config/__init__.py    Empty - no configuration values yet
 ├── collector/README.md   Empty - will hold Node.js API bootstrap + collection code (see below)
 ├── backend/__init__.py   Empty - no storage/change-detection code yet
-├── dashboard/
-│   ├── __init__.py
-│   └── page.py           render() shows only a status placeholder - no product data
 ├── research/
 │   ├── pickup/           Empty - future Pickup-channel HAR captures / notes go here
 │   ├── delivery/         Empty - future Delivery-channel HAR captures / notes go here
@@ -78,29 +75,14 @@ implementation.**
 ## Isolation
 
 - `competitors/mcdonalds/` never imports from `competitors/kfc/` or any other
-  competitor folder, and nothing else imports from here except
-  `pages/3_McDonalds.py` at the repo root.
+  competitor folder. Shared access is provided only through the BFF adapter contract.
 - Once implemented, McDonald's's database will live at
   `competitors/mcdonalds/data/database/mcdonalds_monitor.db` - its own file, never
   shared with or written to by another competitor's collector.
 
-## Streamlit page
+## React application
 
-`pages/3_McDonalds.py` (repo root) calls this folder's `dashboard/page.py`:
-
-```python
-from competitors.mcdonalds.dashboard.page import render
-
-render()
-```
-
-`render()` currently only shows:
-
-```text
-McDonald's Price Intelligence
-Status: Collector not implemented yet.
-Folder structure is ready for future development.
-```
+There is no brand-specific UI or official-source collector yet. When a HungerStation snapshot is available, the shared HungerStation adapter exposes this brand through the React/FastAPI application.
 
 ## Adding the real implementation later
 
@@ -116,9 +98,7 @@ When McDonald's is implemented, the intended shape (mirroring
    `competitors/kfc/README.md` "Architecture" for the pattern to follow
    (not to copy verbatim - McDonald's's endpoints are unresearched and will
    differ).
-3. Build the Python `backend/` (database, change detection, Excel
-   export) the same way, writing only to
+3. Build the Python `backend/` (database and change detection) the same way,
+   writing only to
    `competitors/mcdonalds/data/database/mcdonalds_monitor.db`.
-4. Replace `dashboard/page.py`'s placeholder `render()` with a real
-   dashboard, keeping the same `from competitors.mcdonalds.dashboard.page
-   import render` contract so `pages/3_McDonalds.py` never needs to change.
+4. Add or configure a source adapter so the shared React/FastAPI application can expose the brand.

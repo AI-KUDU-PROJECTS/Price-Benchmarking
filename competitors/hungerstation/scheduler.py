@@ -17,7 +17,7 @@ logger = logging.getLogger("hungerstation-scheduler")
 
 def scheduled_job() -> None:
     result = subprocess.run(
-        [sys.executable, "run_hungerstation_collector.py", "--all"],
+        [sys.executable, "manage.py", "collect", "hungerstation", "--all"],
         cwd=config.REPO_ROOT,
         check=False,
     )
@@ -53,4 +53,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

@@ -27,6 +27,7 @@ def _wait_for_completion(manager: PullManager) -> dict:
 def test_all_five_sources_are_configured() -> None:
     assert [target.id for target in TARGETS] == ["kudu", "kfc", "hardees", "burger-king", "herfy"]
     assert TARGETS[0].args == ("-m", "kudu.refresh")
+    assert all(target.args[:3] == ("manage.py", "collect", target.id) for target in TARGETS[1:])
     assert all("--channel=BOTH" in target.args for target in TARGETS[1:])
 
 
@@ -34,7 +35,10 @@ def test_all_six_hungerstation_restaurants_are_configured() -> None:
     assert [target.id for target in HUNGERSTATION_TARGETS] == [
         "kfc", "hardees", "burger-king", "herfy", "mcdonalds", "albaik",
     ]
-    assert all(target.args[:2] == ("run_hungerstation_collector.py", "--brand") for target in HUNGERSTATION_TARGETS)
+    assert all(
+        target.args[:4] == ("manage.py", "collect", "hungerstation", "--brand")
+        for target in HUNGERSTATION_TARGETS
+    )
 
 
 def test_hungerstation_targets_run_sequentially() -> None:
@@ -161,6 +165,25 @@ def test_partial_collection_retries_and_can_recover(tmp_path, monkeypatch) -> No
     status, message = PullManager._run_subprocess(TARGETS[1], "partial-run")
     assert (status, message) == ("success", "Data updated after retry.")
     assert len(calls) == 2
+
+
+def test_hungerstation_failure_reason_reaches_pull_status(tmp_path, monkeypatch) -> None:
+    def fake_run(*args, **kwargs):
+        kwargs["stdout"].write(
+            "HUNGERSTATION_RESULT brand=kfc status=FAILED products=0\n"
+            "HUNGERSTATION_ERROR brand=kfc code=AI_UPDATE_REQUIRED "
+            "message=Sonnet identified a blocking Update now screen.\n"
+        )
+        return SimpleNamespace(returncode=1)
+
+    monkeypatch.setattr(pull_all, "LOG_DIR", tmp_path)
+    monkeypatch.setattr(pull_all.subprocess, "run", fake_run)
+    monkeypatch.setattr(pull_all.time, "sleep", lambda seconds: None)
+    status, message = PullManager._run_subprocess(HUNGERSTATION_TARGETS[0], "hs-failure")
+    assert status == "failed"
+    assert "blocking Update now screen" in message
+    assert "Error code: AI_UPDATE_REQUIRED" in message
+    assert "Previous complete data kept" in message
 
 
 def test_server_restart_marks_unfinished_run_and_keeps_completed_source(tmp_path) -> None:
