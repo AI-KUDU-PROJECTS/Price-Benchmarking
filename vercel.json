@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "fastapi",
+  "installCommand": "npm ci --ignore-scripts",
+  "buildCommand": "VITE_PLAYGROUND_STORAGE=local npm run build"
+}
