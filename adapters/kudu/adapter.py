@@ -11,18 +11,30 @@ from bff.contract import (
     freshness_from_timestamp, to_riyadh_iso,
 )
 from kudu.catalog import CATALOG_PATH, CHANNELS
+from kudu.hungerstation import SNAPSHOT_PATH as HUNGERSTATION_PATH
 
 
 class KuduAdapter:
     brand_id = "kudu"
 
-    def __init__(self, catalog_path: Path = CATALOG_PATH) -> None:
+    def __init__(
+        self,
+        catalog_path: Path = CATALOG_PATH,
+        hungerstation_path: Path = HUNGERSTATION_PATH,
+    ) -> None:
         self.catalog_path = Path(catalog_path)
+        self.hungerstation_path = Path(hungerstation_path)
 
     def _catalog(self) -> dict[str, Any] | None:
         if not self.catalog_path.exists():
             return None
         return json.loads(self.catalog_path.read_text(encoding="utf-8"))
+
+    def _hungerstation(self) -> dict[str, Any] | None:
+        """KUDU's HungerStation menu from the integration API, if collected."""
+        if not self.hungerstation_path.exists():
+            return None
+        return json.loads(self.hungerstation_path.read_text(encoding="utf-8"))
 
     def get_brand(self) -> Brand:
         catalog = self._catalog()
@@ -35,14 +47,14 @@ class KuduAdapter:
             last_successful_run_at=to_riyadh_iso(timestamp),
             data_freshness=freshness,
             capabilities=BrandCapabilities(has_discount=False, has_size_prices=False, has_images=True),
-            channels=["delivery", "pickup"],
+            channels=["delivery", "pickup", *(["hungerstation"] if self.hungerstation_path.exists() else [])],
             location_label="KUDU production menu · template 1",
         )
 
     def _products(self) -> list[Product]:
         catalog = self._catalog()
         if not catalog:
-            return []
+            return self._hungerstation_products()
         observed = to_riyadh_iso(catalog["retrievedAtUtc"])
         products: list[Product] = []
         for channel in CHANNELS:
@@ -76,6 +88,43 @@ class KuduAdapter:
                         observed_at=observed,
                         source_run_id=f"kudu-{channel}-{catalog['retrievedAtUtc']}",
                     ))
+        return products + self._hungerstation_products()
+
+    def _hungerstation_products(self) -> list[Product]:
+        snapshot = self._hungerstation()
+        if not snapshot:
+            return []
+        observed = to_riyadh_iso(snapshot["retrievedAtUtc"])
+        products: list[Product] = []
+        for category in snapshot["categories"]:
+            for item in category["items"]:
+                price = as_money(item.get("price"))
+                original = as_money(item.get("originalPrice"))
+                # originalPrice is the pre-discount price when HungerStation
+                # runs an offer; it is 0/absent otherwise.
+                discounted = price is not None and original is not None and original > price
+                products.append(Product(
+                    id=f"hungerstation-{item['id']}",
+                    brand_id=self.brand_id,
+                    source_id=str(item["id"]),
+                    name_ar=item.get("nameArabic"),
+                    name_en=item.get("nameEnglish"),
+                    category=category.get("titleEnglish") or category.get("titleArabic"),
+                    category_ar=category.get("titleArabic"),
+                    image_url=item.get("imageUrl"),
+                    channel="hungerstation",
+                    location="HungerStation",
+                    regular_price=original if discounted else price,
+                    special_price=price if discounted else None,
+                    currency="SAR",
+                    description_ar=item.get("descriptionArabic"),
+                    description_en=item.get("descriptionEnglish"),
+                    status="active",
+                    first_seen_at=observed,
+                    last_seen_at=observed,
+                    observed_at=observed,
+                    source_run_id=f"kudu-hungerstation-{snapshot['retrievedAtUtc']}",
+                ))
         return products
 
     def get_overview(self) -> BrandOverview:
@@ -96,6 +145,19 @@ class KuduAdapter:
             )
             for channel in CHANNELS
         ] if catalog else []
+        snapshot = self._hungerstation()
+        if snapshot:
+            retrieved = to_riyadh_iso(snapshot["retrievedAtUtc"])
+            runs.append(CollectionRun(
+                id=f"kudu-hungerstation-{snapshot['retrievedAtUtc']}",
+                brand_id=self.brand_id,
+                status="success",
+                started_at=retrieved,
+                completed_at=retrieved,
+                channel="hungerstation",
+                location="HungerStation",
+                item_count=sum(len(category["items"]) for category in snapshot["categories"]),
+            ))
         return BrandOverview(
             brand=brand,
             runs=runs,
@@ -142,8 +204,9 @@ class KuduAdapter:
         self, *, channel: Channel | None = None, status: str | None = None,
         category: str | None = None, query: str | None = None,
     ) -> list[Promotion]:
-        # The API has a Special Offers category, but no original price or
-        # discount. Expose its items as offers without inventing savings.
+        # The app menu has a Special Offers category and the HungerStation
+        # menu a Promotions category; neither gives a discount unless
+        # HungerStation sends an original price. Never invent savings.
         offers = [
             Promotion(
                 id=product.id,
@@ -152,15 +215,21 @@ class KuduAdapter:
                 title=product.name_en or product.name_ar,
                 image_url=product.image_url,
                 status="active",
-                promotional_price=product.regular_price,
+                regular_price=product.regular_price if product.special_price is not None else None,
+                promotional_price=product.special_price if product.special_price is not None else product.regular_price,
+                discount_percent=(
+                    round((product.regular_price - product.special_price) / product.regular_price * 100, 2)
+                    if product.special_price is not None and product.regular_price else None
+                ),
                 channel=product.channel,
-                source="KUDU Special Offers menu",
+                source="KUDU HungerStation Promotions menu" if product.channel == "hungerstation" else "KUDU Special Offers menu",
                 category=product.category,
                 first_seen_at=product.first_seen_at,
                 last_seen_at=product.last_seen_at,
             )
             for product in self._products()
             if product.category == "Special Offers"
+            or (product.channel == "hungerstation" and product.category == "Promotions")
         ]
         if channel:
             offers = [p for p in offers if p.channel == channel]

@@ -11,7 +11,7 @@ Browser → React → FastAPI BFF → adapters → source databases/catalogs
 
 | Source | Collection path |
 | --- | --- |
-| KUDU | KUDU API/catalog baseline |
+| KUDU | KUDU API/catalog baseline; HungerStation menu from the KUDU integration API |
 | KFC | Official-source collector |
 | Hardee's | Official-source collector |
 | Burger King | Official-source collector |
@@ -117,6 +117,18 @@ and run:
 ```bash
 python -m kudu.refresh
 ```
+
+KUDU's own HungerStation menu comes from the KUDU integration API, not the
+emulator. Set `KUDU_AGGREGATOR_TOKEN` in `.env` and run:
+
+```bash
+python manage.py collect kudu-hungerstation
+```
+
+It also runs first in "Collect HungerStation". The integration host is on
+KUDU's internal network, so the machine running it must reach that network.
+The API has no images: items reuse the main-menu image of the same item id,
+the same name, or a clearly matching name, and stay blank otherwise.
 
 ## Architecture
 

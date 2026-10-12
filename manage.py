@@ -16,6 +16,7 @@ COLLECTOR_MODULES = {
     "burger-king": "competitors.burger_king.run_collector",
     "herfy": "competitors.herfy.run_collector",
     "hungerstation": "competitors.hungerstation.collector",
+    "kudu-hungerstation": "kudu.hungerstation",
 }
 
 SCHEDULER_MODULES = {

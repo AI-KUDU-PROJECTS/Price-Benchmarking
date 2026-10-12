@@ -19,7 +19,11 @@ import { setPageParam, setSearchParam } from "../lib/params";
 export function BrandMenuPage({ brandId }: { brandId: string }) {
   const [params, setParams] = useSearchParams();
   const isKudu = brandId === "kudu";
-  const channel = params.get("channel") || (isKudu ? "delivery" : "");
+  // KUDU opens on Delivery when the URL has no channel, so "All channels"
+  // needs an explicit value there; competitors use an empty value.
+  const allChannels = isKudu ? "all" : "";
+  const selectedChannel = params.get("channel") || (isKudu ? "delivery" : "");
+  const channel = selectedChannel === "all" ? "" : selectedChannel;
   const q = params.get("q") || "";
   const query = new URLSearchParams();
   if (channel) query.set("channel", channel);
@@ -37,7 +41,11 @@ export function BrandMenuPage({ brandId }: { brandId: string }) {
       <PageHeader
         title={isKudu ? "KUDU menu" : "Menu"}
         subtitle={isKudu
-          ? "Production menu · template 1 · prices and images from the latest saved collection"
+          ? channel === "hungerstation"
+            ? "HungerStation menu from the KUDU integration API · images reused from the main menu where the item matches"
+            : channel === ""
+              ? "All channels · production menu (delivery, pickup) and the HungerStation menu from the KUDU integration API"
+              : "Production menu · template 1 · prices and images from the latest saved collection"
           : "Latest successful collection. Missing prices stay blank."}
       />
       <BrandTabs brandId={brandId} />
@@ -53,13 +61,13 @@ export function BrandMenuPage({ brandId }: { brandId: string }) {
         <select
           id="filter-channel"
           className="control"
-          value={channel}
+          value={selectedChannel}
           onChange={(e) => setSearchParam(setParams, params, "channel", e.target.value)}
         >
-          {!isKudu && <option value="">All channels</option>}
+          <option value={allChannels}>All channels</option>
           <option value="pickup">Pickup</option>
           <option value="delivery">Delivery</option>
-          {!isKudu && <option value="hungerstation">HungerStation</option>}
+          <option value="hungerstation">HungerStation</option>
         </select>
       </div>
       <div className="results" aria-busy={loading}>

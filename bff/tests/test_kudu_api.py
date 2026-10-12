@@ -21,12 +21,13 @@ def client() -> TestClient:
 def test_kudu_is_first_and_has_both_channels(client: TestClient) -> None:
     brands = client.get("/api/v1/brands").json()["items"]
     assert brands[0]["id"] == "kudu"
-    assert brands[0]["channels"] == ["delivery", "pickup"]
+    # A HungerStation channel is added once kudu-hungerstation has collected.
+    assert brands[0]["channels"][:2] == ["delivery", "pickup"]
     overview = client.get("/api/v1/brands/kudu/overview")
     assert overview.status_code == 200
     body = overview.json()
     run_counts = {run["channel"]: run["itemCount"] for run in body["runs"]}
-    assert set(run_counts) == {"delivery", "pickup"}
+    assert {"delivery", "pickup"} <= set(run_counts)
     assert body["productCount"] == sum(run_counts.values())
     assert body["promotionCount"] >= 0
 

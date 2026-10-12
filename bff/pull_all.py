@@ -44,7 +44,10 @@ TARGETS = (
     PullTarget("herfy", "Herfy", ("manage.py", "collect", "herfy", "--channel=BOTH", "--no-screenshots")),
 )
 
+# KUDU's own HungerStation menu comes from the KUDU integration API (no
+# emulator); it reports results in the same HUNGERSTATION_* format.
 HUNGERSTATION_TARGETS = (
+    PullTarget("kudu", "KUDU", ("manage.py", "collect", "kudu-hungerstation")),
     PullTarget("kfc", "KFC", ("manage.py", "collect", "hungerstation", "--brand", "kfc")),
     PullTarget("hardees", "Hardee's", ("manage.py", "collect", "hungerstation", "--brand", "hardees")),
     PullTarget("burger-king", "Burger King", ("manage.py", "collect", "hungerstation", "--brand", "burger-king")),
@@ -54,6 +57,13 @@ HUNGERSTATION_TARGETS = (
 )
 
 Runner = Callable[[PullTarget, str], tuple[str, str]]
+
+
+def _reports_hungerstation_result(target: PullTarget) -> bool:
+    return target.args[:3] in {
+        ("manage.py", "collect", "hungerstation"),
+        ("manage.py", "collect", "kudu-hungerstation"),
+    }
 
 
 class PullManager:
@@ -185,7 +195,7 @@ class PullManager:
             output_text = log_path.read_text(encoding="utf-8", errors="replace")
             if result.returncode == 2 and "Refused to start" in output_text:
                 return "already_running", "A separate collection is already running for this brand."
-            if target.args[:3] == ("manage.py", "collect", "hungerstation"):
+            if _reports_hungerstation_result(target):
                 match = re.search(
                     rf"HUNGERSTATION_RESULT brand={re.escape(target.id)} status=(SUCCESS|FAILED) products=(\d+)",
                     output_text,
@@ -225,7 +235,7 @@ class PullManager:
                 last_failure = best_partial
             elif result.returncode == 0 and confirmed is None:
                 last_failure = "Collector exited without confirming completion."
-            elif target.args[:3] != ("manage.py", "collect", "hungerstation"):
+            elif not _reports_hungerstation_result(target):
                 last_failure = f"Collector failed (exit {result.returncode}); previous complete data kept."
             if attempt + 1 < attempts:
                 time.sleep(8)

@@ -33,11 +33,13 @@ def test_all_five_sources_are_configured() -> None:
 
 def test_all_six_hungerstation_restaurants_are_configured() -> None:
     assert [target.id for target in HUNGERSTATION_TARGETS] == [
-        "kfc", "hardees", "burger-king", "herfy", "mcdonalds", "albaik",
+        "kudu", "kfc", "hardees", "burger-king", "herfy", "mcdonalds", "albaik",
     ]
+    # KUDU's own menu comes from the integration API, not the emulator.
+    assert HUNGERSTATION_TARGETS[0].args == ("manage.py", "collect", "kudu-hungerstation")
     assert all(
         target.args[:4] == ("manage.py", "collect", "hungerstation", "--brand")
-        for target in HUNGERSTATION_TARGETS
+        for target in HUNGERSTATION_TARGETS[1:]
     )
 
 
@@ -179,7 +181,7 @@ def test_hungerstation_failure_reason_reaches_pull_status(tmp_path, monkeypatch)
     monkeypatch.setattr(pull_all, "LOG_DIR", tmp_path)
     monkeypatch.setattr(pull_all.subprocess, "run", fake_run)
     monkeypatch.setattr(pull_all.time, "sleep", lambda seconds: None)
-    status, message = PullManager._run_subprocess(HUNGERSTATION_TARGETS[0], "hs-failure")
+    status, message = PullManager._run_subprocess(HUNGERSTATION_TARGETS[1], "hs-failure")
     assert status == "failed"
     assert "blocking Update now screen" in message
     assert "Error code: AI_UPDATE_REQUIRED" in message
@@ -204,3 +206,14 @@ def test_server_restart_marks_unfinished_run_and_keeps_completed_source(tmp_path
     assert "server restart" in recovered["brands"][1]["message"]
     assert recovered["completedAt"]
     assert json.loads(path.read_text())["status"] == "partial"
+
+
+def test_kudu_hungerstation_result_reaches_pull_status(tmp_path, monkeypatch) -> None:
+    def fake_run(*args, **kwargs):
+        kwargs["stdout"].write("HUNGERSTATION_RESULT brand=kudu status=SUCCESS products=143\n")
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(pull_all, "LOG_DIR", tmp_path)
+    monkeypatch.setattr(pull_all.subprocess, "run", fake_run)
+    status, message = PullManager._run_subprocess(HUNGERSTATION_TARGETS[0], "kudu-hs")
+    assert (status, message) == ("success", "Collected 143 products from HungerStation.")
