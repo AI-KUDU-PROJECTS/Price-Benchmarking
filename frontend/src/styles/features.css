@@ -172,8 +172,14 @@
 }
 
 /* Market Overview: one explicit action with compact per-source progress. */
-.schedule-note {
-  margin: 0 0 var(--kudu-space-4);
+/* Automatic-collection schedule: a full-border brand-yellow notice so every
+   user sees when data refreshes. Text stays dark; icon and times use the
+   warning text tone, which keeps 4.5:1 contrast on the light yellow. */
+.alert.schedule-note {
+  --tone-surface: color-mix(in srgb, var(--kudu-brand-yellow) 14%, var(--kudu-surface-primary));
+  --tone-border: var(--kudu-brand-yellow);
+  --tone-text: var(--kudu-status-warning-text);
+  margin-bottom: var(--kudu-space-4);
 }
 
 .pull-panel {

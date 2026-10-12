@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Download, RefreshCw } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { CalendarClock, Download, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
 import { api } from "../api/client";
 import type { PullRun, PullSchedule } from "../api/types";
@@ -131,7 +131,12 @@ export function MarketOverviewPage() {
           </div>
         }
       />
-      {schedule && <p className="meta-text schedule-note">{scheduleText(schedule)}</p>}
+      {schedule && (
+        <div className="alert schedule-note" role="status">
+          <span className="alert-icon"><CalendarClock size={18} aria-hidden="true" /></span>
+          <p className="alert-text">{scheduleText(schedule)}</p>
+        </div>
+      )}
       {pullError && <div className="alert" data-tone="error" role="alert"><p className="alert-text">{pullError}</p></div>}
       {hungerstationError && <div className="alert" data-tone="error" role="alert"><p className="alert-text">{hungerstationError}</p></div>}
       {pullRun && (
@@ -262,11 +267,15 @@ export function MarketOverviewPage() {
   );
 }
 
-function scheduleText(schedule: PullSchedule): string {
+function scheduleText(schedule: PullSchedule): ReactNode {
   if (!schedule.enabled) return "Automatic collection is off. Use the buttons above to collect.";
   const order = schedule.includeHungerstation ? "websites, then HungerStation" : "websites only";
-  const next = schedule.nextRunAt ? ` Next run ${formatRiyadhDateTime(schedule.nextRunAt)}.` : "";
-  return `Automatic collection daily at ${schedule.times.join(", ")} Riyadh time (${order}).${next}`;
+  return (
+    <>
+      Automatic collection daily at <strong>{schedule.times.join(", ")}</strong> Riyadh time ({order}).
+      {schedule.nextRunAt ? <> Next run: <strong>{formatRiyadhDateTime(schedule.nextRunAt)}</strong>.</> : null}
+    </>
+  );
 }
 
 function triggerLabel(run: PullRun): string {
