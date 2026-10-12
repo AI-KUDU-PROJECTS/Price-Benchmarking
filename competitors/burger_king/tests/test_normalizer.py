@@ -104,3 +104,20 @@ def test_normalize_product_end_to_end_real_shape(pickup_result):
     assert snap["description_en"] and "flame-grilled" in snap["description_en"].lower()
     assert snap["description_ar"]
     assert snap["channel"] == "PICKUP"
+
+
+def test_normalize_product_records_store_menu_availability(pickup_result):
+    base = next(p for p in pickup_result["products"] if p["_id"] == "b9bd3a45-b4eb-45c5-a1d0-65267b9dcc32")
+    kwargs = dict(
+        channel="PICKUP", branch_id=11474, branch_name="Dabab Street", city="Riyadh",
+        cluster_id=None, config_id=None, run_id="run-1", captured_at="2026-08-01T06:05:00Z",
+    )
+    unavailable = normalizer.normalize_product({**base, "__available": False, "__price": None}, **kwargs)
+    available = normalizer.normalize_product({**base, "__available": True}, **kwargs)
+    unmatched = normalizer.normalize_product({k: v for k, v in base.items() if k != "__available"}, **kwargs)
+
+    assert unavailable["availability"] == 0
+    assert unavailable["regular_price"] is None
+    assert available["availability"] == 1
+    # No storeMenu match: presence in the menu stays the only signal.
+    assert unmatched["availability"] == 1

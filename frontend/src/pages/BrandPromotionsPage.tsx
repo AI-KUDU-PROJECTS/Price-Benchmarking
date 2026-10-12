@@ -5,24 +5,29 @@ import { Badge } from "../components/Badge";
 import { BrandTabs } from "../components/BrandTabs";
 import { DataBanner } from "../components/DataBanner";
 import { PageHeader } from "../components/PageHeader";
+import { Pager } from "../components/Pager";
 import { Price } from "../components/Price";
 import { ProductImage } from "../components/ProductImage";
+import { SearchField } from "../components/SearchField";
 import { EmptyState, ErrorState, LoadingState } from "../components/States";
 import { promotionHref } from "../lib/links";
 import { formatRiyadhDateTime } from "../lib/dateTime";
-import { setSearchParam } from "../lib/params";
+import { setPageParam, setSearchParam } from "../lib/params";
 
 export function BrandPromotionsPage({ brandId }: { brandId: string }) {
   const [params, setParams] = useSearchParams();
   const channel = params.get("channel") || "";
   const status = params.get("status") || "";
+  const q = params.get("q") || "";
   const query = new URLSearchParams();
   if (channel) query.set("channel", channel);
   if (status) query.set("status", status);
+  if (q) query.set("q", q);
+  if (params.get("page")) query.set("page", params.get("page") as string);
   const suffix = query.toString() ? `?${query}` : "";
-  const { data, error, loading } = useApi(() => api.promotions(brandId, suffix), [brandId, suffix]);
+  const { data, error, loading } = useApi(() => api.promotions(brandId, suffix), [brandId, suffix], { keepPreviousData: true });
 
-  if (loading) return <LoadingState variant="cards" />;
+  if (loading && !data) return <LoadingState variant="cards" />;
   if (error) return <ErrorState error={error} />;
   if (!data) return <EmptyState message="No promotions." />;
 
@@ -32,6 +37,12 @@ export function BrandPromotionsPage({ brandId }: { brandId: string }) {
       <BrandTabs brandId={brandId} />
       <DataBanner freshness={data.meta.freshness} />
       <div className="filter-bar">
+        <SearchField
+          label="Search promotions"
+          placeholder="Search promotions"
+          defaultValue={q}
+          onCommit={(value) => setSearchParam(setParams, params, "q", value)}
+        />
         <label className="visually-hidden" htmlFor="filter-channel">Channel</label>
         <select id="filter-channel" className="control" value={channel} onChange={(e) => setSearchParam(setParams, params, "channel", e.target.value)}>
           <option value="">All channels</option>
@@ -49,37 +60,40 @@ export function BrandPromotionsPage({ brandId }: { brandId: string }) {
           <option value="returned">Returned</option>
         </select>
       </div>
-      {data.items.length === 0 ? (
-        <EmptyState message="No promotions match these filters." />
-      ) : (
-        <div className="grid cards">
-          {data.items.map((promo) => (
-            <Link key={promo.id} className="card promo-card" to={promotionHref(brandId, promo.id)}>
-              <ProductImage src={promo.imageUrl} alt={promo.title || ""} large />
-              <div className="body">
-                <div className="promo-meta">
-                  <Badge value={promo.isNew ? "new" : promo.status} />
-                  <span className="meta-text">{promo.channel}</span>
+      <div className="results" aria-busy={loading}>
+        {data.items.length === 0 ? (
+          <EmptyState message="No promotions match these filters." />
+        ) : (
+          <div className="grid cards">
+            {data.items.map((promo) => (
+              <Link key={promo.id} className="card promo-card" to={promotionHref(brandId, promo.id)}>
+                <ProductImage src={promo.imageUrl} alt={promo.title || ""} large />
+                <div className="body">
+                  <div className="promo-meta">
+                    <Badge value={promo.isNew ? "new" : promo.status} />
+                    <span className="meta-text">{promo.channel}</span>
+                  </div>
+                  <h3>{promo.title || "Untitled offer"}</h3>
+                  <div>
+                    <Price
+                      value={promo.promotionalPrice}
+                      currency="SAR"
+                      previous={promo.regularPrice}
+                    />
+                  </div>
+                  <div className="meta-text">
+                    Discount: {promo.discountPercent === null ? "—" : `${promo.discountPercent}%`}
+                  </div>
+                  <div className="meta-text">
+                    First {formatRiyadhDateTime(promo.firstSeenAt)} · Last {formatRiyadhDateTime(promo.lastSeenAt)}
+                  </div>
                 </div>
-                <h3>{promo.title || "Untitled offer"}</h3>
-                <div>
-                  <Price
-                    value={promo.promotionalPrice}
-                    currency="SAR"
-                    previous={promo.regularPrice}
-                  />
-                </div>
-                <div className="meta-text">
-                  Discount: {promo.discountPercent === null ? "—" : `${promo.discountPercent}%`}
-                </div>
-                <div className="meta-text">
-                  First {formatRiyadhDateTime(promo.firstSeenAt)} · Last {formatRiyadhDateTime(promo.lastSeenAt)}
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
+              </Link>
+            ))}
+          </div>
+        )}
+        <Pager meta={data.meta} onPage={(page) => setPageParam(setParams, params, page)} />
+      </div>
     </>
   );
 }

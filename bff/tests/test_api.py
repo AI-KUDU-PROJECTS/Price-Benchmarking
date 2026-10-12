@@ -8,7 +8,9 @@ from fastapi.testclient import TestClient
 from adapters.kfc import KfcAdapter
 from adapters.kfc.tests.seed import seed_kfc_db
 from bff.app import app
+from bff.contract import ChangeEvent
 from bff.registry import configure_adapters_for_test, configure_kfc_adapter
+from bff.routes import _filter_change_query
 
 
 @pytest.fixture()
@@ -76,6 +78,36 @@ def test_market_feeds_use_connected_adapters(client: TestClient) -> None:
     assert promotions.status_code == 200
     assert all(item["brandId"] == "kfc" for item in changes.json()["items"])
     assert all(item["brandId"] == "kfc" for item in promotions.json()["items"])
+
+
+def test_change_query_filter_matches_ids_titles_and_values() -> None:
+    target = ChangeEvent(
+        id="event-zinger",
+        brand_id="kfc",
+        product_id="product-1",
+        type="price_increased",
+        title="Zinger meal",
+        before_value="SAR 20",
+        after_value="SAR 25",
+        detected_at="2026-10-12T09:00:00+03:00",
+        channel="delivery",
+        category="Meals",
+    )
+    other = ChangeEvent(
+        id="event-burger",
+        brand_id="kfc",
+        product_id="product-2",
+        type="product_added",
+        title="Burger meal",
+        detected_at="2026-10-12T10:00:00+03:00",
+        channel="pickup",
+        category="Meals",
+    )
+
+    assert _filter_change_query([target, other], "zinger") == [target]
+    assert _filter_change_query([target, other], "SAR 25") == [target]
+    assert _filter_change_query([target, other], "event-burger") == [other]
+    assert _filter_change_query([target, other], "  ") == [target, other]
 
 
 def test_market_excel_export_uses_connected_adapters(client: TestClient) -> None:

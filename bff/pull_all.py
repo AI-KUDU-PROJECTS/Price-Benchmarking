@@ -111,7 +111,7 @@ class PullManager:
         with self._lock:
             return copy.deepcopy(self._run)
 
-    def start(self) -> tuple[dict, bool]:
+    def start(self, trigger: str = "manual") -> tuple[dict, bool]:
         with self._lock:
             if self._run and self._run["status"] == "running":
                 return copy.deepcopy(self._run), False
@@ -119,6 +119,7 @@ class PullManager:
             self._run = {
                 "runId": run_id,
                 "status": "running",
+                "trigger": trigger,
                 "startedAt": _now(),
                 "completedAt": None,
                 "brands": [

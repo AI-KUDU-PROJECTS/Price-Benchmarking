@@ -253,7 +253,10 @@ def normalize_product(
         "limited_offer": 0,
         "product_type": product.get("_type"),
         "bundle_type_id": "combo" if product.get("_type") == "combo" else None,
-        "availability": 1,  # appearing in GetMenuSections is the only availability signal available - see api-map.md
+        # storeMenu marks items the branch does not sell in this channel with
+        # isAvailable=false (and a 0 price); without a storeMenu match the
+        # product's presence in GetMenuSections is the only signal.
+        "availability": 0 if product.get("__available") is False else 1,
         "image_url": extract_image_url(product),
         "product_url": None,  # SPA, no confirmed per-product deep link - see api-map.md
         "calories": None,  # not present anywhere in the collected data this session

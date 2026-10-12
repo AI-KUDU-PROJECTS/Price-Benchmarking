@@ -360,6 +360,31 @@ tbody tr:hover {
   margin-top: var(--kudu-space-4);
 }
 
+/* Results stay visible (dimmed) while a filter or search reloads them. */
+.results[aria-busy="true"] {
+  opacity: 0.55;
+  transition: opacity 120ms ease;
+}
+
+/* Quiet pagination under paged lists: range on one side, actions on the other. */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--kudu-space-3);
+  flex-wrap: wrap;
+  margin-top: var(--kudu-space-4);
+}
+
+.pager-actions {
+  display: flex;
+  gap: var(--kudu-space-2);
+}
+
+[dir="rtl"] .pager-actions svg {
+  transform: scaleX(-1);
+}
+
 .control {
   height: var(--kudu-control-md);
   border: 1px solid var(--kudu-border-default);
@@ -396,11 +421,29 @@ select.control {
   align-items: center;
 }
 
-.field-search svg {
+.field-search-submit {
   position: absolute;
-  inset-inline-start: var(--kudu-space-3);
+  inset-inline-start: 0;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--kudu-control-md);
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: var(--kudu-radius-small);
+  background: transparent;
   color: var(--kudu-text-muted);
-  pointer-events: none;
+  cursor: pointer;
+}
+
+.field-search-submit:hover {
+  color: var(--kudu-text-brand);
+}
+
+.field-search-submit:focus-visible {
+  color: var(--kudu-text-brand);
 }
 
 .field-search .control {

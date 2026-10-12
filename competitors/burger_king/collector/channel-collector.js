@@ -237,7 +237,21 @@ async function collectChannel(channel, logger, { onRawResponse } = {}) {
     error: null,
   }));
 
-  const status = products.length > 0 ? 'SUCCESS' : 'FAILED';
+  // A run where most sellable items lost their price (for example when
+  // storeMenu fails and the DOM fallback cannot pick a store) must not
+  // become the latest snapshot or be compared as real price changes.
+  const sellable = products.filter((p) => p.__available !== false);
+  const sellablePriced = sellable.filter((p) => p.__price != null).length;
+  const pricesIncomplete = sellable.length > 0 && sellablePriced / sellable.length < CONFIG.MIN_PRICED_RATIO;
+  if (pricesIncomplete) {
+    logger.tag('PRICE', `Only ${sellablePriced}/${sellable.length} available products have a price (minimum ${Math.round(CONFIG.MIN_PRICED_RATIO * 100)}%) - marking ${channel} PARTIAL`);
+  }
+  const status = products.length === 0 ? 'FAILED' : pricesIncomplete ? 'PARTIAL' : 'SUCCESS';
+  const errorMessage = products.length === 0
+    ? 'GetMenuSections returned zero products'
+    : pricesIncomplete
+      ? `Only ${sellablePriced}/${sellable.length} available products have a price`
+      : null;
 
   return {
     channel,
@@ -258,7 +272,7 @@ async function collectChannel(channel, logger, { onRawResponse } = {}) {
     promotions: [],
     productCount: products.length,
     branchCurrentlyClosed: branchCheck.currentlyClosed,
-    errorMessage: status === 'FAILED' ? 'GetMenuSections returned zero products' : null,
+    errorMessage,
   };
 }
 

@@ -15,6 +15,8 @@ from pydantic.alias_generators import to_camel
 TIMEZONE_NAME = "Asia/Riyadh"
 RIYADH = ZoneInfo(TIMEZONE_NAME)
 STALE_AFTER = timedelta(hours=30)
+# Overview counts, highlights, and "recent changes" all use this one window.
+RECENT_WINDOW_DAYS = 7
 
 Health = Literal["healthy", "partial", "stale", "error", "disconnected"]
 Freshness = Literal["fresh", "stale", "unavailable"]
@@ -396,6 +398,19 @@ def freshness_from_timestamp(last_success: str | None, now: datetime | None = No
         current = current.replace(tzinfo=timezone.utc)
     age = current - dt
     return "fresh" if age <= STALE_AFTER else "stale"
+
+
+def recent_window(events: list[ChangeEvent], now: datetime | None = None) -> list[ChangeEvent]:
+    """Events detected in the last RECENT_WINDOW_DAYS. Never falls back to
+    older events, so overview counts always describe the same period."""
+    current = now or datetime.now(tz=timezone.utc)
+    cutoff = current - timedelta(days=RECENT_WINDOW_DAYS)
+    recent = []
+    for event in events:
+        detected = parse_utc(event.detected_at)
+        if detected and detected >= cutoff:
+            recent.append(event)
+    return recent
 
 
 def disconnected_brand(brand_id: str, name: str) -> Brand:

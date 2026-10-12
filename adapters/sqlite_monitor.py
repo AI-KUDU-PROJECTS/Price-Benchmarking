@@ -1,9 +1,10 @@
 """Generic read-only adapter for the shared competitor SQLite schema."""
 from __future__ import annotations
 
+import ast
 import json
 import sqlite3
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -28,9 +29,16 @@ from bff.contract import (
     freshness_from_timestamp,
     now_riyadh,
     parse_utc,
+    recent_window,
     select_highlights,
     to_riyadh_iso,
 )
+
+# REGULAR_PRICE_CHANGED is written alongside every PRICE_INCREASE/DECREASE
+# with the same values, so showing both lists each price change twice.
+_DUPLICATE_SOURCE_EVENTS = {"REGULAR_PRICE_CHANGED"}
+
+
 class SQLiteMonitorAdapter:
     def __init__(
         self,
@@ -77,15 +85,19 @@ class SQLiteMonitorAdapter:
             products = self._latest_products(conn)
             promotions = self._latest_promotions(conn)
             changes = self._changes(conn)
-            window = _recent_window(changes)
+            window = recent_window(changes)
             return BrandOverview(
                 brand=brand,
                 runs=runs,
                 product_count=len(products),
                 promotion_count=sum(1 for p in promotions if p.status == "active"),
-                recent_changes=window[:20],
+                recent_changes=window,
                 highlights=select_highlights(window),
             )
+
+    def list_runs(self, limit: int = 8) -> list[CollectionRun]:
+        with self._connect() as conn:
+            return self._runs(conn, limit=limit)
 
     def list_products(
         self,
@@ -758,7 +770,7 @@ class SQLiteMonitorAdapter:
         events: list[ChangeEvent] = []
         for row in rows:
             mapped = SOURCE_EVENT_TO_CONTRACT.get(row["event_type"])
-            if mapped is None:
+            if mapped is None or _is_noise_event(row):
                 continue
             entity_type = row["entity_type"]
             entity_key = row["entity_key"]
@@ -774,8 +786,8 @@ class SQLiteMonitorAdapter:
                     promotion_id=promotion_id,
                     type=mapped,
                     title=_blank_to_none(row["entity_name"]),
-                    before_value=_blank_to_none(row["old_value"]),
-                    after_value=_blank_to_none(row["new_value"]),
+                    before_value=_display_value(row["old_value"]),
+                    after_value=_display_value(row["new_value"]),
                     percentage_change=as_money(row["percentage_change"]),
                     detected_at=to_riyadh_iso(row["detected_at"]) or now_riyadh().isoformat(),
                     channel=_to_channel(row["channel"]),
@@ -1092,11 +1104,32 @@ def _parse_riyadh_boundary(value: str | None, *, end_of_day: bool) -> datetime |
     return parse_utc(text)
 
 
-def _recent_window(events: list[ChangeEvent], days: int = 7) -> list[ChangeEvent]:
-    cutoff = now_riyadh().astimezone(timezone.utc) - timedelta(days=days)
-    recent = []
-    for event in events:
-        detected = parse_utc(event.detected_at)
-        if detected and detected >= cutoff:
-            recent.append(event)
-    return recent or events[:50]
+def _is_noise_event(row: sqlite3.Row) -> bool:
+    """Hide rows that repeat another event or only track add-on menus.
+
+    Add-on groups (for example optional sides) appear and disappear with
+    stock between runs; Herfy alone produced hundreds of these rows.
+    """
+    if row["event_type"] in _DUPLICATE_SOURCE_EVENTS:
+        return True
+    return row["event_type"] == "DETAILS_CHANGED" and row["field_name"] == "option_groups"
+
+
+def _display_value(value: Any) -> str | None:
+    """Render offer-change values (stored as a Python dict repr such as
+    "{'offer_price': None}") as readable text."""
+    text = _blank_to_none(value)
+    if text is None or not text.startswith("{"):
+        return text
+    try:
+        parsed = ast.literal_eval(text)
+    except (ValueError, SyntaxError):
+        return text
+    if not isinstance(parsed, dict):
+        return text
+    parts = []
+    for field, field_value in parsed.items():
+        label = str(field).replace("_", " ").capitalize()
+        shown = "—" if field_value in (None, "", "[]") else field_value
+        parts.append(f"{label}: {shown}")
+    return " · ".join(parts) or None

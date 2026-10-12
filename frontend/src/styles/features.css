@@ -172,6 +172,10 @@
 }
 
 /* Market Overview: one explicit action with compact per-source progress. */
+.schedule-note {
+  margin: 0 0 var(--kudu-space-4);
+}
+
 .pull-panel {
   margin-bottom: var(--kudu-space-5);
 }

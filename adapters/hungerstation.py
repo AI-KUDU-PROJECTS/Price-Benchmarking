@@ -20,10 +20,15 @@ from bff.contract import (
     Promotion,
     as_money,
     freshness_from_timestamp,
+    recent_window,
     select_highlights,
     to_riyadh_iso,
 )
 from competitors.hungerstation import config, database
+
+# Adapters are rebuilt for every request, so the cache lives at module level.
+# Entries are keyed by brand and invalidated when either database changes.
+_PRODUCT_CACHE: dict[tuple[str, str], tuple[tuple, list[Product]]] = {}
 
 
 def _public_id(source_id: str) -> str:
@@ -51,6 +56,31 @@ def _image_map(base: BrandAdapter | None) -> dict[str, str]:
             if product.image_url:
                 images.setdefault(_normalize(product.name_en or product.name_ar), product.image_url)
     return images
+
+
+def _file_signature(*paths: Path | None) -> tuple:
+    """mtime/size of each SQLite file and its WAL; changes after any write."""
+    signature: list[tuple[int, int] | None] = []
+    for path in paths:
+        if path is None:
+            continue
+        for candidate in (path, path.with_name(f"{path.name}-wal")):
+            try:
+                stat = candidate.stat()
+            except OSError:
+                signature.append(None)
+            else:
+                signature.append((stat.st_mtime_ns, stat.st_size))
+    return tuple(signature)
+
+
+def _base_channels(channel: Channel | None) -> tuple[Channel, ...]:
+    """Official-site channels to request from the base adapter. Base
+    databases also hold legacy HungerStation rows, which the overlay
+    replaces, so skip them instead of building and discarding them."""
+    if channel is None:
+        return ("pickup", "delivery")
+    return () if channel == "hungerstation" else (channel,)
 
 
 def _match_image(name: str | None, images: dict[str, str]) -> str | None:
@@ -127,16 +157,15 @@ class HungerstationOverlayAdapter:
     def get_overview(self) -> BrandOverview:
         products = self.list_products()
         promotions = self.list_promotions()
-        changes = self.list_changes()
+        recent = recent_window(self.list_changes())
         runs: list[CollectionRun] = []
         if self.base is not None:
             try:
-                runs.extend(run for run in self.base.get_overview().runs if run.channel != "hungerstation")
+                runs.extend(run for run in self.base.list_runs() if run.channel != "hungerstation")
             except (FileNotFoundError, sqlite3.Error):
                 pass
         runs.extend(self._runs())
         runs.sort(key=lambda run: run.started_at or "", reverse=True)
-        recent = changes[:200]
         return BrandOverview(
             brand=self.get_brand(),
             runs=runs[:12],
@@ -168,10 +197,19 @@ class HungerstationOverlayAdapter:
         ]
 
     def _hungerstation_products(self) -> list[Product]:
+        # Fuzzy image matching is the slow part of every overview/menu
+        # request, so reuse the result until a collector writes new data.
+        key = (self.brand_id, str(self.db_path))
+        signature = _file_signature(self.db_path, getattr(self.base, "db_path", None))
+        cached = _PRODUCT_CACHE.get(key)
+        if cached is not None and cached[0] == signature:
+            return list(cached[1])
         with database.readonly_connection(self.db_path) as db:
             rows = database.latest_products(db, self.brand_id)
         images = _image_map(self.base)
-        return [self._product(row, _match_image(row["name_en"], images)) for row in rows]
+        products = [self._product(row, _match_image(row["name_en"], images)) for row in rows]
+        _PRODUCT_CACHE[key] = (signature, products)
+        return list(products)
 
     def _product(self, row: sqlite3.Row | dict[str, Any], fallback_image: str | None = None) -> Product:
         data = dict(row)
@@ -209,14 +247,14 @@ class HungerstationOverlayAdapter:
         query: str | None = None,
     ) -> list[Product]:
         products: list[Product] = []
-        if channel != "hungerstation" and self.base is not None:
+        if self.base is not None:
             try:
-                products.extend(
-                    product for product in self.base.list_products(channel=channel, category=category, query=query)
-                    if product.channel != "hungerstation"
-                )
+                for base_channel in _base_channels(channel):
+                    products.extend(self.base.list_products(channel=base_channel, category=category, query=query))
             except (FileNotFoundError, sqlite3.Error):
                 pass
+            # Keep each item's pickup and delivery rows next to each other.
+            products.sort(key=lambda product: (product.category or "", product.name_en or ""))
         if channel in (None, "hungerstation"):
             products.extend(self._hungerstation_products())
         category_key = (category or "").casefold()
@@ -301,15 +339,15 @@ class HungerstationOverlayAdapter:
         query: str | None = None,
     ) -> list[Promotion]:
         promotions: list[Promotion] = []
-        if channel != "hungerstation" and self.base is not None:
+        if self.base is not None:
             try:
-                promotions.extend(
-                    promotion for promotion in self.base.list_promotions(
-                        channel=channel, status=status, category=category, query=query
-                    ) if promotion.channel != "hungerstation"
-                )
+                for base_channel in _base_channels(channel):
+                    promotions.extend(self.base.list_promotions(
+                        channel=base_channel, status=status, category=category, query=query
+                    ))
             except (FileNotFoundError, sqlite3.Error):
                 pass
+            promotions.sort(key=lambda promotion: (promotion.status != "active", promotion.title or ""))
         if channel in (None, "hungerstation"):
             promotions.extend(self._hungerstation_promotions())
         return [
@@ -420,9 +458,10 @@ class HungerstationOverlayAdapter:
                 pass
         if channel in (None, "hungerstation"):
             events.extend(self._hungerstation_changes())
+        wanted_types = {part.strip() for part in (event_type or "").split(",") if part.strip()}
         events = [
             event for event in events
-            if (not event_type or event.type == event_type)
+            if (not wanted_types or event.type in wanted_types)
             and (not category or (event.category or "").casefold() == category.casefold())
             and (not date_from or event.detected_at[:10] >= date_from)
             and (not date_to or event.detected_at[:10] <= date_to)

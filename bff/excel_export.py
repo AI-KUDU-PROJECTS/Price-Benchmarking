@@ -9,7 +9,9 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
 from adapters.base import BrandAdapter
-from bff.contract import Product, now_riyadh
+from bff.contract import KNOWN_BRANDS, Product, now_riyadh
+
+BRAND_NAMES = dict(KNOWN_BRANDS)
 
 HEADERS = [
     "Brand",
@@ -38,7 +40,7 @@ def _row(product: Product) -> list[object | None]:
         else product.regular_price
     )
     return [
-        product.brand_id,
+        BRAND_NAMES.get(product.brand_id, product.brand_id),
         product.channel,
         product.category,
         product.name_en,

@@ -194,6 +194,8 @@ export interface PullBrand {
 export interface PullRun {
   runId: string;
   status: "running" | "success" | "partial" | "failed";
+  /** Absent on runs saved before automatic collection existed. */
+  trigger?: "manual" | "scheduled";
   startedAt: string;
   completedAt: string | null;
   brands: PullBrand[];
@@ -202,6 +204,15 @@ export interface PullRun {
 export interface PullResponse {
   run: PullRun | null;
   started?: boolean;
+}
+
+export interface PullSchedule {
+  enabled: boolean;
+  /** Daily HH:MM times in Asia/Riyadh. */
+  times: string[];
+  includeHungerstation: boolean;
+  nextRunAt: string | null;
+  timezone: string;
 }
 
 export type PricePosition = "higher" | "lower" | "equal" | "unavailable";

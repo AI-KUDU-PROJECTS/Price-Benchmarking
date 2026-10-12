@@ -5,12 +5,14 @@ import { EventType } from "../components/Badge";
 import { DataBanner } from "../components/DataBanner";
 import { DataTable } from "../components/DataTable";
 import { PageHeader } from "../components/PageHeader";
+import { Pager } from "../components/Pager";
+import { SearchField } from "../components/SearchField";
 import { EmptyState, ErrorState, LoadingState } from "../components/States";
 import { changeHref } from "../lib/links";
 import { formatRiyadhDateTime } from "../lib/dateTime";
-import { clearSearchParams, setSearchParam } from "../lib/params";
+import { clearSearchParams, setPageParam, setSearchParam } from "../lib/params";
 
-const FILTER_KEYS = ["brand", "channel", "type", "from", "to"] as const;
+const FILTER_KEYS = ["q", "brand", "channel", "type", "from", "to"] as const;
 
 const BRANDS = [
   ["", "All brands"],
@@ -18,6 +20,8 @@ const BRANDS = [
   ["hardees", "Hardee's"],
   ["burger-king", "Burger King"],
   ["herfy", "Herfy"],
+  ["mcdonalds", "McDonald's"],
+  ["albaik", "AlBaik"],
 ];
 
 const EVENT_TYPES = [
@@ -38,11 +42,12 @@ export function MarketChangesPage() {
     const value = params.get(key);
     if (value) query.set(key, value);
   }
+  if (params.get("page")) query.set("page", params.get("page") as string);
   const suffix = query.toString() ? `?${query}` : "";
-  const { data, error, loading } = useApi(() => api.marketChanges(suffix), [suffix]);
+  const { data, error, loading } = useApi(() => api.marketChanges(suffix), [suffix], { keepPreviousData: true });
   const hasFilters = FILTER_KEYS.some((key) => params.get(key));
 
-  if (loading) return <LoadingState />;
+  if (loading && !data) return <LoadingState />;
   if (error) return <ErrorState error={error} />;
   if (!data) return <EmptyState message="No market changes." />;
 
@@ -51,6 +56,12 @@ export function MarketChangesPage() {
       <PageHeader title="Market Changes" subtitle="Chronological activity across connected competitors." />
       <DataBanner freshness={data.meta.freshness} />
       <div className="filter-bar">
+        <SearchField
+          label="Search changes"
+          placeholder="Search changes"
+          defaultValue={params.get("q") || ""}
+          onCommit={(value) => setSearchParam(setParams, params, "q", value)}
+        />
         <label className="visually-hidden" htmlFor="filter-brand">Brand</label>
         <select id="filter-brand" className="control" value={params.get("brand") || ""} onChange={(event) => setSearchParam(setParams, params, "brand", event.target.value)}>
           {BRANDS.map(([value, label]) => <option key={value || "all"} value={value}>{label}</option>)}
@@ -76,29 +87,32 @@ export function MarketChangesPage() {
           </button>
         ) : null}
       </div>
-      {data.items.length === 0 ? (
-        <EmptyState message="No changes match these filters." />
-      ) : (
-        <DataTable caption="Market-wide change events">
-          <thead>
-            <tr><th>When</th><th>Brand</th><th>Type</th><th>Item</th><th>Before</th><th>After</th><th className="num">%</th><th>Channel</th></tr>
-          </thead>
-          <tbody>
-            {data.items.map((event) => (
-              <tr key={`${event.brandId}-${event.id}`}>
-                <td className="nowrap">{formatRiyadhDateTime(event.detectedAt)}</td>
-                <td>{labelForBrand(event.brandId)}</td>
-                <td><EventType value={event.type} /></td>
-                <td><Link className="linkish" to={changeHref(event)}>{event.title || event.id}</Link></td>
-                <td><span className="cell-clip" title={event.beforeValue || undefined}>{event.beforeValue || "—"}</span></td>
-                <td><span className="cell-clip" title={event.afterValue || undefined}>{event.afterValue || "—"}</span></td>
-                <td className="num">{event.percentageChange === null ? "—" : `${event.percentageChange}%`}</td>
-                <td className="nowrap">{event.channel}</td>
-              </tr>
-            ))}
-          </tbody>
-        </DataTable>
-      )}
+      <div className="results" aria-busy={loading}>
+        {data.items.length === 0 ? (
+          <EmptyState message="No changes match these filters." />
+        ) : (
+          <DataTable caption="Market-wide change events">
+            <thead>
+              <tr><th>When</th><th>Brand</th><th>Type</th><th>Item</th><th>Before</th><th>After</th><th className="num">%</th><th>Channel</th></tr>
+            </thead>
+            <tbody>
+              {data.items.map((event) => (
+                <tr key={`${event.brandId}-${event.id}`}>
+                  <td className="nowrap">{formatRiyadhDateTime(event.detectedAt)}</td>
+                  <td>{labelForBrand(event.brandId)}</td>
+                  <td><EventType value={event.type} /></td>
+                  <td><Link className="linkish" to={changeHref(event)}>{event.title || event.id}</Link></td>
+                  <td><span className="cell-clip" title={event.beforeValue || undefined}>{event.beforeValue || "—"}</span></td>
+                  <td><span className="cell-clip" title={event.afterValue || undefined}>{event.afterValue || "—"}</span></td>
+                  <td className="num">{event.percentageChange === null ? "—" : `${event.percentageChange}%`}</td>
+                  <td className="nowrap">{event.channel}</td>
+                </tr>
+              ))}
+            </tbody>
+          </DataTable>
+        )}
+        <Pager meta={data.meta} onPage={(page) => setPageParam(setParams, params, page)} />
+      </div>
     </>
   );
 }

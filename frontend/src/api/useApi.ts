@@ -6,12 +6,23 @@ interface State<T> {
   loading: boolean;
 }
 
-export function useApi<T>(loader: () => Promise<T>, deps: unknown[]): State<T> {
+interface Options {
+  /** Keep showing the last result while a new one loads, so filter bars and
+   * the search box stay mounted (and keep focus) as the user types. */
+  keepPreviousData?: boolean;
+}
+
+export function useApi<T>(loader: () => Promise<T>, deps: unknown[], options: Options = {}): State<T> {
   const [state, setState] = useState<State<T>>({ data: null, error: null, loading: true });
+  const { keepPreviousData = false } = options;
 
   useEffect(() => {
     let cancelled = false;
-    setState({ data: null, error: null, loading: true });
+    setState((previous) => ({
+      data: keepPreviousData ? previous.data : null,
+      error: null,
+      loading: true,
+    }));
     loader()
       .then((data) => {
         if (!cancelled) setState({ data, error: null, loading: false });

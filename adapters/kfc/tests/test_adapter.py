@@ -1,13 +1,17 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
 
+import adapters.sqlite_monitor as sqlite_monitor
 from adapters.kfc import KfcAdapter
 from adapters.kfc.adapter import _filter_changes
 from adapters.kfc.tests.seed import seed_kfc_db
-from bff.contract import ChangeEvent, HIGHLIGHT_RANK, select_highlights
+from bff.contract import ChangeEvent, HIGHLIGHT_RANK, recent_window, select_highlights
+
+SEED_WEEK = datetime(2026, 9, 9, tzinfo=timezone.utc)
 
 
 @pytest.fixture()
@@ -106,7 +110,16 @@ def test_stale_run_is_marked_stale(adapter: KfcAdapter) -> None:
     assert "+03:00" in brand.last_successful_run_at or brand.last_successful_run_at.endswith("+03:00")
 
 
-def test_highlights_skip_not_observed(adapter: KfcAdapter) -> None:
+def test_overview_window_excludes_events_older_than_seven_days(adapter: KfcAdapter) -> None:
+    # The seed runs are from September; the old fallback reported them as
+    # "recent" forever, which inflated the Market Overview counts.
+    later = datetime(2026, 10, 12, tzinfo=timezone.utc)
+    assert recent_window(adapter.list_changes(), now=later) == []
+    assert recent_window(adapter.list_changes(), now=SEED_WEEK)
+
+
+def test_highlights_skip_not_observed(adapter: KfcAdapter, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(sqlite_monitor, "recent_window", lambda events: recent_window(events, now=SEED_WEEK))
     overview = adapter.get_overview()
     types = [h.type for h in overview.highlights]
     assert "product_not_observed" not in types
@@ -153,3 +166,21 @@ def test_date_filters_use_riyadh_calendar_day() -> None:
     )
 
     assert [event.id for event in filtered] == ["early"]
+
+
+def test_duplicate_and_add_on_events_are_hidden() -> None:
+    def row(event_type: str, field_name: str | None = None) -> dict[str, str | None]:
+        return {"event_type": event_type, "field_name": field_name}
+
+    assert sqlite_monitor._is_noise_event(row("REGULAR_PRICE_CHANGED", "regular_price"))
+    assert sqlite_monitor._is_noise_event(row("DETAILS_CHANGED", "option_groups"))
+    assert not sqlite_monitor._is_noise_event(row("DETAILS_CHANGED", "description_en,option_groups"))
+    assert not sqlite_monitor._is_noise_event(row("PRICE_INCREASE", "regular_price"))
+
+
+def test_offer_change_values_are_readable() -> None:
+    assert sqlite_monitor._display_value("{'offer_price': None}") == "Offer price: —"
+    assert sqlite_monitor._display_value("{'offer_price': 60.0, 'sizes': '[]'}") == "Offer price: 60.0 · Sizes: —"
+    assert sqlite_monitor._display_value("17.99") == "17.99"
+    assert sqlite_monitor._display_value("{not python") == "{not python"
+    assert sqlite_monitor._display_value("  ") is None

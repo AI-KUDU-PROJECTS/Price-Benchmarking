@@ -62,6 +62,22 @@ python manage.py schedule herfy
 python manage.py schedule hungerstation
 ```
 
+### Automatic collection
+
+Set `AUTO_PULL_TIMES` in `.env` (Riyadh time, comma-separated) and restart
+the API, for example:
+
+```bash
+AUTO_PULL_TIMES=11:00
+```
+
+At each time the API runs the website collection and, when it finishes, the
+HungerStation collection (`AUTO_PULL_HUNGERSTATION=false` skips it). Runs
+appear on Market Overview with the same progress table as the buttons, and
+the page shows the schedule and the next run. Use one API process (no
+`--workers`), or each process would start its own schedule. The per-brand
+`manage.py schedule` commands are not needed alongside it.
+
 Official-source collectors preserve their existing options:
 
 ```bash
@@ -139,6 +155,7 @@ See the source documentation for operational details:
 ```bash
 python -m compileall -q adapters bff competitors kudu
 python -m pytest -q
+node --test competitors/burger_king/tests/*.js competitors/kfc/tests/*.js
 npm test
 npm run build
 git diff --check

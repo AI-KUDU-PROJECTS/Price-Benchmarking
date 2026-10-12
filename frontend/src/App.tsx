@@ -28,15 +28,17 @@ export function App() {
         <Route path="/changes/:changeId" element={<ChangeDetailPage />} />
         <Route path="/playground" element={<PlaygroundPage />} />
         <Route path="/playground/mappings/:mappingId" element={<MappingViewPage />} />
+        {/* key={brandId} remounts a page when the brand changes, so results kept
+            on screen while filters reload never show another brand's data. */}
         {BRANDS.map((brandId) => (
           <Fragment key={brandId}>
-            <Route path={`/competitors/${brandId}`} element={<BrandOverviewPage brandId={brandId} />} />
-            <Route path={`/competitors/${brandId}/menu`} element={<BrandMenuPage brandId={brandId} />} />
-            <Route path={`/competitors/${brandId}/promotions`} element={<BrandPromotionsPage brandId={brandId} />} />
-            <Route path={`/competitors/${brandId}/promotions/:promotionId`} element={<PromotionDetailPage brandId={brandId} />} />
-            <Route path={`/competitors/${brandId}/changes`} element={<BrandChangesPage brandId={brandId} />} />
-            <Route path={`/competitors/${brandId}/history`} element={<BrandHistoryIndexPage brandId={brandId} />} />
-            <Route path={`/competitors/${brandId}/products/:productId`} element={<ProductHistoryPage brandId={brandId} />} />
+            <Route path={`/competitors/${brandId}`} element={<BrandOverviewPage key={brandId} brandId={brandId} />} />
+            <Route path={`/competitors/${brandId}/menu`} element={<BrandMenuPage key={brandId} brandId={brandId} />} />
+            <Route path={`/competitors/${brandId}/promotions`} element={<BrandPromotionsPage key={brandId} brandId={brandId} />} />
+            <Route path={`/competitors/${brandId}/promotions/:promotionId`} element={<PromotionDetailPage key={brandId} brandId={brandId} />} />
+            <Route path={`/competitors/${brandId}/changes`} element={<BrandChangesPage key={brandId} brandId={brandId} />} />
+            <Route path={`/competitors/${brandId}/history`} element={<BrandHistoryIndexPage key={brandId} brandId={brandId} />} />
+            <Route path={`/competitors/${brandId}/products/:productId`} element={<ProductHistoryPage key={brandId} brandId={brandId} />} />
           </Fragment>
         ))}
       </Route>
