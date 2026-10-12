@@ -468,6 +468,8 @@ class SQLiteMonitorAdapter:
             currency=currency,
             sizes=parse_sizes(row["sizes"] if "sizes" in row.keys() else None, currency),
             availability=_availability(row["availability"] if "availability" in row.keys() else None),
+            description_en=_blank_to_none(row["description_en"]) if "description_en" in row.keys() else None,
+            description_ar=_blank_to_none(row["description_ar"]) if "description_ar" in row.keys() else None,
             status=PRODUCT_STATUS_TO_CONTRACT.get(
                 row["entity_status"] if "entity_status" in row.keys() else "ACTIVE",
                 "active",
