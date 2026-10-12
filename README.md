@@ -130,6 +130,17 @@ KUDU's internal network, so the machine running it must reach that network.
 The API has no images: items reuse the main-menu image of the same item id,
 the same name, or a clearly matching name, and stay blank otherwise.
 
+## AI mapping
+
+The AI page suggests, for one KUDU item, the closest item at each competitor
+in the same channel, following the matching rules agreed with Marketing
+(same kind of item and protein, meal versus sandwich, patty and piece counts,
+Medium on HungerStation and Regular elsewhere, no temporary promo bundles).
+The model sees names and descriptions only, never prices. Suggestions are
+reviewed on the page and saved as normal Playground mappings. It needs
+`ANTHROPIC_API_KEY` in `.env`; `AI_MODEL` (default `claude-opus-5-5`) and
+`AI_EFFORT` are optional. Spend estimates are logged in `bff/data/ai.db`.
+
 ## Architecture
 
 ```text

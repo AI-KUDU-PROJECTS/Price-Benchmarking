@@ -261,3 +261,30 @@ export interface PriceMappingWrite {
   kuduProductId: string;
   competitorItems: MappingSelectionInput[];
 }
+
+export interface AiStatus {
+  configured: boolean;
+  model: string;
+  calls: number;
+  costUsd: number;
+}
+
+/** One competitor's AI suggestion for a KUDU item (AI section). */
+export interface AiMatch {
+  brandId: string;
+  brandName: string;
+  product: Product | null;
+  alternative: Product | null;
+  confidence: "high" | "medium" | "none";
+  reason: string;
+  differences: string;
+}
+
+export interface AiSuggestion {
+  kuduProduct: Product;
+  channel: Channel;
+  matches: AiMatch[];
+  model: string;
+  costUsd: number;
+  seconds: number;
+}

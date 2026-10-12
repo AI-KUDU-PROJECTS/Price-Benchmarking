@@ -205,3 +205,39 @@
   min-width: 18rem;
   white-space: normal;
 }
+
+/* AI section: choose a KUDU item, review suggestions, save as a mapping. */
+.ai-panel {
+  margin-bottom: var(--kudu-space-5);
+}
+
+.ai-panel .filter-bar {
+  margin-bottom: var(--kudu-space-2);
+}
+
+.ai-why {
+  min-width: 12rem;
+  max-width: 22rem;
+}
+
+/* Long alternative names would otherwise widen the whole table. */
+.ai-use {
+  width: 11rem;
+}
+
+/* Product photos on the AI page: larger and uncropped, so the whole item
+   (box, meal, drink) is visible when reviewing a suggestion. */
+.ai-image .thumb,
+.ai-image .thumb-missing {
+  width: 104px;
+  height: 104px;
+  object-fit: contain;
+  background: var(--kudu-surface-primary);
+  border: 1px solid var(--kudu-border-subtle);
+}
+
+.ai-image-kudu .thumb,
+.ai-image-kudu .thumb-missing {
+  width: 80px;
+  height: 80px;
+}

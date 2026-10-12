@@ -1,4 +1,6 @@
 import type {
+  AiStatus,
+  AiSuggestion,
   Brand,
   BrandOverview,
   ChangeEvent,
@@ -105,6 +107,13 @@ export const api = {
   hungerstationPullStatus: () => request<PullResponse>("/market/hungerstation/pull"),
   startHungerstationPull: () => request<PullResponse>("/market/hungerstation/pull", { method: "POST" }),
   pullSchedule: () => request<PullSchedule>("/market/pull/schedule"),
+  aiStatus: () => request<AiStatus>("/ai/status"),
+  suggestAiMapping: (kuduProductId: string, channel: Channel) =>
+    request<AiSuggestion>("/ai/mapping/suggest", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ kuduProductId, channel }),
+    }),
   marketChanges: (params = "") => request<ListResponse<ChangeEvent>>(`/market/changes${params}`),
   marketPromotions: (params = "") => request<ListResponse<Promotion>>(`/market/promotions${params}`),
   brands: () => request<ListResponse<Brand>>("/brands"),

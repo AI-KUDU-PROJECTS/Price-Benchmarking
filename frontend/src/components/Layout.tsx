@@ -1,4 +1,4 @@
-import { Activity, FlaskConical, Gauge, Store, Tag } from "lucide-react";
+import { Activity, Bot, FlaskConical, Gauge, Store, Tag } from "lucide-react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useApi } from "../api/useApi";
 import { api } from "../api/client";
@@ -53,6 +53,10 @@ export function Layout() {
           <NavLink to="/playground" className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}>
             <FlaskConical size={18} aria-hidden="true" />
             Playground
+          </NavLink>
+          <NavLink to="/ai" className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}>
+            <Bot size={18} aria-hidden="true" />
+            AI
           </NavLink>
         </nav>
         <nav className="nav-group" aria-label="Competitors">
