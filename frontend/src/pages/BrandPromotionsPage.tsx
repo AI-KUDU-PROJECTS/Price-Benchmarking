@@ -25,9 +25,9 @@ export function BrandPromotionsPage({ brandId }: { brandId: string }) {
   if (q) query.set("q", q);
   if (params.get("page")) query.set("page", params.get("page") as string);
   const suffix = query.toString() ? `?${query}` : "";
-  const { data, error, loading } = useApi(() => api.promotions(brandId, suffix), [brandId, suffix]);
+  const { data, error, loading } = useApi(() => api.promotions(brandId, suffix), [brandId, suffix], { keepPreviousData: true });
 
-  if (loading) return <LoadingState variant="cards" />;
+  if (loading && !data) return <LoadingState variant="cards" />;
   if (error) return <ErrorState error={error} />;
   if (!data) return <EmptyState message="No promotions." />;
 
@@ -60,38 +60,40 @@ export function BrandPromotionsPage({ brandId }: { brandId: string }) {
           <option value="returned">Returned</option>
         </select>
       </div>
-      {data.items.length === 0 ? (
-        <EmptyState message="No promotions match these filters." />
-      ) : (
-        <div className="grid cards">
-          {data.items.map((promo) => (
-            <Link key={promo.id} className="card promo-card" to={promotionHref(brandId, promo.id)}>
-              <ProductImage src={promo.imageUrl} alt={promo.title || ""} large />
-              <div className="body">
-                <div className="promo-meta">
-                  <Badge value={promo.isNew ? "new" : promo.status} />
-                  <span className="meta-text">{promo.channel}</span>
+      <div className="results" aria-busy={loading}>
+        {data.items.length === 0 ? (
+          <EmptyState message="No promotions match these filters." />
+        ) : (
+          <div className="grid cards">
+            {data.items.map((promo) => (
+              <Link key={promo.id} className="card promo-card" to={promotionHref(brandId, promo.id)}>
+                <ProductImage src={promo.imageUrl} alt={promo.title || ""} large />
+                <div className="body">
+                  <div className="promo-meta">
+                    <Badge value={promo.isNew ? "new" : promo.status} />
+                    <span className="meta-text">{promo.channel}</span>
+                  </div>
+                  <h3>{promo.title || "Untitled offer"}</h3>
+                  <div>
+                    <Price
+                      value={promo.promotionalPrice}
+                      currency="SAR"
+                      previous={promo.regularPrice}
+                    />
+                  </div>
+                  <div className="meta-text">
+                    Discount: {promo.discountPercent === null ? "—" : `${promo.discountPercent}%`}
+                  </div>
+                  <div className="meta-text">
+                    First {formatRiyadhDateTime(promo.firstSeenAt)} · Last {formatRiyadhDateTime(promo.lastSeenAt)}
+                  </div>
                 </div>
-                <h3>{promo.title || "Untitled offer"}</h3>
-                <div>
-                  <Price
-                    value={promo.promotionalPrice}
-                    currency="SAR"
-                    previous={promo.regularPrice}
-                  />
-                </div>
-                <div className="meta-text">
-                  Discount: {promo.discountPercent === null ? "—" : `${promo.discountPercent}%`}
-                </div>
-                <div className="meta-text">
-                  First {formatRiyadhDateTime(promo.firstSeenAt)} · Last {formatRiyadhDateTime(promo.lastSeenAt)}
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
-      <Pager meta={data.meta} onPage={(page) => setPageParam(setParams, params, page)} />
+              </Link>
+            ))}
+          </div>
+        )}
+        <Pager meta={data.meta} onPage={(page) => setPageParam(setParams, params, page)} />
+      </div>
     </>
   );
 }

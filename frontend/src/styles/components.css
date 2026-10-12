@@ -360,6 +360,12 @@ tbody tr:hover {
   margin-top: var(--kudu-space-4);
 }
 
+/* Results stay visible (dimmed) while a filter or search reloads them. */
+.results[aria-busy="true"] {
+  opacity: 0.55;
+  transition: opacity 120ms ease;
+}
+
 /* Quiet pagination under paged lists: range on one side, actions on the other. */
 .pager {
   display: flex;

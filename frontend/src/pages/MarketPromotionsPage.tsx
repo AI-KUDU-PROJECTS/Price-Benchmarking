@@ -34,10 +34,10 @@ export function MarketPromotionsPage() {
   }
   if (params.get("page")) query.set("page", params.get("page") as string);
   const suffix = query.toString() ? `?${query}` : "";
-  const { data, error, loading } = useApi(() => api.marketPromotions(suffix), [suffix]);
+  const { data, error, loading } = useApi(() => api.marketPromotions(suffix), [suffix], { keepPreviousData: true });
   const hasFilters = FILTER_KEYS.some((key) => params.get(key));
 
-  if (loading) return <LoadingState variant="cards" />;
+  if (loading && !data) return <LoadingState variant="cards" />;
   if (error) return <ErrorState error={error} />;
   if (!data) return <EmptyState message="No market promotions." />;
 
@@ -78,25 +78,27 @@ export function MarketPromotionsPage() {
           </button>
         ) : null}
       </div>
-      {data.items.length === 0 ? (
-        <EmptyState message="No promotions match these filters." />
-      ) : (
-        <div className="grid cards">
-          {data.items.map((promotion) => (
-            <Link key={`${promotion.brandId}-${promotion.id}`} className="card promo-card" to={promotionHref(promotion.brandId, promotion.id)}>
-              <ProductImage src={promotion.imageUrl} alt={promotion.title || ""} large />
-              <div className="body">
-                <div className="promo-meta"><Badge value={promotion.isNew ? "new" : promotion.status} /><span className="meta-text">{labelForBrand(promotion.brandId)} · {promotion.channel}</span></div>
-                <h3>{promotion.title || "Untitled offer"}</h3>
-                <Price value={promotion.promotionalPrice} currency="SAR" previous={promotion.regularPrice} />
-                <div className="meta-text">Discount: {promotion.discountPercent === null ? "—" : `${promotion.discountPercent}%`}</div>
-                <div className="meta-text">First {formatRiyadhDateTime(promotion.firstSeenAt)} · Last {formatRiyadhDateTime(promotion.lastSeenAt)}</div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
-      <Pager meta={data.meta} onPage={(page) => setPageParam(setParams, params, page)} />
+      <div className="results" aria-busy={loading}>
+        {data.items.length === 0 ? (
+          <EmptyState message="No promotions match these filters." />
+        ) : (
+          <div className="grid cards">
+            {data.items.map((promotion) => (
+              <Link key={`${promotion.brandId}-${promotion.id}`} className="card promo-card" to={promotionHref(promotion.brandId, promotion.id)}>
+                <ProductImage src={promotion.imageUrl} alt={promotion.title || ""} large />
+                <div className="body">
+                  <div className="promo-meta"><Badge value={promotion.isNew ? "new" : promotion.status} /><span className="meta-text">{labelForBrand(promotion.brandId)} · {promotion.channel}</span></div>
+                  <h3>{promotion.title || "Untitled offer"}</h3>
+                  <Price value={promotion.promotionalPrice} currency="SAR" previous={promotion.regularPrice} />
+                  <div className="meta-text">Discount: {promotion.discountPercent === null ? "—" : `${promotion.discountPercent}%`}</div>
+                  <div className="meta-text">First {formatRiyadhDateTime(promotion.firstSeenAt)} · Last {formatRiyadhDateTime(promotion.lastSeenAt)}</div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+        <Pager meta={data.meta} onPage={(page) => setPageParam(setParams, params, page)} />
+      </div>
     </>
   );
 }
