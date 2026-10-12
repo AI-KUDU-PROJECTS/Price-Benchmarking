@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Download, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
 import { api } from "../api/client";
-import type { PullRun } from "../api/types";
+import type { PullRun, PullSchedule } from "../api/types";
 import { useApi } from "../api/useApi";
 import { Badge, EventType } from "../components/Badge";
 import { DataBanner } from "../components/DataBanner";
@@ -20,6 +20,7 @@ export function MarketOverviewPage() {
   const [hungerstationRun, setHungerstationRun] = useState<PullRun | null>(null);
   const [hungerstationStarting, setHungerstationStarting] = useState(false);
   const [hungerstationError, setHungerstationError] = useState<string | null>(null);
+  const [schedule, setSchedule] = useState<PullSchedule | null>(null);
   const { data, error, loading } = useApi(() => api.marketOverview(), [refreshKey]);
 
   useEffect(() => {
@@ -30,6 +31,10 @@ export function MarketOverviewPage() {
     api.hungerstationPullStatus()
       .then((response) => { if (active) setHungerstationRun(response.run); })
       .catch((reason: Error) => { if (active) setHungerstationError(reason.message); });
+    // The schedule note is informational; a failed lookup just hides it.
+    api.pullSchedule()
+      .then((response) => { if (active) setSchedule(response); })
+      .catch(() => undefined);
     return () => { active = false; };
   }, []);
 
@@ -126,6 +131,7 @@ export function MarketOverviewPage() {
           </div>
         }
       />
+      {schedule && <p className="meta-text schedule-note">{scheduleText(schedule)}</p>}
       {pullError && <div className="alert" data-tone="error" role="alert"><p className="alert-text">{pullError}</p></div>}
       {hungerstationError && <div className="alert" data-tone="error" role="alert"><p className="alert-text">{hungerstationError}</p></div>}
       {pullRun && (
@@ -134,7 +140,7 @@ export function MarketOverviewPage() {
             <h2 className="panel-title">Website collection</h2>
             <span aria-live="polite"><Badge value={pullRun.status} /></span>
           </div>
-          <p className="meta-text">Started {formatRiyadhDateTime(pullRun.startedAt)} · Finished {formatRiyadhDateTime(pullRun.completedAt)}</p>
+          <p className="meta-text">{triggerLabel(pullRun)}Started {formatRiyadhDateTime(pullRun.startedAt)} · Finished {formatRiyadhDateTime(pullRun.completedAt)}</p>
           <DataTable caption="Status of the current data pull by brand">
             <thead><tr><th>Brand</th><th>Status</th><th>Started</th><th>Finished</th><th>Result</th></tr></thead>
             <tbody>
@@ -157,7 +163,7 @@ export function MarketOverviewPage() {
             <h2 className="panel-title">HungerStation collection</h2>
             <span aria-live="polite"><Badge value={hungerstationRun.status} /></span>
           </div>
-          <p className="meta-text">Started {formatRiyadhDateTime(hungerstationRun.startedAt)} · Finished {formatRiyadhDateTime(hungerstationRun.completedAt)}</p>
+          <p className="meta-text">{triggerLabel(hungerstationRun)}Started {formatRiyadhDateTime(hungerstationRun.startedAt)} · Finished {formatRiyadhDateTime(hungerstationRun.completedAt)}</p>
           <DataTable caption="HungerStation collection status by restaurant">
             <thead><tr><th>Restaurant</th><th>Status</th><th>Started</th><th>Finished</th><th>Result / failure reason</th></tr></thead>
             <tbody>
@@ -177,16 +183,16 @@ export function MarketOverviewPage() {
       <DataBanner freshness={data.freshness} lastUpdatedAt={data.lastUpdatedAt} />
       <div className="kpi-row">
         <Stat label="Last updated (Riyadh)" value={formatRiyadhDateTime(data.lastUpdatedAt)} />
-        <Stat label="Price decreases" value={data.counts.priceDecreases} />
-        <Stat label="Price increases" value={data.counts.priceIncreases} />
-        <Stat label="New products" value={data.counts.newProducts} />
-        <Stat label="New / ended offers" value={`${data.counts.newOffers} / ${data.counts.endedOffers}`} />
+        <Stat label="Price decreases · 7 days" value={data.counts.priceDecreases} />
+        <Stat label="Price increases · 7 days" value={data.counts.priceIncreases} />
+        <Stat label="New products · 7 days" value={data.counts.newProducts} />
+        <Stat label="New / ended offers · 7 days" value={`${data.counts.newOffers} / ${data.counts.endedOffers}`} />
       </div>
       <div className="panel-grid">
         <div className="card">
           <h2 className="panel-title">Prioritized highlights</h2>
           {data.highlights.length === 0 ? (
-            <EmptyState message="No highlight-worthy events in the current window." />
+            <EmptyState message="No highlight-worthy events in the last 7 days." />
           ) : (
             <DataTable caption="Prioritized highlights across connected competitors">
               <thead>
@@ -225,7 +231,7 @@ export function MarketOverviewPage() {
                 <th>Last success</th>
                 <th className="num">Products</th>
                 <th className="num">Promos</th>
-                <th className="num">Changes</th>
+                <th className="num">Changes (7 days)</th>
               </tr>
             </thead>
             <tbody>
@@ -254,4 +260,15 @@ export function MarketOverviewPage() {
       </div>
     </>
   );
+}
+
+function scheduleText(schedule: PullSchedule): string {
+  if (!schedule.enabled) return "Automatic collection is off. Use the buttons above to collect.";
+  const order = schedule.includeHungerstation ? "websites, then HungerStation" : "websites only";
+  const next = schedule.nextRunAt ? ` Next run ${formatRiyadhDateTime(schedule.nextRunAt)}.` : "";
+  return `Automatic collection daily at ${schedule.times.join(", ")} Riyadh time (${order}).${next}`;
+}
+
+function triggerLabel(run: PullRun): string {
+  return run.trigger === "scheduled" ? "Automatic run · " : "";
 }

@@ -109,7 +109,7 @@ function extractPickerSizes(product, storeById) {
 
 /**
  * Mutates products in place: sets __price / __price_min / __price_max /
- * __price_source / __sizes from storeMenu. Returns match stats.
+ * __price_source / __sizes / __available from storeMenu. Returns match stats.
  */
 function applyStoreMenuPrices(products, storeMenuEntities) {
   const storeById = buildStoreMenuIndex(storeMenuEntities);
@@ -121,6 +121,9 @@ function applyStoreMenuPrices(products, storeMenuEntities) {
     const entity = storeById.get(id);
     if (!entity) continue;
     matched += 1;
+    // storeMenu lists items this branch does not sell in this service mode
+    // with isAvailable=false and a 0 price; record that instead of a blank.
+    product.__available = entity.isAvailable !== false;
     const range = entityPriceRange(entity);
     product.__price_min = range.min;
     product.__price_max = range.max;

@@ -1,6 +1,8 @@
 """Marketing BFF. The React app may call only this HTTP surface."""
 from __future__ import annotations
 
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
@@ -8,16 +10,28 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+from bff import auto_pull
 from bff.routes import router
 from competitors.hungerstation import config as hungerstation_config
 
 ROOT = Path(__file__).resolve().parents[1]
 FRONTEND_DIST = ROOT / "frontend" / "dist"
 
+
+@asynccontextmanager
+async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    auto_pull.start_from_env()
+    try:
+        yield
+    finally:
+        auto_pull.stop()
+
+
 app = FastAPI(
     title="Kudu Price Intelligence BFF",
     version="v1",
     description="Composition API for KUDU's menu baseline and competitor price monitoring.",
+    lifespan=lifespan,
 )
 
 app.add_middleware(

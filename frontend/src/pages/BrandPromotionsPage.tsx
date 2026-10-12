@@ -5,20 +5,25 @@ import { Badge } from "../components/Badge";
 import { BrandTabs } from "../components/BrandTabs";
 import { DataBanner } from "../components/DataBanner";
 import { PageHeader } from "../components/PageHeader";
+import { Pager } from "../components/Pager";
 import { Price } from "../components/Price";
 import { ProductImage } from "../components/ProductImage";
+import { SearchField } from "../components/SearchField";
 import { EmptyState, ErrorState, LoadingState } from "../components/States";
 import { promotionHref } from "../lib/links";
 import { formatRiyadhDateTime } from "../lib/dateTime";
-import { setSearchParam } from "../lib/params";
+import { setPageParam, setSearchParam } from "../lib/params";
 
 export function BrandPromotionsPage({ brandId }: { brandId: string }) {
   const [params, setParams] = useSearchParams();
   const channel = params.get("channel") || "";
   const status = params.get("status") || "";
+  const q = params.get("q") || "";
   const query = new URLSearchParams();
   if (channel) query.set("channel", channel);
   if (status) query.set("status", status);
+  if (q) query.set("q", q);
+  if (params.get("page")) query.set("page", params.get("page") as string);
   const suffix = query.toString() ? `?${query}` : "";
   const { data, error, loading } = useApi(() => api.promotions(brandId, suffix), [brandId, suffix]);
 
@@ -32,6 +37,12 @@ export function BrandPromotionsPage({ brandId }: { brandId: string }) {
       <BrandTabs brandId={brandId} />
       <DataBanner freshness={data.meta.freshness} />
       <div className="filter-bar">
+        <SearchField
+          label="Search promotions"
+          placeholder="Search promotions"
+          defaultValue={q}
+          onCommit={(value) => setSearchParam(setParams, params, "q", value)}
+        />
         <label className="visually-hidden" htmlFor="filter-channel">Channel</label>
         <select id="filter-channel" className="control" value={channel} onChange={(e) => setSearchParam(setParams, params, "channel", e.target.value)}>
           <option value="">All channels</option>
@@ -80,6 +91,7 @@ export function BrandPromotionsPage({ brandId }: { brandId: string }) {
           ))}
         </div>
       )}
+      <Pager meta={data.meta} onPage={(page) => setPageParam(setParams, params, page)} />
     </>
   );
 }

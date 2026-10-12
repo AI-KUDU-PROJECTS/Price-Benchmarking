@@ -436,6 +436,12 @@ inside a browser) to confirm they truly need no session.
   meal sizes (SANDWICH ONLY / GO REGULAR / GO MEDIUM / GO LARGE) and
   piece counts are stored in `sizes` when option ids price successfully.
   See `research/api-map/api-map.md` "Live prices: storeMenu".
+  Items that `storeMenu` returns with `isAvailable=false` (always priced 0)
+  are not sold by this branch in that channel: they are stored with
+  `availability=0` and no price. A channel is recorded as PARTIAL, not
+  SUCCESS, when fewer than 80% of its available items have a price
+  (`BK_MIN_PRICED_RATIO`), so a failed price lookup never becomes the
+  latest snapshot or produces false price/offer changes.
 - **No confirmed price-discount ("before/after") signal exists anywhere in
   the collected data**, and offers here are NOT identified from a
   product's own name/description text (that rule, established for KFC,

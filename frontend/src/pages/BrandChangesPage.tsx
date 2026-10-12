@@ -6,12 +6,14 @@ import { BrandTabs } from "../components/BrandTabs";
 import { DataBanner } from "../components/DataBanner";
 import { DataTable } from "../components/DataTable";
 import { PageHeader } from "../components/PageHeader";
+import { Pager } from "../components/Pager";
+import { SearchField } from "../components/SearchField";
 import { EmptyState, ErrorState, LoadingState } from "../components/States";
 import { changeHref } from "../lib/links";
 import { formatRiyadhDateTime } from "../lib/dateTime";
-import { clearSearchParams, setSearchParam } from "../lib/params";
+import { clearSearchParams, setPageParam, setSearchParam } from "../lib/params";
 
-const FILTER_KEYS = ["channel", "type", "from", "to"] as const;
+const FILTER_KEYS = ["q", "channel", "type", "from", "to"] as const;
 
 const EVENT_OPTIONS = [
   ["", "All types"],
@@ -36,6 +38,7 @@ export function BrandChangesPage({ brandId }: { brandId: string }) {
     const value = params.get(key);
     if (value) query.set(key, value);
   }
+  if (params.get("page")) query.set("page", params.get("page") as string);
   const suffix = query.toString() ? `?${query}` : "";
   const { data, error, loading } = useApi(() => api.changes(brandId, suffix), [brandId, suffix]);
   const hasFilters = FILTER_KEYS.some((key) => params.get(key));
@@ -50,6 +53,12 @@ export function BrandChangesPage({ brandId }: { brandId: string }) {
       <BrandTabs brandId={brandId} />
       <DataBanner freshness={data.meta.freshness} />
       <div className="filter-bar">
+        <SearchField
+          label="Search changes"
+          placeholder="Search changes"
+          defaultValue={params.get("q") || ""}
+          onCommit={(value) => setSearchParam(setParams, params, "q", value)}
+        />
         <label className="visually-hidden" htmlFor="filter-channel">Channel</label>
         <select id="filter-channel" className="control" value={params.get("channel") || ""} onChange={(e) => setSearchParam(setParams, params, "channel", e.target.value)}>
           <option value="">All channels</option>
@@ -107,6 +116,7 @@ export function BrandChangesPage({ brandId }: { brandId: string }) {
           </tbody>
         </DataTable>
       )}
+      <Pager meta={data.meta} onPage={(page) => setPageParam(setParams, params, page)} />
     </>
   );
 }

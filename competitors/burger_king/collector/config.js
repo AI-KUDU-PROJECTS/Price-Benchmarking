@@ -82,6 +82,9 @@ const CONFIG = {
   DELAY_BETWEEN_PAGES: toInt(process.env.DELAY_BETWEEN_PAGES, 1500),
   DELAY_BETWEEN_ACTIONS: toInt(process.env.DELAY_BETWEEN_ACTIONS, 800),
   MAX_SCREENSHOTS_PER_RUN: toInt(process.env.MAX_SCREENSHOTS_PER_RUN, 40),
+  // A channel is PARTIAL (not SUCCESS) when fewer than this share of the
+  // items the branch sells came back with a price.
+  MIN_PRICED_RATIO: toFloat(process.env.BK_MIN_PRICED_RATIO, 0.8),
 
   // --- robots.txt handling (price-scraper/screenshot-capture navigate real pages) ---
   // See research/api-map/api-map.md "robots.txt". burgerking.com.sa's own

@@ -30,7 +30,7 @@ export function BrandOverviewPage({ brandId }: { brandId: string }) {
         <Stat label="Last successful update (Riyadh)" value={formatRiyadhDateTime(brand.lastSuccessfulRunAt)} />
         <Stat label="Items in latest success" value={data.productCount} />
         <Stat label="Active promotions" value={data.promotionCount} />
-        <Stat label="Recent change rows" value={data.recentChanges.length} />
+        <Stat label="Changes · 7 days" value={data.recentChanges.length} />
         <div className="kpi">
           <div className="kpi-label">Run health</div>
           <div className="kpi-runs">
@@ -44,9 +44,9 @@ export function BrandOverviewPage({ brandId }: { brandId: string }) {
       </div>
       <div className="panel-grid">
         <div className="card">
-          <h2 className="panel-title">Highlights</h2>
+          <h2 className="panel-title">Highlights · 7 days</h2>
           {data.highlights.length === 0 ? (
-            <EmptyState message="No ranked highlights for this window." />
+            <EmptyState message="No ranked highlights in the last 7 days." />
           ) : (
             <div className="table-scroll">
               <table>
@@ -67,15 +67,19 @@ export function BrandOverviewPage({ brandId }: { brandId: string }) {
         </div>
         <div className="card">
           <h2 className="panel-title">Recent changes</h2>
-          <div className="stack">
-            {data.recentChanges.slice(0, 12).map((event) => (
-              <div key={event.id}>
-                <EventType value={event.type} />{" "}
-                <Link className="linkish" to={changeHref(event)}>{event.title || event.type}</Link>
-                <div className="meta-text">{event.channel} · {formatRiyadhDateTime(event.detectedAt)}</div>
-              </div>
-            ))}
-          </div>
+          {data.recentChanges.length === 0 ? (
+            <EmptyState message="No changes in the last 7 days." />
+          ) : (
+            <div className="stack">
+              {data.recentChanges.slice(0, 12).map((event) => (
+                <div key={event.id}>
+                  <EventType value={event.type} />{" "}
+                  <Link className="linkish" to={changeHref(event)}>{event.title || event.type}</Link>
+                  <div className="meta-text">{event.channel} · {formatRiyadhDateTime(event.detectedAt)}</div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </>

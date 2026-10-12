@@ -9,6 +9,7 @@ from fastapi.responses import StreamingResponse
 from bff.contract import (
     BrandOverview,
     BrandStatusRow,
+    ChangeEvent,
     Channel,
     EventType,
     ListMeta,
@@ -30,6 +31,7 @@ from bff.playground import (
 )
 from bff.registry import all_brands, connected_adapters, get_adapter
 from bff.pull_all import hungerstation_pull_manager, pull_manager
+from bff.auto_pull import schedule_status
 from bff.excel_export import build_market_workbook
 
 router = APIRouter()
@@ -66,6 +68,12 @@ def start_hungerstation_pull() -> dict[str, Any]:
 def hungerstation_pull_status() -> dict[str, Any]:
     return {"run": hungerstation_pull_manager.latest()}
 
+
+@router.get("/market/pull/schedule")
+def market_pull_schedule() -> dict[str, Any]:
+    return schedule_status()
+
+
 def _meta(items: list[Any], freshness: str, source_run_ids: list[str],
           page: int = 1, page_size: int | None = None) -> dict[str, Any]:
     total = len(items)
@@ -100,6 +108,33 @@ def _market_freshness(adapters: dict[str, Any]) -> str:
     return "fresh" if all(value == "fresh" for value in freshness_values) else "stale"
 
 
+def _filter_change_query(items: list[ChangeEvent], query: str | None) -> list[ChangeEvent]:
+    if not query or not query.strip():
+        return items
+    term = query.casefold().strip()
+    return [
+        event
+        for event in items
+        if term in " ".join(
+            str(value)
+            for value in (
+                event.id,
+                event.brand_id,
+                event.product_id,
+                event.promotion_id,
+                event.type,
+                event.title,
+                event.before_value,
+                event.after_value,
+                event.channel,
+                event.location,
+                event.category,
+            )
+            if value is not None
+        ).casefold()
+    ]
+
+
 def _require_adapter(brand_id: str):
     adapter = get_adapter(brand_id)
     if adapter is None:
@@ -132,7 +167,8 @@ def market_overview() -> dict[str, Any]:
             brand_rows.append(BrandStatusRow(brand=brand))
             continue
         overview: BrandOverview = adapter.get_overview()
-        changes = adapter.list_changes()
+        # recent_changes is the RECENT_WINDOW_DAYS window, so every count,
+        # highlight, and per-brand change total covers the same period.
         window = overview.recent_changes
         counts.price_decreases += sum(1 for e in window if e.type == "price_decreased")
         counts.price_increases += sum(1 for e in window if e.type == "price_increased")
@@ -150,7 +186,7 @@ def market_overview() -> dict[str, Any]:
                 brand=overview.brand,
                 product_count=overview.product_count,
                 promotion_count=overview.promotion_count,
-                change_count=len(changes),
+                change_count=len(window),
             )
         )
 
@@ -182,6 +218,7 @@ def market_changes(
     channel: Channel | None = None,
     type: EventType | str | None = Query(default=None, alias="type"),
     category: str | None = None,
+    q: str | None = None,
     date_from: str | None = Query(default=None, alias="from"),
     date_to: str | None = Query(default=None, alias="to"),
     page: int = Query(1, ge=1),
@@ -199,6 +236,7 @@ def market_changes(
                 date_to=date_to,
             )
         )
+    items = _filter_change_query(items, q)
     items.sort(key=lambda event: event.detected_at, reverse=True)
     source_run_ids = sorted({event.source_run_id for event in items if event.source_run_id})
     return _meta(
@@ -313,6 +351,7 @@ def brand_changes(
     channel: Channel | None = None,
     type: EventType | str | None = Query(default=None, alias="type"),
     category: str | None = None,
+    q: str | None = None,
     date_from: str | None = Query(default=None, alias="from"),
     date_to: str | None = Query(default=None, alias="to"),
     page: int = Query(1, ge=1),
@@ -326,6 +365,7 @@ def brand_changes(
         date_from=date_from,
         date_to=date_to,
     )
+    items = _filter_change_query(items, q)
     brand = adapter.get_brand()
     run_ids = sorted({e.source_run_id for e in items if e.source_run_id})
     return _meta(items, brand.data_freshness, run_ids, page=page, page_size=page_size)

@@ -420,3 +420,25 @@ def test_adb_location_failure_gets_actionable_user_reason() -> None:
     assert code == "ADB_LOCATION_FAILED"
     assert "Riyadh location" in message
     assert "console is unavailable" in message
+
+
+def test_overlay_type_filter_accepts_several_types_and_sees_new_runs(tmp_path: Path) -> None:
+    path = tmp_path / "hungerstation.db"
+    _save(path, "old", "2026-09-01T20:00:00Z", _item(30.0))
+    _save(path, "new", "2026-09-02T20:00:00Z", _item(30.0, 18.0))
+    adapter = HungerstationOverlayAdapter(
+        brand_id="mcdonalds",
+        brand_name="McDonald's",
+        base=None,
+        db_path=path,
+    )
+
+    both = adapter.list_changes(event_type="price_decreased,offer_started")
+    assert {change.type for change in both} == {"price_decreased", "offer_started"}
+    assert {change.type for change in adapter.list_changes(event_type="offer_started")} == {"offer_started"}
+
+    # Products are cached between requests; a new collection must show up.
+    assert adapter.list_products(channel="hungerstation")[0].special_price == 18.0
+    _save(path, "newer", "2026-09-03T20:00:00Z", _item(25.0))
+    assert adapter.list_products(channel="hungerstation")[0].special_price is None
+    assert adapter.list_products(channel="hungerstation")[0].regular_price == 25.0

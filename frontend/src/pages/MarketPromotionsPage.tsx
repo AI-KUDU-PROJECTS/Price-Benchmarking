@@ -4,14 +4,16 @@ import { useApi } from "../api/useApi";
 import { Badge } from "../components/Badge";
 import { DataBanner } from "../components/DataBanner";
 import { PageHeader } from "../components/PageHeader";
+import { Pager } from "../components/Pager";
 import { Price } from "../components/Price";
 import { ProductImage } from "../components/ProductImage";
+import { SearchField } from "../components/SearchField";
 import { EmptyState, ErrorState, LoadingState } from "../components/States";
 import { promotionHref } from "../lib/links";
 import { formatRiyadhDateTime } from "../lib/dateTime";
-import { clearSearchParams, setSearchParam } from "../lib/params";
+import { clearSearchParams, setPageParam, setSearchParam } from "../lib/params";
 
-const FILTER_KEYS = ["brand", "channel", "status"] as const;
+const FILTER_KEYS = ["q", "brand", "channel", "status"] as const;
 
 const BRANDS = [
   ["", "All brands"],
@@ -19,6 +21,8 @@ const BRANDS = [
   ["hardees", "Hardee's"],
   ["burger-king", "Burger King"],
   ["herfy", "Herfy"],
+  ["mcdonalds", "McDonald's"],
+  ["albaik", "AlBaik"],
 ];
 
 export function MarketPromotionsPage() {
@@ -28,6 +32,7 @@ export function MarketPromotionsPage() {
     const value = params.get(key);
     if (value) query.set(key, value);
   }
+  if (params.get("page")) query.set("page", params.get("page") as string);
   const suffix = query.toString() ? `?${query}` : "";
   const { data, error, loading } = useApi(() => api.marketPromotions(suffix), [suffix]);
   const hasFilters = FILTER_KEYS.some((key) => params.get(key));
@@ -41,6 +46,12 @@ export function MarketPromotionsPage() {
       <PageHeader title="Promotions" subtitle="Observed offers across connected competitors." />
       <DataBanner freshness={data.meta.freshness} />
       <div className="filter-bar">
+        <SearchField
+          label="Search promotions"
+          placeholder="Search promotions"
+          defaultValue={params.get("q") || ""}
+          onCommit={(value) => setSearchParam(setParams, params, "q", value)}
+        />
         <label className="visually-hidden" htmlFor="filter-brand">Brand</label>
         <select id="filter-brand" className="control" value={params.get("brand") || ""} onChange={(event) => setSearchParam(setParams, params, "brand", event.target.value)}>
           {BRANDS.map(([value, label]) => <option key={value || "all"} value={value}>{label}</option>)}
@@ -85,6 +96,7 @@ export function MarketPromotionsPage() {
           ))}
         </div>
       )}
+      <Pager meta={data.meta} onPage={(page) => setPageParam(setParams, params, page)} />
     </>
   );
 }

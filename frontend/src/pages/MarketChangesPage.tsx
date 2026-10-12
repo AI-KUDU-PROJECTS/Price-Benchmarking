@@ -5,12 +5,14 @@ import { EventType } from "../components/Badge";
 import { DataBanner } from "../components/DataBanner";
 import { DataTable } from "../components/DataTable";
 import { PageHeader } from "../components/PageHeader";
+import { Pager } from "../components/Pager";
+import { SearchField } from "../components/SearchField";
 import { EmptyState, ErrorState, LoadingState } from "../components/States";
 import { changeHref } from "../lib/links";
 import { formatRiyadhDateTime } from "../lib/dateTime";
-import { clearSearchParams, setSearchParam } from "../lib/params";
+import { clearSearchParams, setPageParam, setSearchParam } from "../lib/params";
 
-const FILTER_KEYS = ["brand", "channel", "type", "from", "to"] as const;
+const FILTER_KEYS = ["q", "brand", "channel", "type", "from", "to"] as const;
 
 const BRANDS = [
   ["", "All brands"],
@@ -18,6 +20,8 @@ const BRANDS = [
   ["hardees", "Hardee's"],
   ["burger-king", "Burger King"],
   ["herfy", "Herfy"],
+  ["mcdonalds", "McDonald's"],
+  ["albaik", "AlBaik"],
 ];
 
 const EVENT_TYPES = [
@@ -38,6 +42,7 @@ export function MarketChangesPage() {
     const value = params.get(key);
     if (value) query.set(key, value);
   }
+  if (params.get("page")) query.set("page", params.get("page") as string);
   const suffix = query.toString() ? `?${query}` : "";
   const { data, error, loading } = useApi(() => api.marketChanges(suffix), [suffix]);
   const hasFilters = FILTER_KEYS.some((key) => params.get(key));
@@ -51,6 +56,12 @@ export function MarketChangesPage() {
       <PageHeader title="Market Changes" subtitle="Chronological activity across connected competitors." />
       <DataBanner freshness={data.meta.freshness} />
       <div className="filter-bar">
+        <SearchField
+          label="Search changes"
+          placeholder="Search changes"
+          defaultValue={params.get("q") || ""}
+          onCommit={(value) => setSearchParam(setParams, params, "q", value)}
+        />
         <label className="visually-hidden" htmlFor="filter-brand">Brand</label>
         <select id="filter-brand" className="control" value={params.get("brand") || ""} onChange={(event) => setSearchParam(setParams, params, "brand", event.target.value)}>
           {BRANDS.map(([value, label]) => <option key={value || "all"} value={value}>{label}</option>)}
@@ -99,6 +110,7 @@ export function MarketChangesPage() {
           </tbody>
         </DataTable>
       )}
+      <Pager meta={data.meta} onPage={(page) => setPageParam(setParams, params, page)} />
     </>
   );
 }

@@ -6,6 +6,7 @@ import { BrandTabs } from "../components/BrandTabs";
 import { DataBanner } from "../components/DataBanner";
 import { DataTable } from "../components/DataTable";
 import { PageHeader } from "../components/PageHeader";
+import { Pager } from "../components/Pager";
 import { Price } from "../components/Price";
 import { ProductImage } from "../components/ProductImage";
 import { SearchField } from "../components/SearchField";
@@ -13,7 +14,7 @@ import { SizeList } from "../components/SizeList";
 import { EmptyState, ErrorState, LoadingState } from "../components/States";
 import { productHref } from "../lib/links";
 import { formatRiyadhDateTime } from "../lib/dateTime";
-import { setSearchParam } from "../lib/params";
+import { setPageParam, setSearchParam } from "../lib/params";
 
 export function BrandMenuPage({ brandId }: { brandId: string }) {
   const [params, setParams] = useSearchParams();
@@ -23,6 +24,7 @@ export function BrandMenuPage({ brandId }: { brandId: string }) {
   const query = new URLSearchParams();
   if (channel) query.set("channel", channel);
   if (q) query.set("q", q);
+  if (params.get("page")) query.set("page", params.get("page") as string);
   const suffix = query.toString() ? `?${query}` : "";
   const { data, error, loading } = useApi(() => api.products(brandId, suffix), [brandId, suffix]);
 
@@ -86,6 +88,7 @@ export function BrandMenuPage({ brandId }: { brandId: string }) {
                   </Link>
                   <div className="meta-text">{product.nameAr || "Arabic name unavailable"}</div>
                   <Badge value={product.isPublished === false ? "unpublished" : product.status} />
+                  {product.availability === false && <Badge value="unavailable" />}
                 </td>
                 <td>{product.category || "—"}{isKudu && product.categoryAr && <div className="meta-text">{product.categoryAr}</div>}</td>
                 <td className="nowrap">{product.channel}</td>
@@ -114,6 +117,7 @@ export function BrandMenuPage({ brandId }: { brandId: string }) {
           </tbody>
         </DataTable>
       )}
+      <Pager meta={data.meta} onPage={(page) => setPageParam(setParams, params, page)} />
     </>
   );
 }
