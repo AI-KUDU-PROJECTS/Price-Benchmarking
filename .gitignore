@@ -87,3 +87,6 @@ bff/data/pull_logs/
 bff/data/playground.db
 bff/data/playground.db-wal
 bff/data/playground.db-shm
+bff/data/ai.db
+bff/data/ai.db-wal
+bff/data/ai.db-shm

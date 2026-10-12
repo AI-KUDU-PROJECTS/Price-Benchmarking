@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -184,3 +185,18 @@ def test_offer_change_values_are_readable() -> None:
     assert sqlite_monitor._display_value("17.99") == "17.99"
     assert sqlite_monitor._display_value("{not python") == "{not python"
     assert sqlite_monitor._display_value("  ") is None
+
+
+def test_official_site_descriptions_reach_the_product(adapter: KfcAdapter) -> None:
+    product = adapter.list_products(channel="pickup")[0]
+    assert product.description_en is None
+    with sqlite3.connect(adapter.db_path) as conn:
+        conn.execute(
+            "UPDATE product_snapshots SET description_en = ?, description_ar = ? WHERE product_key = ? AND run_id = ?",
+            ("Crispy chicken fillet with fries", "فيليه دجاج مقرمش مع بطاطس", product.source_id, product.source_run_id),
+        )
+
+    updated = adapter.get_product(product.id)
+    assert updated is not None
+    assert updated.description_en == "Crispy chicken fillet with fries"
+    assert updated.description_ar == "فيليه دجاج مقرمش مع بطاطس"

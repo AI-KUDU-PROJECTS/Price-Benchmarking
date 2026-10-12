@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout";
+import { AiPage } from "./pages/AiPage";
 import { BrandChangesPage } from "./pages/BrandChangesPage";
 import { BrandHistoryIndexPage } from "./pages/BrandHistoryIndexPage";
 import { BrandMenuPage } from "./pages/BrandMenuPage";
@@ -27,6 +28,7 @@ export function App() {
         <Route path="/promotions" element={<MarketPromotionsPage />} />
         <Route path="/changes/:changeId" element={<ChangeDetailPage />} />
         <Route path="/playground" element={<PlaygroundPage />} />
+        <Route path="/ai" element={<AiPage />} />
         <Route path="/playground/mappings/:mappingId" element={<MappingViewPage />} />
         {/* key={brandId} remounts a page when the brand changes, so results kept
             on screen while filters reload never show another brand's data. */}

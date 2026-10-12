@@ -1,5 +1,6 @@
 # Application, collector, scheduler, export, image, and test dependencies.
 python-dotenv==1.0.1
+anthropic==1.13.0
 fastapi==0.115.6
 uvicorn==0.32.1
 pydantic==2.10.4
