@@ -263,7 +263,7 @@ describe("PlaygroundPage", () => {
     await user.click(within(confirm).getByRole("button", { name: "Delete mapping" }));
 
     await waitFor(() => expect(apiMock.deletePlaygroundMapping).toHaveBeenCalledWith("mapping-1"));
-    expect(await screen.findByText("No mappings have been saved yet.")).toBeTruthy();
+    expect(await screen.findByText("No mappings have been saved yet. Use the steps above to create one.")).toBeTruthy();
   });
 
   it("removes competitor rows and keeps an actionable API error without losing selections", async () => {

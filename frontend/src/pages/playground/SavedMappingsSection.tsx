@@ -9,12 +9,11 @@ import { channelLabel, flowProductName } from "../../lib/playground";
 
 type Props = {
   mappings: PriceMapping[];
-  onCreate: () => void;
   onEdit: (mapping: PriceMapping) => void;
   onDelete: (mapping: PriceMapping) => void;
 };
 
-export function SavedMappingsSection({ mappings, onCreate, onEdit, onDelete }: Props) {
+export function SavedMappingsSection({ mappings, onEdit, onDelete }: Props) {
   return (
     <section className="saved-mappings" aria-labelledby="saved-mappings-title">
       <div className="section-heading">
@@ -25,8 +24,7 @@ export function SavedMappingsSection({ mappings, onCreate, onEdit, onDelete }: P
         <span className="meta-text">{mappings.length} saved</span>
       </div>
       {mappings.length === 0 ? (
-        <EmptyState message="No mappings have been saved yet."
-          action={<button type="button" className="btn btn-primary" onClick={onCreate}>Create first mapping</button>} />
+        <EmptyState message="No mappings have been saved yet. Use the steps above to create one." />
       ) : (
         <DataTable caption="Saved Playground mappings">
           <thead>

@@ -1,4 +1,3 @@
-import { Plus } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { api, ApiError } from "../api/client";
@@ -378,12 +377,6 @@ export function PlaygroundPage() {
       <PageHeader
         title="Playground"
         subtitle="Map one KUDU item to selected competitor items and compare their latest effective prices."
-        extra={(
-          <button type="button" className="btn btn-secondary" onClick={requestNewMapping}>
-            <Plus size={16} aria-hidden="true" />
-            New mapping
-          </button>
-        )}
       />
 
       <PlaygroundBuilder
@@ -410,7 +403,6 @@ export function PlaygroundPage() {
 
       <SavedMappingsSection
         mappings={mappings}
-        onCreate={requestNewMapping}
         onEdit={(mapping) => {
           setAppliedEditId(mapping.id);
           setSearchParams({ edit: mapping.id }, { replace: true });
