@@ -193,6 +193,7 @@ export function MarketOverviewPage() {
         <Stat label="New products · 7 days" value={data.counts.newProducts} />
         <Stat label="New / ended offers · 7 days" value={`${data.counts.newOffers} / ${data.counts.endedOffers}`} />
       </div>
+      <p className="meta-text">Changes compare each channel with its previous successful collection over the last 7 days. The first saved catalog is excluded.</p>
       <div className="panel-grid">
         <div className="card">
           <h2 className="panel-title">Prioritized highlights</h2>

@@ -322,9 +322,9 @@ def _event(conn, event_id, run_id, event_type, entity_type, entity_key, name, ol
     conn.execute(
         """
         INSERT INTO change_events (
-            id, run_id, event_type, channel, branch_id, entity_type, entity_key,
+            id, run_id, compared_run_id, event_type, channel, branch_id, entity_type, entity_key,
             entity_name, old_value, new_value, percentage_change, detected_at
-        ) VALUES (?, ?, ?, 'PICKUP', ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, 'run-old-p', ?, 'PICKUP', ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (event_id, run_id, event_type, BRANCH_ID, entity_type, entity_key, name, old, new, pct, detected),
     )

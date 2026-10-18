@@ -18,6 +18,14 @@ Configured restaurants: KFC, Hardee's, Burger King, Herfy, McDonald's, and
 AlBaik. A failed restaurant does not replace its last successful snapshot and
 does not stop the remaining restaurants.
 
+On a server with the `android-emulator.service` systemd unit, set
+`HUNGERSTATION_EMULATOR_SERVICE=android-emulator.service` in `.env`. Every live
+restaurant collection then restarts the emulator, waits for Android to finish
+booting, and stops it when that restaurant finishes, including failed runs.
+The same behavior applies to manual, scheduled, and Market Overview pulls.
+Collections from a saved capture do not start the emulator. The service user
+must be able to run `sudo -n systemctl restart/stop android-emulator.service`.
+
 Use at least 4 GB RAM for the Android virtual device. The collector uses the
 Appium Settings location service, when available, to keep the emulator at the
 configured Riyadh coordinates (`HUNGERSTATION_LATITUDE` and

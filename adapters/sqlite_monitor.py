@@ -774,6 +774,11 @@ class SQLiteMonitorAdapter:
             mapped = SOURCE_EVENT_TO_CONTRACT.get(row["event_type"])
             if mapped is None or _is_noise_event(row):
                 continue
+            # The first successful pull establishes a catalog baseline. It has
+            # no earlier run to compare with, so its NEW_* rows are not market
+            # changes, even if that first pull falls inside the recent window.
+            if mapped in {"product_added", "offer_started"} and row["compared_run_id"] is None:
+                continue
             entity_type = row["entity_type"]
             entity_key = row["entity_key"]
             product_id = _public_id(entity_key) if entity_type == "product" else None

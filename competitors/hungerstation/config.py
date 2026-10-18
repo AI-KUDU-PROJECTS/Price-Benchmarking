@@ -14,6 +14,7 @@ DB_PATH = Path(os.environ.get("HUNGERSTATION_DB_PATH", PROJECT_ROOT / "data" / "
 RAW_DIR = Path(os.environ.get("HUNGERSTATION_RAW_DIR", PROJECT_ROOT / "data" / "raw"))
 IMAGE_DIR = Path(os.environ.get("HUNGERSTATION_IMAGE_DIR", PROJECT_ROOT / "data" / "images"))
 ADB_SERIAL = os.environ.get("HUNGERSTATION_ADB_SERIAL", "emulator-5554")
+EMULATOR_SERVICE = os.environ.get("HUNGERSTATION_EMULATOR_SERVICE", "").strip()
 LATITUDE = float(os.environ.get("HUNGERSTATION_LATITUDE", "24.7136"))
 LONGITUDE = float(os.environ.get("HUNGERSTATION_LONGITUDE", "46.6753"))
 UPLOAD_URL = os.environ.get("HUNGERSTATION_UPLOAD_URL", "").strip()

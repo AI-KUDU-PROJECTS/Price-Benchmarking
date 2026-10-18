@@ -119,6 +119,30 @@ def test_overview_window_excludes_events_older_than_seven_days(adapter: KfcAdapt
     assert recent_window(adapter.list_changes(), now=SEED_WEEK)
 
 
+def test_first_catalog_does_not_count_as_new_market_activity(adapter: KfcAdapter) -> None:
+    with sqlite3.connect(adapter.db_path) as conn:
+        conn.execute(
+            """INSERT INTO change_events
+               (run_id, compared_run_id, event_type, channel, branch_id,
+                entity_type, entity_key, entity_name, detected_at)
+               VALUES ('run-old-p', NULL, 'NEW_PRODUCT', 'PICKUP', 143,
+                       'product', '143|PICKUP|baseline:1', 'Baseline product',
+                       '2026-09-08T06:01:06Z')"""
+        )
+        conn.execute(
+            """INSERT INTO change_events
+               (run_id, compared_run_id, event_type, channel, branch_id,
+                entity_type, entity_key, entity_name, detected_at)
+               VALUES ('run-old-p', NULL, 'NEW_OFFER', 'PICKUP', 143,
+                       'offer', '143|PICKUP|baseline:2', 'Baseline offer',
+                       '2026-09-08T06:01:07Z')"""
+        )
+
+    changes = adapter.list_changes()
+    assert not any(event.title and event.title.startswith("Baseline") for event in changes)
+    assert any(event.type == "offer_started" and event.title == "Bites Deal" for event in changes)
+
+
 def test_highlights_skip_not_observed(adapter: KfcAdapter, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(sqlite_monitor, "recent_window", lambda events: recent_window(events, now=SEED_WEEK))
     overview = adapter.get_overview()

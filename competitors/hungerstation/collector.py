@@ -49,6 +49,7 @@ def _adb_candidates() -> Iterable[Path]:
         value = os.environ.get(name)
         if value:
             yield Path(value) / "platform-tools" / ("adb.exe" if os.name == "nt" else "adb")
+    yield Path.home() / "Android" / "Sdk" / "platform-tools" / ("adb.exe" if os.name == "nt" else "adb")
     yield from Path("/mnt/c/Users").glob("*/AppData/Local/Android/Sdk/platform-tools/adb.exe")
 
 
@@ -1482,13 +1483,41 @@ def main() -> int:
     restaurants = config.RESTAURANTS if args.all else (config.RESTAURANT_BY_ID[args.brand],)
     results = []
     for restaurant in restaurants:
-        result = collect_restaurant(
-            restaurant,
-            device=device,
-            db_path=args.db,
-            batch_id=args.batch_id,
-            from_capture=args.from_capture,
-        )
+        result = None
+        try:
+            if config.EMULATOR_SERVICE and not args.from_capture:
+                from competitors.hungerstation.emulator_lifecycle import emulator_session
+
+                with emulator_session(device, config.EMULATOR_SERVICE):
+                    result = collect_restaurant(
+                        restaurant, device=device, db_path=args.db,
+                        batch_id=args.batch_id, from_capture=args.from_capture,
+                    )
+            else:
+                result = collect_restaurant(
+                    restaurant, device=device, db_path=args.db,
+                    batch_id=args.batch_id, from_capture=args.from_capture,
+                )
+        except Exception as error:
+            error_code, user_message = _failure_details(error)
+            if result is None:
+                started_at = utc_now()
+                run_id = f"hs-{restaurant.id}-{uuid.uuid4().hex[:8]}"
+                database.save_failure(
+                    run_id=run_id, batch_id=args.batch_id, brand_id=restaurant.id,
+                    restaurant_name=restaurant.name, started_at=started_at,
+                    finished_at=utc_now(), error=f"[{error_code}] {user_message}",
+                    path=args.db,
+                )
+            result = {
+                "brand_id": restaurant.id,
+                "name": restaurant.name,
+                "status": "failed",
+                "run_id": result["run_id"] if result else run_id,
+                "product_count": 0,
+                "error_code": error_code,
+                "error": user_message,
+            }
         results.append(result)
         print(
             f"HUNGERSTATION_RESULT brand={restaurant.id} status={result['status'].upper()} "
