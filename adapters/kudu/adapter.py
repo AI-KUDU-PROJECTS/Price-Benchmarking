@@ -62,6 +62,12 @@ class KuduAdapter:
             for category in categories:
                 for item in category["items"]:
                     item_id = str(item["itemId"])
+                    regular_price = as_money(item.get("price"))
+                    if channel == "pickup" and item.get("isCustomizedPrice") is True and regular_price is not None:
+                        regular_price += (
+                            (as_money(item.get("drinkItemPrice")) or 0)
+                            + (as_money(item.get("friesItemPrice")) or 0)
+                        )
                     products.append(Product(
                         id=f"{channel}-{item_id}",
                         brand_id=self.brand_id,
@@ -73,7 +79,7 @@ class KuduAdapter:
                         image_url=item.get("itemImageUrl") or None,
                         channel=channel,
                         location=None,
-                        regular_price=as_money(item.get("price")),
+                        regular_price=regular_price,
                         special_price=None,
                         currency="SAR",
                         availability=item.get("isAvailable"),

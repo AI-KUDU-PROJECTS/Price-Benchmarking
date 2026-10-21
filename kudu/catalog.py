@@ -45,6 +45,7 @@ def normalize_catalog(raw: dict[str, Any]) -> dict[str, Any]:
                 products.append({
                     key: item.get(key) for key in (
                         "itemId", "nameArabic", "nameEnglish", "price", "itemImageUrl",
+                        "isCustomizedPrice", "drinkItemPrice", "friesItemPrice",
                         "descriptionArabic", "descriptionEnglish", "calories", "isAvailable",
                         "isPublish", "isHidden", "status", "updatedAt",
                     )
