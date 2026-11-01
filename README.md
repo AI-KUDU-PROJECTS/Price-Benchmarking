@@ -118,6 +118,23 @@ and run:
 python -m kudu.refresh
 ```
 
+KUDU products appearing in several menus are stored once per channel, keeping
+their existing `<channel>-<itemId>` identity. The canonical record comes from a
+regular menu before Special Offers, then the lexicographically smallest menu ID
+if several menus have equal priority. Its image, description and pricing fields
+stay together; other occurrences are retained in `categoryVariants`. Those
+memberships keep products discoverable under Special Offers without increasing
+product counts or creating new matching IDs. Promotions use the canonical
+product's price and image and do not imply a discount.
+
+Duplicate occurrences must agree on base price. Pickup must also agree on
+whether default sides are added and on each applied drink/fries price (missing
+or null sides count as zero). Delivery uses its inclusive base price, so differing
+side settings are retained but not added. Numeric strings compare numerically.
+Ambiguous pricing, conflicting records within one menu, incomplete collections
+and failed writes keep the previous snapshot. Collection status includes the
+reason via `KUDU_ERROR`, without credentials or response bodies.
+
 KUDU's own HungerStation menu comes from the KUDU integration API, not the
 emulator. Set `KUDU_AGGREGATOR_TOKEN` in `.env` and run:
 

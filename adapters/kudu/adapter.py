@@ -10,7 +10,7 @@ from bff.contract import (
     Observation, Product, ProductHistory, Promotion, as_money,
     freshness_from_timestamp, to_riyadh_iso,
 )
-from kudu.catalog import CATALOG_PATH, CHANNELS
+from kudu.catalog import CATALOG_PATH, CHANNELS, is_special_offers
 from kudu.hungerstation import SNAPSHOT_PATH as HUNGERSTATION_PATH
 
 
@@ -35,6 +35,20 @@ class KuduAdapter:
         if not self.hungerstation_path.exists():
             return None
         return json.loads(self.hungerstation_path.read_text(encoding="utf-8"))
+
+    def _category_memberships(self) -> dict[str, list[dict[str, Any]]]:
+        """Secondary menus are memberships, never additional products."""
+        catalog = self._catalog()
+        memberships = {}
+        if catalog:
+            for channel in CHANNELS:
+                for category in catalog["services"][channel]:
+                    for item in category["items"]:
+                        memberships[f"{channel}-{item['itemId']}"] = (
+                            [variant["menu"] for variant in item["categoryVariants"]]
+                            if item.get("categoryVariants") else [category]
+                        )
+        return memberships
 
     def get_brand(self) -> Brand:
         catalog = self._catalog()
@@ -180,11 +194,19 @@ class KuduAdapter:
         products = self._products()
         if channel:
             products = [p for p in products if p.channel == channel]
+        memberships = self._category_memberships() if category or query else {}
         if category:
-            products = [p for p in products if (p.category or "").casefold() == category.casefold()]
+            products = [p for p in products if any(
+                (menu.get("titleEnglish") or menu.get("titleArabic") or "").casefold() == category.casefold()
+                for menu in memberships.get(p.id, [{"titleEnglish": p.category}])
+            )]
         if query:
             term = query.casefold().strip()
-            products = [p for p in products if term in " ".join((p.name_ar or "", p.name_en or "", p.category or "", p.category_ar or "")).casefold()]
+            products = [p for p in products if term in " ".join([
+                p.name_ar or "", p.name_en or "", p.category or "", p.category_ar or "",
+                *(str(menu.get(key) or "") for menu in memberships.get(p.id, [])
+                  for key in ("titleEnglish", "titleArabic")),
+            ]).casefold()]
         return products
 
     def get_product(self, product_id: str) -> Product | None:
@@ -213,6 +235,8 @@ class KuduAdapter:
         # The app menu has a Special Offers category and the HungerStation
         # menu a Promotions category; neither gives a discount unless
         # HungerStation sends an original price. Never invent savings.
+        offer_ids = {product_id for product_id, menus in self._category_memberships().items()
+                     if any(is_special_offers(menu) for menu in menus)}
         offers = [
             Promotion(
                 id=product.id,
@@ -229,12 +253,12 @@ class KuduAdapter:
                 ),
                 channel=product.channel,
                 source="KUDU HungerStation Promotions menu" if product.channel == "hungerstation" else "KUDU Special Offers menu",
-                category=product.category,
+                category="Special Offers" if product.id in offer_ids else product.category,
                 first_seen_at=product.first_seen_at,
                 last_seen_at=product.last_seen_at,
             )
             for product in self._products()
-            if product.category == "Special Offers"
+            if product.id in offer_ids
             or (product.channel == "hungerstation" and product.category == "Promotions")
         ]
         if channel:

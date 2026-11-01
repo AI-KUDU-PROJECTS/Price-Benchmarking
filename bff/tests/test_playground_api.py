@@ -127,6 +127,37 @@ def payload(product_id: str = "kfc-offer") -> dict:
     }
 
 
+def test_existing_kudu_mapping_survives_multi_menu_catalog_refresh(playground, tmp_path) -> None:
+    from adapters.kudu import KuduAdapter
+    from bff.tests.test_kudu_catalog import _raw
+    from kudu.catalog import save_catalog
+
+    client, _kudu, kfc = playground
+    old = _raw()
+    for channel in old["services"]:
+        # Before the upstream menu change, these products appeared in offers only.
+        old["services"][channel] = [old["services"][channel][2]]
+    path = save_catalog(old, tmp_path / "catalog.json")
+    kudu = KuduAdapter(catalog_path=path, hungerstation_path=tmp_path / "absent.json")
+    configure_adapters_for_test({"kudu": kudu, "kfc": kfc})
+    body = {**payload(), "kuduProductId": "pickup-104379"}
+    created = client.post("/api/v1/playground/mappings", json=body)
+    assert created.status_code == 201
+    mapping_id = created.json()["id"]
+    assert created.json()["kuduItem"]["category"] == "Special Offers"
+
+    save_catalog(_raw(), path)
+    detail = client.get(f"/api/v1/playground/mappings/{mapping_id}")
+    assert detail.status_code == 200
+    mapping = detail.json()
+    assert mapping["id"] == mapping_id
+    assert mapping["kuduItem"]["productId"] == "pickup-104379"
+    assert mapping["kuduItem"]["missing"] is False
+    assert mapping["kuduItem"]["category"] == "Sandwiches"
+    assert mapping["kuduItem"]["effectivePrice"] == 19
+    assert mapping["competitorItems"][0]["differenceAmount"] == 1
+
+
 def test_playground_mapping_crud_and_duplicate_kudu_groups(playground) -> None:
     client, _kudu, _kfc = playground
 

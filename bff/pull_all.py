@@ -223,6 +223,14 @@ class PullManager:
                     )
             elif target.id == "kudu":
                 confirmed = "success" if "KUDU catalog updated:" in output_text else None
+                failure = re.search(r"^KUDU_ERROR code=([A-Z0-9_]+) message=(.+)$", output_text, re.MULTILINE)
+                if result.returncode != 0 and failure:
+                    code, message = failure.groups()
+                    # Keep the collector's actionable reason through retries.
+                    last_failure = f"{message.strip()} Error code: {code}."
+                    if attempt + 1 < attempts:
+                        time.sleep(8)
+                    continue
             else:
                 match = re.search(r"\[RUN\] Finished\. Overall status: (SUCCESS|PARTIAL|FAILED)", output_text)
                 confirmed = match.group(1).lower() if match else None

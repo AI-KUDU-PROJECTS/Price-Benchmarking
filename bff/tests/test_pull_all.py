@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import threading
 import time
+from contextlib import redirect_stdout
 from types import SimpleNamespace
 
 from fastapi.testclient import TestClient
@@ -217,3 +218,41 @@ def test_kudu_hungerstation_result_reaches_pull_status(tmp_path, monkeypatch) ->
     monkeypatch.setattr(pull_all.subprocess, "run", fake_run)
     status, message = PullManager._run_subprocess(HUNGERSTATION_TARGETS[0], "kudu-hs")
     assert (status, message) == ("success", "Collected 143 products from HungerStation.")
+
+
+def test_kudu_validation_reason_reaches_pull_api_and_preserves_snapshot(tmp_path, monkeypatch) -> None:
+    from kudu import catalog, refresh
+    from bff.tests.test_kudu_catalog import _raw
+
+    path = catalog.save_catalog(_raw(), tmp_path / "catalog.json")
+    previous = path.read_bytes()
+    raw = _raw()
+    raw["services"]["delivery"][2]["items"][0]["price"] = 26
+    monkeypatch.setattr(refresh, "load_dotenv", lambda: None)
+    monkeypatch.setenv("KUDU_API_USERNAME", "test-user")
+    monkeypatch.setenv("KUDU_API_PASSWORD", "test-password")
+    monkeypatch.setattr(refresh, "fetch_catalog", lambda *_: raw)
+    monkeypatch.setattr(refresh, "save_catalog", lambda data: catalog.save_catalog(data, path))
+
+    def fake_run(*args, **kwargs):
+        with redirect_stdout(kwargs["stdout"]):
+            return SimpleNamespace(returncode=refresh.main())
+
+    monkeypatch.setattr(pull_all, "LOG_DIR", tmp_path / "logs")
+    monkeypatch.setattr(pull_all.subprocess, "run", fake_run)
+    monkeypatch.setattr(pull_all.time, "sleep", lambda _: None)
+    status, message = PullManager._run_subprocess(TARGETS[0], "kudu-conflict")
+    assert status == "failed"
+    assert "delivery item 104380 in menus 20, 44" in message
+    assert "conflicting price" in message
+    assert "INVALID_CATALOG" in message
+    assert "Previous complete data kept" in message
+    assert (tmp_path / "logs/kudu-conflict/kudu.retry.log").exists()
+    assert path.read_bytes() == previous
+
+    manager = PullManager(targets=(TARGETS[0],), runner=lambda *_: (status, message))
+    monkeypatch.setattr(routes, "pull_manager", manager)
+    manager.start()
+    _wait_for_completion(manager)
+    response = TestClient(app).get("/api/v1/market/pull")
+    assert response.json()["run"]["brands"][0]["message"] == message
