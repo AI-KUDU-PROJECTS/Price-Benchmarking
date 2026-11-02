@@ -14,6 +14,7 @@ from bff import auto_pull
 from bff.ai.routes import router as ai_router
 from bff.routes import router
 from competitors.hungerstation import config as hungerstation_config
+from competitors.albaik import app_config as albaik_config
 
 ROOT = Path(__file__).resolve().parents[1]
 FRONTEND_DIST = ROOT / "frontend" / "dist"
@@ -60,6 +61,11 @@ app.mount(
     "/assets",
     StaticFiles(directory=FRONTEND_DIST / "assets", check_dir=False),
     name="frontend-assets",
+)
+app.mount(
+    "/albaik-app-images",
+    StaticFiles(directory=albaik_config.IMAGE_DIR, check_dir=False),
+    name="albaik-app-images",
 )
 
 

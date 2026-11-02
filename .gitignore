@@ -22,6 +22,7 @@ competitors/*/data/database/*.db
 competitors/*/data/database/*.db-journal
 competitors/*/data/database/*.db-wal
 competitors/*/data/database/*.db-shm
+competitors/albaik/data/images/
 !competitors/*/data/database/.gitkeep
 competitors/*/exports/*
 !competitors/*/exports/.gitkeep

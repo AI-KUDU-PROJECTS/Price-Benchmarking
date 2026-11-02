@@ -1,0 +1,28 @@
+<hierarchy>
+  <node text="" resource-id="com.albaik.customer:id/action_bar_root" class="android.widget.LinearLayout" content-desc="" clickable="false" bounds="[0,0][1080,2400]" />
+  <node text="" resource-id="android:id/content" class="android.widget.FrameLayout" content-desc="" clickable="false" bounds="[0,0][1080,2400]" />
+  <node text="Orange Juice - small size" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[26,660][835,738]" />
+  <node text="2.00 ﷼" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[848,655][1054,742]" />
+  <node text="" resource-id="" class="android.view.ViewGroup" content-desc="200ml orange juice" clickable="true" bounds="[26,755][1054,824]" />
+  <node text="200ml orange juice" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[26,755][1054,824]" />
+  <node text="" resource-id="Reduce button" class="android.view.ViewGroup" content-desc="" clickable="false" bounds="[77,909][169,1001]" />
+  <node text="" resource-id="MinusIcon" class="com.horcrux.svg.SvgView" content-desc="" clickable="false" bounds="[106,938][140,972]" />
+  <node text="1" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[169,924][396,986]" />
+  <node text="" resource-id="Add button" class="android.view.ViewGroup" content-desc="" clickable="true" bounds="[397,909][489,1001]" />
+  <node text="" resource-id="PlusIcon" class="com.horcrux.svg.SvgView" content-desc="" clickable="false" bounds="[426,938][460,972]" />
+  <node text="" resource-id="Add to order" class="android.view.ViewGroup" content-desc="Add to order" clickable="true" bounds="[566,890][1028,1021]" />
+  <node text="Add to order" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[673,925][920,987]" />
+  <node text="" resource-id="" class="android.view.ViewGroup" content-desc="84 kcal" clickable="true" bounds="[26,1073][569,1183]" />
+  <node text="84 kcal" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[263,1099][382,1157]" />
+  <node text="" resource-id="" class="android.view.ViewGroup" content-desc="Dietary" clickable="true" bounds="[582,1073][1054,1183]" />
+  <node text="Dietary" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[759,1099][876,1157]" />
+  <node text="Customize your order" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[258,1257][823,1374]" />
+  <node text="" resource-id="" class="android.view.ViewGroup" content-desc="Large size" clickable="true" bounds="[66,1440][540,1565]" />
+  <node text="Large size" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[98,1472][510,1534]" />
+  <node text="" resource-id="" class="android.view.ViewGroup" content-desc="Small size " clickable="false" bounds="[541,1440][1015,1565]" />
+  <node text="Small size " resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[573,1472][984,1534]" />
+  <node text="" resource-id="nutritional-facts-accordion" class="android.view.ViewGroup" content-desc="Nutritional Facts" clickable="true" bounds="[82,1725][1000,1790]" />
+  <node text="Nutritional Facts" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[319,1725][763,1790]" />
+  <node text="DIETARY INFORMATION" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[142,1914][643,1965]" />
+  <node text="Estimated time needed to burn calories: 39 mins" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[158,2018][964,2076]" />
+</hierarchy>

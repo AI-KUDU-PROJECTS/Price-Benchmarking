@@ -1,0 +1,26 @@
+<hierarchy>
+  <node text="" resource-id="com.albaik.customer:id/action_bar_root" class="android.widget.LinearLayout" content-desc="" clickable="false" bounds="[0,0][1080,2400]" />
+  <node text="" resource-id="android:id/content" class="android.widget.FrameLayout" content-desc="" clickable="false" bounds="[0,0][1080,2400]" />
+  <node text="" resource-id="favorite-product-icon" class="android.view.ViewGroup" content-desc="" clickable="true" bounds="[949,128][1054,220]" />
+  <node text="Egg Sandwich with Chicken and Cheese" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[26,1475][835,1617]" />
+  <node text="7.50 ﷼" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[848,1502][1054,1590]" />
+  <node text="" resource-id="" class="android.view.ViewGroup" content-desc="Egg sandwich with grilled chicken fillet and 2 slices of cheese" clickable="true" bounds="[26,1630][1054,1699]" />
+  <node text="Egg sandwich with grilled chicken fillet and 2 slices of cheese" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[26,1630][1054,1699]" />
+  <node text="" resource-id="Reduce button" class="android.view.ViewGroup" content-desc="" clickable="false" bounds="[77,1784][169,1876]" />
+  <node text="" resource-id="MinusIcon" class="com.horcrux.svg.SvgView" content-desc="" clickable="false" bounds="[106,1813][140,1847]" />
+  <node text="1" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[169,1799][396,1861]" />
+  <node text="" resource-id="Add button" class="android.view.ViewGroup" content-desc="" clickable="true" bounds="[397,1784][489,1876]" />
+  <node text="" resource-id="PlusIcon" class="com.horcrux.svg.SvgView" content-desc="" clickable="false" bounds="[426,1813][460,1847]" />
+  <node text="" resource-id="Add to order" class="android.view.ViewGroup" content-desc="Add to order" clickable="true" bounds="[566,1765][1028,1896]" />
+  <node text="Add to order" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[673,1800][920,1862]" />
+  <node text="" resource-id="" class="android.view.ViewGroup" content-desc="593 kcal" clickable="true" bounds="[26,1948][397,2058]" />
+  <node text="593 kcal" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[166,1974][306,2032]" />
+  <node text="" resource-id="" class="android.view.ViewGroup" content-desc="Dietary" clickable="true" bounds="[410,1948][725,2058]" />
+  <node text="Dietary" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[509,1974][626,2032]" />
+  <node text="" resource-id="" class="android.view.ViewGroup" content-desc="Allergens" clickable="true" bounds="[738,1948][1054,2058]" />
+  <node text="Allergens" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[820,1974][972,2032]" />
+  <node text="Customize your order" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[258,2132][823,2249]" />
+  <node text="" resource-id="variation-Spicy" class="android.view.ViewGroup" content-desc="Spicy" clickable="true" bounds="[53,2302][511,2298]" />
+  <node text="" resource-id="variation-Cheese" class="android.view.ViewGroup" content-desc="1.00 ﷼, Cheese" clickable="true" bounds="[570,2302][1029,2298]" />
+  <node text="1.00 ﷼" resource-id="" class="android.widget.TextView" content-desc="" clickable="false" bounds="[766,2334][950,2298]" />
+</hierarchy>

@@ -30,7 +30,7 @@ from bff.playground import (
     update_mapping,
 )
 from bff.registry import all_brands, connected_adapters, get_adapter
-from bff.pull_all import hungerstation_pull_manager, pull_manager
+from bff.pull_all import albaik_app_pull_manager, hungerstation_pull_manager, pull_manager
 from bff.auto_pull import schedule_status
 from bff.excel_export import build_market_workbook
 
@@ -72,6 +72,18 @@ def hungerstation_pull_status() -> dict[str, Any]:
 @router.get("/market/pull/schedule")
 def market_pull_schedule() -> dict[str, Any]:
     return schedule_status()
+
+
+@router.post("/market/albaik-app/pull", status_code=202)
+def start_albaik_app_pull() -> dict[str, Any]:
+    run, started = albaik_app_pull_manager.start()
+    return {"run": run, "started": started}
+
+
+@router.get("/market/albaik-app/pull")
+def albaik_app_pull_status() -> dict[str, Any]:
+    from competitors.albaik.backend.app_store import latest_collection_status
+    return {"run": latest_collection_status(albaik_app_pull_manager.latest())}
 
 
 def _meta(items: list[Any], freshness: str, source_run_ids: list[str],

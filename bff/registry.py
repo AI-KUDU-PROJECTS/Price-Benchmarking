@@ -4,6 +4,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from adapters.base import BrandAdapter
+from adapters.albaik import AlbaikAdapter
 from adapters.burger_king import BurgerKingAdapter
 from adapters.hardees import HardeesAdapter
 from adapters.herfy import HerfyAdapter
@@ -14,14 +15,14 @@ from bff.contract import KNOWN_BRANDS, Brand, disconnected_brand
 
 AdapterFactory = Callable[[], BrandAdapter]
 
-# Official-site adapters. McDonald's and AlBaik currently have only the
-# HungerStation source, so they intentionally have no factory here.
+# Official-source adapters. McDonald's currently has only HungerStation.
 _BASE_FACTORIES: dict[str, AdapterFactory] = {
     "kudu": KuduAdapter,
     "kfc": KfcAdapter,
     "hardees": HardeesAdapter,
     "burger-king": BurgerKingAdapter,
     "herfy": HerfyAdapter,
+    "albaik": AlbaikAdapter,
 }
 _BRAND_NAMES = dict(KNOWN_BRANDS)
 

@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { CalendarClock, Download, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
 import { api } from "../api/client";
+import { AlbaikAppCollection, AlbaikAppCollectionButton, useAlbaikAppCollection } from "../components/AlbaikAppCollection";
 import type { PullRun, PullSchedule } from "../api/types";
 import { useApi } from "../api/useApi";
 import { Badge, EventType } from "../components/Badge";
@@ -14,6 +15,7 @@ import { formatRiyadhDateTime } from "../lib/dateTime";
 
 export function MarketOverviewPage() {
   const [refreshKey, setRefreshKey] = useState(0);
+  const albaikCollection = useAlbaikAppCollection(() => setRefreshKey((value) => value + 1));
   const [pullRun, setPullRun] = useState<PullRun | null>(null);
   const [starting, setStarting] = useState(false);
   const [pullError, setPullError] = useState<string | null>(null);
@@ -124,6 +126,7 @@ export function MarketOverviewPage() {
               <RefreshCw size={18} aria-hidden="true" />
               Collect HungerStation
             </button>
+            <AlbaikAppCollectionButton collection={albaikCollection} />
             <a className="btn btn-secondary" href="/api/v1/market/export.xlsx" download>
               <Download size={18} aria-hidden="true" />
               Export Excel
@@ -186,6 +189,7 @@ export function MarketOverviewPage() {
         </section>
       )}
       <DataBanner freshness={data.freshness} lastUpdatedAt={data.lastUpdatedAt} />
+      <AlbaikAppCollection collection={albaikCollection} />
       <div className="kpi-row">
         <Stat label="Last updated (Riyadh)" value={formatRiyadhDateTime(data.lastUpdatedAt)} />
         <Stat label="Price decreases · 7 days" value={data.counts.priceDecreases} />
@@ -270,7 +274,8 @@ export function MarketOverviewPage() {
 
 function scheduleText(schedule: PullSchedule): ReactNode {
   if (!schedule.enabled) return "Automatic collection is off. Use the buttons above to collect.";
-  const order = schedule.includeHungerstation ? "websites, then HungerStation" : "websites only";
+  const order = ["websites", ...(schedule.includeHungerstation ? ["HungerStation"] : []),
+    ...(schedule.includeAlbaikApp ? ["Albaik app (pickup, then delivery)"] : [])].join(", then ");
   return (
     <>
       Automatic collection daily at <strong>{schedule.times.join(", ")}</strong> Riyadh time ({order}).

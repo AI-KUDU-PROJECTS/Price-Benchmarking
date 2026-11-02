@@ -16,10 +16,12 @@ Browser → React → FastAPI BFF → adapters → source databases/catalogs
 | Hardee's | Official-source collector |
 | Burger King | Official-source collector |
 | Herfy | Official-source collector |
+| AlBaik | Official ALBAIK Android app: Arubah pickup and nearby delivery, plus HungerStation |
 | HungerStation | Android Emulator through ADB |
 
-McDonald's and AlBaik currently have HungerStation data only. Their official
-source packages remain scaffolds, not connected collectors.
+McDonald's currently has HungerStation data only. The independent **Albaik App
+Collection** panel in Market Overview runs both official app channels and shows
+each result. See [AlBaik setup and collection](competitors/albaik/README.md).
 
 ## Install
 
@@ -54,6 +56,8 @@ python manage.py collect hardees
 python manage.py collect burger-king
 python manage.py collect herfy
 python manage.py collect hungerstation
+python manage.py collect albaik-app --channel PICKUP
+python manage.py collect albaik-app --channel DELIVERY
 
 python manage.py schedule kfc
 python manage.py schedule hardees
@@ -72,7 +76,9 @@ AUTO_PULL_TIMES=11:00
 ```
 
 At each time the API runs the website collection and, when it finishes, the
-HungerStation collection (`AUTO_PULL_HUNGERSTATION=false` skips it). Runs
+HungerStation collection (`AUTO_PULL_HUNGERSTATION=false` skips it), then the
+official Albaik app, pickup followed by delivery (`AUTO_PULL_ALBAIK_APP=false`
+skips it). Each collection waits for the previous group to finish. Runs
 appear on Market Overview with the same progress table as the buttons, and
 the page shows the schedule and the next run. Use one API process (no
 `--workers`), or each process would start its own schedule. The per-brand

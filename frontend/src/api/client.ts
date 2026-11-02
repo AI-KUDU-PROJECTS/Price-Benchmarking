@@ -107,6 +107,8 @@ export const api = {
   hungerstationPullStatus: () => request<PullResponse>("/market/hungerstation/pull"),
   startHungerstationPull: () => request<PullResponse>("/market/hungerstation/pull", { method: "POST" }),
   pullSchedule: () => request<PullSchedule>("/market/pull/schedule"),
+  albaikAppPullStatus: () => request<PullResponse>("/market/albaik-app/pull"),
+  startAlbaikAppPull: () => request<PullResponse>("/market/albaik-app/pull", { method: "POST" }),
   aiStatus: () => request<AiStatus>("/ai/status"),
   suggestAiMapping: (kuduProductId: string, channel: Channel) =>
     request<AiSuggestion>("/ai/mapping/suggest", {

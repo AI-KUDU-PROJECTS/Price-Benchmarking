@@ -211,6 +211,7 @@ export interface PullSchedule {
   /** Daily HH:MM times in Asia/Riyadh. */
   times: string[];
   includeHungerstation: boolean;
+  includeAlbaikApp: boolean;
   nextRunAt: string | null;
   timezone: string;
 }

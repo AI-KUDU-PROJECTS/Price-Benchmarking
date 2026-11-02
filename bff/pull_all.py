@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 LOG_DIR = ROOT / "bff" / "data" / "pull_logs"
 STATE_PATH = LOG_DIR / "latest.json"
 HUNGERSTATION_STATE_PATH = LOG_DIR / "hungerstation-latest.json"
+ALBAIK_APP_STATE_PATH = LOG_DIR / "albaik-app-latest.json"
 TIMEOUT_SECONDS = 45 * 60
 
 
@@ -54,6 +55,12 @@ HUNGERSTATION_TARGETS = (
     PullTarget("herfy", "Herfy", ("manage.py", "collect", "hungerstation", "--brand", "herfy")),
     PullTarget("mcdonalds", "McDonald's", ("manage.py", "collect", "hungerstation", "--brand", "mcdonalds")),
     PullTarget("albaik", "AlBaik", ("manage.py", "collect", "hungerstation", "--brand", "albaik")),
+)
+
+ALBAIK_APP_TARGETS = tuple(
+    PullTarget(f"albaik-{channel.lower()}", f"AlBaik · {channel.title()}",
+               ("manage.py", "collect", "albaik-app", "--channel", channel))
+    for channel in ("PICKUP", "DELIVERY")
 )
 
 Runner = Callable[[PullTarget, str], tuple[str, str]]
@@ -195,6 +202,22 @@ class PullManager:
             output_text = log_path.read_text(encoding="utf-8", errors="replace")
             if result.returncode == 2 and "Refused to start" in output_text:
                 return "already_running", "A separate collection is already running for this brand."
+            if target.args[:3] == ("manage.py", "collect", "albaik-app"):
+                channel = target.args[-1]
+                match = re.search(rf"^ALBAIK_RESULT channel={channel} status=SUCCESS products=(\d+) images_new=(\d+)(?: excluded=(\d+))?(?: skipped=(\d+))?$", output_text, re.MULTILINE)
+                if result.returncode == 0 and match:
+                    message = f"Collected {match[1]} products; {match[2]} new images saved."
+                    if match[3] and int(match[3]):
+                        message += f" {match[3]} product(s) excluded as requested."
+                    if match[4] and int(match[4]):
+                        message += f" {match[4]} product(s) could not open after two attempts and were skipped."
+                    return "success", message
+                failure = re.search(rf"^ALBAIK_ERROR channel={channel} code=([A-Z0-9_]+) message=(.+)$", output_text, re.MULTILINE)
+                last_failure = (f"{failure[2].strip()} Error code: {failure[1]}. Previous complete data kept."
+                                if failure else "AlBaik app collection failed; previous complete data kept. Check the collection log.")
+                if attempt + 1 < attempts:
+                    time.sleep(8)
+                continue
             if _reports_hungerstation_result(target):
                 match = re.search(
                     rf"HUNGERSTATION_RESULT brand={re.escape(target.id)} status=(SUCCESS|FAILED) products=(\d+)",
@@ -254,5 +277,10 @@ pull_manager = PullManager(state_path=STATE_PATH)
 hungerstation_pull_manager = PullManager(
     targets=HUNGERSTATION_TARGETS,
     state_path=HUNGERSTATION_STATE_PATH,
+    max_workers=1,
+)
+albaik_app_pull_manager = PullManager(
+    targets=ALBAIK_APP_TARGETS,
+    state_path=ALBAIK_APP_STATE_PATH,
     max_workers=1,
 )

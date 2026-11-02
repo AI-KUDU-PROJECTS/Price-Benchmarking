@@ -11,6 +11,7 @@ from collections.abc import Sequence
 
 
 COLLECTOR_MODULES = {
+    "albaik-app": "competitors.albaik.collector.app",
     "kfc": "competitors.kfc.run_collector",
     "hardees": "competitors.hardees.run_collector",
     "burger-king": "competitors.burger_king.run_collector",

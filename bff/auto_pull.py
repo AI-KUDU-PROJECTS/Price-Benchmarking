@@ -3,8 +3,8 @@
 Set AUTO_PULL_TIMES (Riyadh time, comma-separated, e.g. "11:00") to enable.
 Each scheduled run uses the same pull managers as the Market Overview
 buttons, so progress and results appear in the app exactly like a manual
-pull. Websites run first and HungerStation starts only after they finish;
-the two never run at the same time.
+pull. Websites run first, then HungerStation, then the official Albaik app.
+Each group waits for the previous collection to finish.
 """
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
 from bff.contract import RIYADH, TIMEZONE_NAME, to_riyadh_iso
-from bff.pull_all import PullManager, hungerstation_pull_manager, pull_manager
+from bff.pull_all import PullManager, albaik_app_pull_manager, hungerstation_pull_manager, pull_manager
 
 logger = logging.getLogger("bff.auto_pull")
 
@@ -28,6 +28,7 @@ POLL_SECONDS = 15.0
 _scheduler: BackgroundScheduler | None = None
 _times: list[str] = []
 _include_hungerstation = False
+_include_albaik_app = False
 
 
 def parse_times(value: str | None) -> list[str]:
@@ -62,25 +63,35 @@ def _wait_until_idle(manager: PullManager, poll_seconds: float) -> None:
         time.sleep(poll_seconds)
 
 
-def run_scheduled_pull(include_hungerstation: bool, poll_seconds: float = POLL_SECONDS) -> None:
-    """Websites first, then HungerStation. A manual pull that is already
+def run_scheduled_pull(
+    include_hungerstation: bool,
+    poll_seconds: float = POLL_SECONDS,
+    *,
+    include_albaik_app: bool = True,
+) -> None:
+    """Websites, then HungerStation, then Albaik pickup and delivery. A manual pull already
     running is waited for instead of being started twice."""
     _wait_until_idle(hungerstation_pull_manager, poll_seconds)
+    _wait_until_idle(albaik_app_pull_manager, poll_seconds)
     pull_manager.start(trigger="scheduled")
     _wait_until_idle(pull_manager, poll_seconds)
     if include_hungerstation:
         hungerstation_pull_manager.start(trigger="scheduled")
         _wait_until_idle(hungerstation_pull_manager, poll_seconds)
+    if include_albaik_app:
+        albaik_app_pull_manager.start(trigger="scheduled")
+        _wait_until_idle(albaik_app_pull_manager, poll_seconds)
 
 
 def start_from_env() -> BackgroundScheduler | None:
     """Start the scheduler when AUTO_PULL_TIMES is set; otherwise do nothing."""
-    global _scheduler, _times, _include_hungerstation
+    global _scheduler, _times, _include_hungerstation, _include_albaik_app
     from dotenv import load_dotenv
 
     load_dotenv(ROOT / ".env")
     times = parse_times(os.environ.get("AUTO_PULL_TIMES"))
     include_hungerstation = _env_flag("AUTO_PULL_HUNGERSTATION", True)
+    include_albaik_app = _env_flag("AUTO_PULL_ALBAIK_APP", True)
     if not times:
         logger.info("[AUTO-PULL] AUTO_PULL_TIMES is not set; automatic collection is off.")
         return None
@@ -92,6 +103,7 @@ def start_from_env() -> BackgroundScheduler | None:
             run_scheduled_pull,
             trigger=CronTrigger(hour=int(hour), minute=int(minute), timezone=RIYADH),
             args=[include_hungerstation],
+            kwargs={"include_albaik_app": include_albaik_app},
             id=f"auto-pull-{value}",
             name=f"Automatic market collection at {value}",
             misfire_grace_time=3600,
@@ -100,9 +112,10 @@ def start_from_env() -> BackgroundScheduler | None:
         )
     scheduler.start()
     _scheduler, _times, _include_hungerstation = scheduler, times, include_hungerstation
+    _include_albaik_app = include_albaik_app
     logger.info(
-        "[AUTO-PULL] Daily at %s %s, HungerStation=%s",
-        ", ".join(times), TIMEZONE_NAME, include_hungerstation,
+        "[AUTO-PULL] Daily at %s %s, HungerStation=%s, AlbaikApp=%s",
+        ", ".join(times), TIMEZONE_NAME, include_hungerstation, include_albaik_app,
     )
     return scheduler
 
@@ -124,6 +137,7 @@ def schedule_status() -> dict[str, Any]:
         "enabled": _scheduler is not None,
         "times": list(_times),
         "includeHungerstation": _include_hungerstation,
+        "includeAlbaikApp": _include_albaik_app,
         "nextRunAt": next_run,
         "timezone": TIMEZONE_NAME,
     }
