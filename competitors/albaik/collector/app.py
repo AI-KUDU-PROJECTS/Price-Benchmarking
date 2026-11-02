@@ -129,11 +129,17 @@ def cache_image(device: AndroidDevice, root: ET.Element, name: str, directory: P
 class AlbaikDevice(AndroidDevice):
     def dump(self) -> str:
         target = "/data/local/tmp/albaik-collection.xml"
+        last_error = "The app did not provide a complete screen."
         for _ in range(4):
             self.run("shell", "rm", "-f", target)
             try:
-                output = self.run("shell", "timeout", "15", "uiautomator", "dump", target, attempts=1)
-            except subprocess.SubprocessError:
+                # Android reports idle/root failures on stderr even with exit 0.
+                output = self.run("shell", "timeout", "15", "uiautomator", "dump", target, "2>&1", attempts=1)
+            except subprocess.SubprocessError as error:
+                detail = getattr(error, "stdout", "") or getattr(error, "stderr", "") or str(error)
+                if isinstance(detail, bytes):
+                    detail = detail.decode("utf-8", errors="replace")
+                last_error = " ".join(detail.split())[:200]
                 time.sleep(1)
                 continue
             if "dumped to" in output:
@@ -142,9 +148,11 @@ class AlbaikDevice(AndroidDevice):
                     ET.fromstring(value)
                     return value
                 except ET.ParseError:
-                    pass
+                    last_error = "Android returned an incomplete screen XML."
+            elif output.strip():
+                last_error = " ".join(output.split())[:200]
             time.sleep(1)
-        raise CollectionFailure("UI_UNAVAILABLE", "The app did not provide a complete screen.")
+        raise CollectionFailure("UI_UNAVAILABLE", last_error)
 
     def start_app(self) -> None:
         self.wait_until_ready()
@@ -210,7 +218,10 @@ class Collector:
                 print(f"ALBAIK_SKIPPED channel={self.channel} reason=load-failed product={name}",flush=True)
 
     def screen(self, purpose: str = "screen") -> ET.Element:
-        xml = self.device.dump()
+        try:
+            xml = self.device.dump()
+        except CollectionFailure as error:
+            raise CollectionFailure(error.code, f"Reading {purpose}: {error}") from error
         self.sequence += 1
         (self.evidence / f"{self.sequence:04d}-{purpose}.xml").write_text(xml, encoding="utf-8")
         return ET.fromstring(xml)
@@ -325,7 +336,45 @@ class Collector:
                 and my+70 < bounds(n)[1] < my+220 and 30 < bounds(n)[3]-bounds(n)[1] < 160
                 and bounds(n)[2]>bounds(n)[0]]
 
+    def position_menu(self, root: ET.Element) -> ET.Element:
+        """Keep the animated promotion offscreen so Android can read the menu.
+
+        Do not request another hierarchy halfway through this move: the banner
+        still animates there and UI Automator times out waiting for idle.
+        Each selected category is subsequently aligned to its first product.
+        """
+        menu = next((n for n in root.iter("node") if n.get("text") == "MENU"), None)
+        if menu is None:
+            raise CollectionFailure("MENU_NOT_VISIBLE", "The app left the menu during collection.")
+        if bounds(menu)[1] > self.height * .3:
+            for _ in range(2):
+                self.device.swipe(int(self.width * .5), int(self.height * .85),
+                                  int(self.width * .5), int(self.height * .2), 600)
+            root = self.screen("menu-positioned")
+            if not self.is_menu(root):
+                raise CollectionFailure("MENU_NOT_VISIBLE", "The app left the menu while positioning its categories.")
+        return root
+
+    def category_start(self, root: ET.Element) -> ET.Element:
+        """Reveal the first row without bringing the animated banner back.
+
+        A category tap can leave rows behind the pinned menu header. Scroll
+        down in small increments until that header just leaves its pinned
+        position. The promotion remains above the viewport at this point.
+        """
+        for _ in range(40):
+            menu = next((n for n in root.iter("node") if n.get("text") == "MENU"), None)
+            if menu is None:
+                raise CollectionFailure("MENU_NOT_VISIBLE", "The app left the menu while finding its first product.")
+            if bounds(menu)[1] > self.height * .13:
+                return root
+            self.device.swipe(int(self.width * .5), int(self.height * .4),
+                              int(self.width * .5), int(self.height * .47), 600)
+            root = self.screen("category-start")
+        raise CollectionFailure("CATEGORY_START_UNVERIFIED", "Could not reveal the beginning of the category.")
+
     def discover_categories(self, root: ET.Element) -> ET.Element:
+        root = self.position_menu(root)
         previous = None
         for _ in range(10):
             tabs = self.tabs(root)
@@ -345,20 +394,16 @@ class Collector:
         raise CollectionFailure("CATEGORY_LIMIT","Category discovery did not reach the end.")
 
     def select_category(self, root: ET.Element, name: str) -> ET.Element:
-        # Return to the beginning of the vertical menu without changing the chosen location.
-        for _ in range(20):
-            tabs=self.tabs(root)
-            if tabs and bounds(tabs[0])[1] > self.height*.3:
-                break
-            self.device.swipe(int(self.width*.5),int(self.height*.3),int(self.width*.5),int(self.height*.9),150)
-            root=self.screen("menu-top")
+        # Use pinned tabs, then reveal the first product without returning to
+        # the animated banner at the very top of the page.
+        root = self.position_menu(root)
         for direction in (1,-1):
             for _ in range(6):
                 tabs=self.tabs(root)
                 node=next((n for n in tabs if label(n)==name and bounds(n)[2]-bounds(n)[0]>self.width*.17),None)
                 if node is not None:
                     self.tap(node)
-                    return self.screen("category-selected")
+                    return self.category_start(self.screen("category-selected"))
                 y=(bounds(tabs[0])[1]+bounds(tabs[0])[3])//2
                 self.device.swipe(int(self.width*(.1 if direction==1 else .9)),y,
                                   int(self.width*(.9 if direction==1 else .1)),y)

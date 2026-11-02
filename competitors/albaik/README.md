@@ -94,6 +94,13 @@ silently skipped. Pickup keeps its stricter failure behavior.
 An Android "isn't responding" dialog is waited once. If it persists during
 location selection, navigation restarts the app once before reporting failure.
 
+The Delivery promotion carousel can keep Android's accessibility reader from
+reaching idle, even though the menu is visible. Before discovering categories,
+the collector scrolls the promotion offscreen without trying to read the
+intermediate animated view. It then uses the pinned category tabs and gently
+aligns each category's first row without returning to the banner. Reader failures
+include Android's original error and the collection stage in the saved result.
+
 The verified Delivery collection completed with **96 product/variant rows
 across 63 base products**. Besides the explicitly excluded burger, the app
 could not open Tahina Sauce, Tartar Sauce, and Water after two attempts; these
