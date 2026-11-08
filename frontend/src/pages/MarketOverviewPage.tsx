@@ -118,6 +118,7 @@ export function MarketOverviewPage() {
   if (loading) return <LoadingState variant="metrics" />;
   if (error) return <ErrorState error={error} />;
   if (!data) return <EmptyState message="No market data." />;
+  const brandNames = new Map(data.brands.map(({ brand }) => [brand.id, brand.name]));
 
   return (
     <>
@@ -231,6 +232,7 @@ export function MarketOverviewPage() {
                     <td className="num">{item.rank}</td>
                     <td><EventType value={item.type} /></td>
                     <td>
+                      <div className="meta-text"><strong>{brandNames.get(item.brandId) ?? item.brandId}</strong></div>
                       <Link className="linkish" to={item.href}>{item.title}</Link>
                       <div className="meta-text">{item.summary}</div>
                     </td>
