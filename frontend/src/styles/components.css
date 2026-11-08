@@ -577,6 +577,13 @@ select.control {
   unicode-bidi: isolate;
 }
 
+.menu-channel-price {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+  min-width: 120px;
+}
+
 .price.unknown {
   color: var(--kudu-text-muted);
   font-weight: var(--kudu-font-weight-regular);

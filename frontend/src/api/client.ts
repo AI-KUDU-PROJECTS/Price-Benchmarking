@@ -10,6 +10,7 @@ import type {
   PriceMappingWrite,
   ListResponse,
   MarketOverview,
+  MenuRow,
   Product,
   ProductHistory,
   Promotion,
@@ -134,6 +135,8 @@ export const api = {
   brandOverview: (brand: string) => request<BrandOverview>(`/brands/${brand}/overview`),
   products: (brand: string, params = "") =>
     request<ListResponse<Product>>(`/brands/${brand}/products${params}`),
+  menu: (brand: string, params = "") =>
+    request<ListResponse<MenuRow>>(`/brands/${brand}/menu${params}`),
   product: (brand: string, id: string) =>
     request<Product>(`/brands/${brand}/products/${encodeURIComponent(id)}`),
   productHistory: (brand: string, id: string) =>

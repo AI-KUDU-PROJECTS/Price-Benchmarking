@@ -1,5 +1,6 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { api } from "../api/client";
+import type { Channel, Product } from "../api/types";
 import { useApi } from "../api/useApi";
 import { Badge } from "../components/Badge";
 import { BrandTabs } from "../components/BrandTabs";
@@ -16,21 +17,45 @@ import { productHref } from "../lib/links";
 import { formatRiyadhDateTime } from "../lib/dateTime";
 import { setPageParam, setSearchParam } from "../lib/params";
 
+const channels: { id: Channel; label: string }[] = [
+  { id: "pickup", label: "Pickup" },
+  { id: "delivery", label: "Delivery" },
+  { id: "hungerstation", label: "HungerStation" },
+];
+
+function ChannelPrice({ product, label }: { product?: Product; label: string }) {
+  if (!product) return <Price value={null} />;
+  return (
+    <div className="menu-channel-price">
+      <Link className="linkish" to={productHref(product.brandId, product.id)}
+        aria-label={`${label} details for ${product.nameEn || product.nameAr || product.id}`}>
+        <Price value={product.specialPrice ?? product.regularPrice} currency={product.currency} />
+      </Link>
+      {product.specialPrice !== null && product.regularPrice !== null && (
+        <div className="meta-text">Regular <Price value={product.regularPrice} currency={product.currency} /></div>
+      )}
+      {product.sizes.length > 0 && <SizeList sizes={product.sizes} currency={product.currency} />}
+      {product.status !== "active" && <Badge value={product.status} />}
+      {product.isPublished === false && <Badge value="unpublished" />}
+      {product.availability === false && <Badge value="unavailable" />}
+    </div>
+  );
+}
+
 export function BrandMenuPage({ brandId }: { brandId: string }) {
   const [params, setParams] = useSearchParams();
   const isKudu = brandId === "kudu";
-  // KUDU opens on Delivery when the URL has no channel, so "All channels"
-  // needs an explicit value there; competitors use an empty value.
-  const allChannels = isKudu ? "all" : "";
-  const selectedChannel = params.get("channel") || (isKudu ? "delivery" : "");
+  // Keep KUDU's Delivery default and use an explicit value for comparisons.
+  const selectedChannel = params.get("channel") || (isKudu ? "delivery" : "all");
   const channel = selectedChannel === "all" ? "" : selectedChannel;
+  const comparing = channel === "";
   const q = params.get("q") || "";
   const query = new URLSearchParams();
   if (channel) query.set("channel", channel);
   if (q) query.set("q", q);
   if (params.get("page")) query.set("page", params.get("page") as string);
   const suffix = query.toString() ? `?${query}` : "";
-  const { data, error, loading } = useApi(() => api.products(brandId, suffix), [brandId, suffix], { keepPreviousData: true });
+  const { data, error, loading } = useApi(() => api.menu(brandId, suffix), [brandId, suffix], { keepPreviousData: true });
 
   if (loading && !data) return <LoadingState />;
   if (error) return <ErrorState error={error} />;
@@ -40,16 +65,16 @@ export function BrandMenuPage({ brandId }: { brandId: string }) {
     <>
       <PageHeader
         title={isKudu ? "KUDU menu" : "Menu"}
-        subtitle={isKudu
+        subtitle={comparing
+          ? "Compare Pickup, Delivery and HungerStation prices for each product. — means no price is available."
+          : isKudu
           ? channel === "hungerstation"
             ? "HungerStation menu from the KUDU integration API · images reused from the main menu where the item matches"
-            : channel === ""
-              ? "All channels · production menu (delivery, pickup) and the HungerStation menu from the KUDU integration API"
-              : "Production menu · template 1 · prices and images from the latest saved collection"
+            : "Production menu · template 1 · prices and images from the latest saved collection"
           : "Latest successful collection. Missing prices stay blank."}
       />
       <BrandTabs brandId={brandId} />
-      <DataBanner freshness={data.meta.freshness} lastUpdatedAt={isKudu ? data.items[0]?.observedAt : undefined} />
+      <DataBanner freshness={data.meta.freshness} lastUpdatedAt={isKudu && !comparing ? data.items[0]?.product.observedAt : undefined} />
       <div className="filter-bar">
         <SearchField
           label="Search products"
@@ -64,7 +89,7 @@ export function BrandMenuPage({ brandId }: { brandId: string }) {
           value={selectedChannel}
           onChange={(e) => setSearchParam(setParams, params, "channel", e.target.value)}
         >
-          <option value={allChannels}>All channels</option>
+          <option value="all">All channels</option>
           <option value="pickup">Pickup</option>
           <option value="delivery">Delivery</option>
           <option value="hungerstation">HungerStation</option>
@@ -80,26 +105,39 @@ export function BrandMenuPage({ brandId }: { brandId: string }) {
                 <th><span className="visually-hidden">Image</span></th>
                 <th>Product</th>
                 <th>Category</th>
-                <th>Channel</th>
-                <th className="num">{isKudu ? "Price" : "Current"}</th>
-                {!isKudu && <th className="num">Previous</th>}
-                {!isKudu && <th>Sizes</th>}
-                <th>{isKudu ? "Collected" : "Last seen"}</th>
+                {comparing ? channels.map(({ id, label }) => (
+                  <th key={id} className="num">{label}</th>
+                )) : <>
+                  <th>Channel</th>
+                  <th className="num">{isKudu ? "Price" : "Current"}</th>
+                  {!isKudu && <th className="num">Previous</th>}
+                  {!isKudu && <th>Sizes</th>}
+                  <th>{isKudu ? "Collected" : "Last seen"}</th>
+                </>}
               </tr>
             </thead>
             <tbody>
-              {data.items.map((product) => (
-                <tr key={product.id}>
-                  <td><ProductImage src={product.imageUrl} alt={product.nameEn || ""} /></td>
+              {data.items.map((row) => {
+                const product = comparing ? row.product : row.channels[channel as Channel];
+                // A channel switch can briefly retain the previous response.
+                if (!product) return null;
+                const image = product.imageUrl || Object.values(row.channels).find((item) => item?.imageUrl)?.imageUrl;
+                return <tr key={row.id}>
+                  <td><ProductImage src={image} alt={product.nameEn || ""} /></td>
                   <td>
                     <Link className="linkish" to={productHref(brandId, product.id)}>
                       {product.nameEn || product.nameAr || product.id}
                     </Link>
                     <div className="meta-text">{product.nameAr || "Arabic name unavailable"}</div>
-                    <Badge value={product.isPublished === false ? "unpublished" : product.status} />
-                    {product.availability === false && <Badge value="unavailable" />}
+                    {!comparing && <>
+                      <Badge value={product.isPublished === false ? "unpublished" : product.status} />
+                      {product.availability === false && <Badge value="unavailable" />}
+                    </>}
                   </td>
                   <td>{product.category || "—"}{isKudu && product.categoryAr && <div className="meta-text">{product.categoryAr}</div>}</td>
+                  {comparing ? channels.map(({ id, label }) => (
+                    <td key={id} className="num"><ChannelPrice product={row.channels[id]} label={label} /></td>
+                  )) : <>
                   <td className="nowrap">{product.channel}</td>
                   <td className="num">
                     <Price
@@ -121,8 +159,9 @@ export function BrandMenuPage({ brandId }: { brandId: string }) {
                     </>
                   )}
                   <td className="nowrap">{formatRiyadhDateTime(product.lastSeenAt)}</td>
+                  </>}
                 </tr>
-              ))}
+              })}
             </tbody>
           </DataTable>
         )}

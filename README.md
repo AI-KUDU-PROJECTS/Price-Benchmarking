@@ -111,6 +111,16 @@ changes, history, Product Matching, manual collection controls, and Excel
 export. The export is served by FastAPI at `/api/v1/market/export.xlsx` and is
 linked from Market Overview.
 
+Each restaurant's Menu offers an **All channels** comparison with one product
+per row and separate Pickup, Delivery and HungerStation prices. The BFF menu
+endpoint (`/api/v1/brands/{brand_id}/menu`) groups the complete menu before
+search and pagination, using shared source IDs or unambiguous normalized
+English/Arabic names. Different sizes, quantities and meal variants are kept
+separate when matching names; uncertain matches remain separate rows. Missing
+prices stay unknown, and discounts, sizes and availability remain specific to
+each channel. All menus place main dishes first, followed by sides and
+desserts, then sauces and drinks.
+
 The Market Overview pull starts KUDU and the four official-source competitors
 concurrently. It collects both channels without event screenshots, retries one
 failed or incomplete pass, and keeps previous complete snapshots available

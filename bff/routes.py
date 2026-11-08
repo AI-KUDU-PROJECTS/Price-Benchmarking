@@ -34,6 +34,7 @@ from bff.pull_all import albaik_app_pull_manager, hungerstation_pull_manager, pu
 from bff.auto_pull import schedule_status
 from bff.excel_export import build_market_workbook
 from bff.hungerstation_status import latest_collection_status as latest_hungerstation_status
+from bff.menu import menu_rows, menu_sort_key
 
 router = APIRouter()
 
@@ -309,10 +310,30 @@ def brand_products(
     page_size: int = Query(200, ge=1, le=500),
 ) -> dict[str, Any]:
     adapter = _require_adapter(brand_id)
-    items = adapter.list_products(channel=channel, category=category, query=q)
+    items = sorted(adapter.list_products(channel=channel, category=category, query=q), key=menu_sort_key)
     brand = adapter.get_brand()
     run_ids = sorted({p.source_run_id for p in items if p.source_run_id})
     return _meta(items, brand.data_freshness, run_ids, page=page, page_size=page_size)
+
+
+@router.get("/brands/{brand_id}/menu")
+def brand_menu(
+    brand_id: str,
+    channel: Channel | None = None,
+    category: str | None = None,
+    q: str | None = None,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(200, ge=1, le=500),
+) -> dict[str, Any]:
+    adapter = _require_adapter(brand_id)
+    products = adapter.list_products(channel=channel)
+    rows = menu_rows(products, compare=channel is None)
+    if category or q:
+        matching_ids = {p.id for p in adapter.list_products(channel=channel, category=category, query=q)}
+        rows = [row for row in rows if any(p.id in matching_ids for p in row.channels.values())]
+    brand = adapter.get_brand()
+    run_ids = sorted({p.source_run_id for row in rows for p in row.channels.values() if p.source_run_id})
+    return _meta(rows, brand.data_freshness, run_ids, page=page, page_size=page_size)
 
 
 @router.get("/brands/{brand_id}/products/{product_id}/history")

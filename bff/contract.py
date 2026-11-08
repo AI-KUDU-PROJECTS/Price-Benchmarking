@@ -170,6 +170,14 @@ class Product(ContractModel):
     source_run_id: str | None = None
 
 
+class MenuRow(ContractModel):
+    """One menu item with its independently collected channel prices."""
+
+    id: str
+    product: Product
+    channels: dict[Channel, Product]
+
+
 class Promotion(ContractModel):
     id: str
     brand_id: str

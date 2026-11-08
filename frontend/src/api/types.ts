@@ -55,6 +55,12 @@ export interface Product {
   sourceRunId: string | null;
 }
 
+export interface MenuRow {
+  id: string;
+  product: Product;
+  channels: Partial<Record<Channel, Product>>;
+}
+
 export interface Promotion {
   id: string;
   brandId: string;
