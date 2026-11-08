@@ -11,7 +11,7 @@ import { DataTable } from "../components/DataTable";
 import { PageHeader } from "../components/PageHeader";
 import { Stat } from "../components/Stat";
 import { EmptyState, ErrorState, LoadingState } from "../components/States";
-import { formatRiyadhDateTime } from "../lib/dateTime";
+import { formatRiyadhDateTime, formatRiyadhDayMonth } from "../lib/dateTime";
 
 export function MarketOverviewPage() {
   const [refreshKey, setRefreshKey] = useState(0);
@@ -242,7 +242,7 @@ export function MarketOverviewPage() {
             </DataTable>
           )}
         </div>
-        <div className="card">
+        <div className="card brand-status-card">
           <h2 className="panel-title">Brand status</h2>
           <DataTable caption="Connected brand status summary">
             <thead>
@@ -266,7 +266,7 @@ export function MarketOverviewPage() {
                     )}
                   </td>
                   <td><Badge value={row.brand.health} /></td>
-                  <td className="nowrap">{formatRiyadhDateTime(row.brand.lastSuccessfulRunAt)}</td>
+                  <td className="nowrap">{formatRiyadhDayMonth(row.brand.lastSuccessfulRunAt)}</td>
                   <td className="num">{row.productCount ?? "—"}</td>
                   <td className="num">{row.promotionCount ?? "—"}</td>
                   <td className="num">{row.changeCount ?? "—"}</td>

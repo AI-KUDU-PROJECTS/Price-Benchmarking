@@ -29,3 +29,9 @@ export function formatRiyadhDateTime(
   );
   return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute} ${parts.dayPeriod.toLowerCase()}`;
 }
+
+/** Compact day/month for narrow summary tables, still using Riyadh time. */
+export function formatRiyadhDayMonth(value: string | null | undefined): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2}) /.exec(formatRiyadhDateTime(value));
+  return match ? `${match[3]}/${match[2]}` : "—";
+}

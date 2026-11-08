@@ -238,6 +238,19 @@ tbody tr:hover {
   background: var(--kudu-surface-hover);
 }
 
+.brand-status-card .table-scroll table {
+  min-width: 0;
+}
+
+.brand-status-card th,
+.brand-status-card td {
+  padding: var(--kudu-space-2);
+}
+
+.brand-status-card th {
+  white-space: normal;
+}
+
 /* ==========================================================================
    Status pill, event type, and alert share one tone system so status
    coloring stays consistent everywhere it appears.
