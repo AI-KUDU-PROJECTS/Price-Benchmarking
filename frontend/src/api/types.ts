@@ -196,6 +196,8 @@ export interface PullRun {
   status: "running" | "success" | "partial" | "failed";
   /** Absent on runs saved before automatic collection existed. */
   trigger?: "manual" | "scheduled";
+  /** Latest results may include individual collections after the last batch. */
+  view?: "latest_results";
   startedAt: string;
   completedAt: string | null;
   brands: PullBrand[];

@@ -62,23 +62,31 @@ export function MarketOverviewPage() {
   }, [pullRun?.runId, pullRun?.status]);
 
   useEffect(() => {
-    if (hungerstationRun?.status !== "running") return;
     let active = true;
+    let busy = false;
     const timer = window.setInterval(() => {
+      if (busy) return;
+      busy = true;
       api.hungerstationPullStatus()
         .then((response) => {
           if (!active) return;
           if (!response.run) {
             setHungerstationRun(null);
-            setHungerstationError("HungerStation collection status was lost. Start a new pull to try again.");
+            if (hungerstationRun?.status === "running") {
+              setHungerstationError("HungerStation collection status was lost. Start a new pull to try again.");
+            }
             return;
           }
           setHungerstationRun(response.run);
           setHungerstationError(null);
-          if (response.run.status !== "running") setRefreshKey((value) => value + 1);
+          if (response.run.status !== "running" && (
+            response.run.runId !== hungerstationRun?.runId || response.run.status !== hungerstationRun?.status
+          )) setRefreshKey((value) => value + 1);
         })
-        .catch((reason: Error) => { if (active) setHungerstationError(reason.message); });
-    }, 2000);
+        .catch((reason: Error) => { if (active) setHungerstationError(reason.message); })
+        .finally(() => { busy = false; });
+    // Observe individual and scheduled collections even when the page is idle.
+    }, hungerstationRun?.status === "running" ? 2000 : 15000);
     return () => { active = false; window.clearInterval(timer); };
   }, [hungerstationRun?.runId, hungerstationRun?.status]);
 
@@ -171,7 +179,10 @@ export function MarketOverviewPage() {
             <h2 className="panel-title">HungerStation collection</h2>
             <span aria-live="polite"><Badge value={hungerstationRun.status} /></span>
           </div>
-          <p className="meta-text">{triggerLabel(hungerstationRun)}Started {formatRiyadhDateTime(hungerstationRun.startedAt)} · Finished {formatRiyadhDateTime(hungerstationRun.completedAt)}</p>
+          <p className="meta-text">{hungerstationRun.view === "latest_results"
+            ? <>Latest result per restaurant, including individual collections · Updated {formatRiyadhDateTime(hungerstationRun.completedAt)}</>
+            : <>{triggerLabel(hungerstationRun)}Started {formatRiyadhDateTime(hungerstationRun.startedAt)} · Finished {formatRiyadhDateTime(hungerstationRun.completedAt)}</>}
+          </p>
           <DataTable caption="HungerStation collection status by restaurant">
             <thead><tr><th>Restaurant</th><th>Status</th><th>Started</th><th>Finished</th><th>Result / failure reason</th></tr></thead>
             <tbody>

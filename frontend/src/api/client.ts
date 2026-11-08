@@ -17,6 +17,7 @@ import type {
   PullSchedule,
 } from "./types";
 import { createPlaygroundDemoApi } from "./playgroundDemoStorage";
+import { withLatestKuduResult } from "../lib/hungerstationStatus";
 
 const BASE = "/api/v1";
 
@@ -104,7 +105,18 @@ export const api = {
   marketOverview: () => request<MarketOverview>("/market/overview"),
   pullStatus: () => request<PullResponse>("/market/pull"),
   startPullAll: () => request<PullResponse>("/market/pull", { method: "POST" }),
-  hungerstationPullStatus: () => request<PullResponse>("/market/hungerstation/pull"),
+  hungerstationPullStatus: async (): Promise<PullResponse> => {
+    const response = await request<PullResponse>("/market/hungerstation/pull");
+    const kudu = response.run?.brands.find((brand) => brand.id === "kudu");
+    if (!kudu || kudu.status === "pending" || kudu.status === "running") return response;
+    try {
+      const overview = await request<BrandOverview>("/brands/kudu/overview");
+      return { ...response, run: withLatestKuduResult(response.run!, overview.runs) };
+    } catch {
+      // Keep collection progress available if the independent menu lookup fails.
+      return response;
+    }
+  },
   startHungerstationPull: () => request<PullResponse>("/market/hungerstation/pull", { method: "POST" }),
   pullSchedule: () => request<PullSchedule>("/market/pull/schedule"),
   albaikAppPullStatus: () => request<PullResponse>("/market/albaik-app/pull"),

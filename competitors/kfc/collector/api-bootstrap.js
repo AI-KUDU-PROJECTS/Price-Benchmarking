@@ -14,13 +14,13 @@
  * session (cookies + the non-secret/secret headers the site's own
  * frontend sends on every API call) and the blob-storage SAS token
  * (needed as a payload field on getStoreList/getMenu/getProductsByCategory),
- * then hand that "session" object back so every subsequent call
+ * then hand that live "session" object back so every subsequent call
  * (getNewStore, validateLocation, getMenuConfig, getMenu,
  * getProductsByCategory, getProgressivePromotion, getStoreList) can be made
- * as a direct HTTPS request via api-client.js - no further browser
- * involvement, no UI clicking required, because channel/branch selection
- * turns out to be a plain request payload field (`orderType`, `storeId`,
- * `lat`/`lng`), not something that requires driving the SPA's UI.
+ * with fetch inside the same browser page. KFC's edge began rejecting the
+ * old Node HTTPS replay with HTTP 403 even when its copied cookies and
+ * headers were valid; keeping the browser transport preserves the browser
+ * TLS/session context without clicking through the UI.
  *
  * The session object holds only what the CURRENT run needs in memory. It
  * is never written to git and is deleted from disk (see collect.js) at the
@@ -48,6 +48,7 @@ const HEADER_NAMES_TO_CAPTURE = [
  */
 async function bootstrapSession(logger) {
   const browser = await chromium.launch({ headless: CONFIG.HEADLESS });
+  let sessionOwnsBrowser = false;
   try {
     const context = await browser.newContext({
       geolocation: { latitude: CONFIG.BRANCH.latitude, longitude: CONFIG.BRANCH.longitude },
@@ -171,9 +172,73 @@ async function bootstrapSession(logger) {
     if (authorization) headers.authorization = authorization;
     if (refreshtoken !== undefined) headers.refreshtoken = refreshtoken;
 
-    return { cookies, headers, blob, bootstrapStoreList };
+    // Browser-controlled request headers (Cookie, Origin, Referer and
+    // User-Agent) cannot be assigned by page.fetch and should not be copied.
+    // The page supplies the correct values automatically from the live,
+    // same-origin guest session. All application headers/tokens remain
+    // in-memory and are passed only to KFC's own origin.
+    const browserRequest = async ({ method = 'GET', url, headers: requestHeaders = {}, body = null, timeoutMs }) => {
+      const forbidden = new Set(['cookie', 'host', 'origin', 'referer', 'user-agent', 'content-length']);
+      const allowedHeaders = Object.fromEntries(
+        Object.entries(requestHeaders).filter(([name]) => !forbidden.has(name.toLowerCase()))
+      );
+      return page.evaluate(
+        async ({ requestUrl, requestMethod, headers, requestBody, requestTimeoutMs }) => {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), requestTimeoutMs);
+          try {
+            const response = await fetch(requestUrl, {
+              method: requestMethod,
+              headers,
+              body: requestBody == null ? undefined : JSON.stringify(requestBody),
+              credentials: 'include',
+              redirect: 'follow',
+              signal: controller.signal,
+            });
+            let bodyText = await response.text();
+            if (bodyText.charCodeAt(0) === 0xfeff) bodyText = bodyText.slice(1);
+            let json = null;
+            let parseError = null;
+            if (bodyText) {
+              try {
+                json = JSON.parse(bodyText);
+              } catch (error) {
+                parseError = error.message;
+              }
+            }
+            return {
+              status: response.status,
+              headers: Object.fromEntries(response.headers.entries()),
+              body: bodyText,
+              json,
+              parseError,
+            };
+          } finally {
+            clearTimeout(timer);
+          }
+        },
+        {
+          requestUrl: url,
+          requestMethod: method,
+          headers: allowedHeaders,
+          requestBody: body,
+          requestTimeoutMs: timeoutMs || CONFIG.API_TIMEOUT,
+        }
+      );
+    };
+
+    let closed = false;
+    const close = async () => {
+      if (closed) return;
+      closed = true;
+      await browser.close();
+    };
+    sessionOwnsBrowser = true;
+    return { cookies, headers, blob, bootstrapStoreList, browserRequest, close };
   } finally {
-    await browser.close();
+    // On a bootstrap error there is no returned session to own cleanup.
+    // Successful callers close the live session after all channels finish.
+    if (!sessionOwnsBrowser) await browser.close();
   }
 }
 

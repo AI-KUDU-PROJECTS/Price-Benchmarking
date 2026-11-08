@@ -391,12 +391,13 @@ def test_ai_search_waits_for_transition_and_clears_in_one_adb_call(monkeypatch) 
         taps: list[tuple[int, int]] = []
         runs: list[tuple[str, ...]] = []
         keys: list[str] = []
+        text = ""
 
         def tap(self, x: int, y: int) -> None:
             self.taps.append((x, y))
 
         def dump(self) -> str:
-            return search_xml
+            return search_xml.replace('<node ', f'<node text="{self.text}" ')
 
         def has_app_error(self) -> bool:
             return False
@@ -406,6 +407,8 @@ def test_ai_search_waits_for_transition_and_clears_in_one_adb_call(monkeypatch) 
 
         def run(self, *args: str) -> str:
             self.runs.append(args)
+            if args[:3] == ("shell", "input", "text"):
+                self.text = args[3]
             return ""
 
     monkeypatch.setattr(collector.time, "sleep", lambda _seconds: None)

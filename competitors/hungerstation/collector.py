@@ -263,16 +263,49 @@ def _labels(root: ET.Element) -> list[tuple[str, str]]:
 
 
 def _has_search_input(xml: str) -> bool:
-    return "com.hungerstation.android.web:id/input_csc" in xml
+    return _find_search_input(xml) is not None
+
+
+def _find_search_node(xml: str) -> ET.Element | None:
+    """Recognize native and Flutter restaurant search, never arbitrary inputs."""
+    root = ET.fromstring(xml)
+    for node in root.iter("node"):
+        if (node.get("resource-id", "").endswith("/input_csc")
+                and node.get("enabled") != "false"
+                and _bounds(node.get("bounds", ""))):
+            return node
+    # The universal-search page can expose an unlabelled EditText. Require
+    # evidence of restaurant search before accepting it (not address/OTP or
+    # a restaurant's internal menu search), and refuse ambiguous inputs.
+    if "menuSearchInput" in xml or not any(
+        node.get("resource-id", "").startswith("UniversalSearch_")
+        for node in root.iter("node")
+    ):
+        return None
+    candidates = [
+        node for node in root.iter("node")
+        if node.get("class") == "android.widget.EditText"
+        and node.get("package") == PACKAGE
+        and node.get("enabled") != "false"
+        and node.get("focusable") == "true"
+        and node.get("password") != "true"
+        and _bounds(node.get("bounds", ""))
+        # Flutter sometimes exposes both the search wrapper and its editable
+        # child as EditText. They are one control, not two competing fields.
+        and not any(
+            child is not node and child.get("class") == "android.widget.EditText"
+            for child in node.iter("node")
+        )
+    ]
+    return candidates[0] if len(candidates) == 1 else None
 
 
 def _find_search_input(xml: str) -> tuple[int, int] | None:
-    root = ET.fromstring(xml)
-    for node in root.iter("node"):
-        if node.attrib.get("resource-id", "").endswith("/input_csc"):
-            box = _bounds(node.attrib.get("bounds", ""))
-            if box:
-                return ((box[0] + box[2]) // 2, (box[1] + box[3]) // 2)
+    node = _find_search_node(xml)
+    if node is not None:
+        box = _bounds(node.get("bounds", ""))
+        if box:
+            return ((box[0] + box[2]) // 2, (box[1] + box[3]) // 2)
     return None
 
 
@@ -524,30 +557,9 @@ def _apply_ai_action(
         device.tap(action.arguments["x"], action.arguments["y"])
         time.sleep(1.5)
     elif action.name == "search_restaurant":
-        device.tap(action.arguments["x"], action.arguments["y"])
-        time.sleep(2.5)
-        try:
-            transitioned_xml = device.dump()
-        except RuntimeError:
-            return
-        transitioned_point = _find_search_input(transitioned_xml)
-        if transitioned_point is None or device.has_app_error():
-            return
-        device.tap(*transitioned_point)
-        _replace_search_text(device, restaurant, submit=False)
-        time.sleep(1.5)
-        try:
-            suggestion_xml = device.dump()
-        except RuntimeError:
-            return
-        suggestion = (
-            _find_autocomplete_shortcut(suggestion_xml, restaurant)
-            or _find_search_suggestion(suggestion_xml, restaurant)
+        _search_restaurant(
+            device, restaurant, (action.arguments["x"], action.arguments["y"])
         )
-        if suggestion is not None:
-            device.tap(*suggestion)
-        else:
-            device.key("66")
     elif action.name == "swipe":
         center = width // 2
         top, bottom = int(height * 0.28), int(height * 0.78)
@@ -561,6 +573,54 @@ def _apply_ai_action(
         time.sleep(3.0)
     elif action.name == "restart_app":
         device.start_app()
+
+
+def _search_restaurant(
+    device: AndroidDevice, restaurant: Restaurant, point: tuple[int, int]
+) -> bool:
+    """Wait for the editable search page and verify text before submitting."""
+    device.tap(*point)
+    for _ in range(4):
+        time.sleep(1.0)
+        try:
+            xml = device.dump()
+        except RuntimeError:
+            continue
+        if device.has_app_error():
+            return False
+        if _is_restaurant_menu(xml, restaurant):
+            return True
+        node = _find_search_node(xml)
+        if node is None or node.get("focusable") == "false":
+            continue
+        search_point = _find_search_input(xml)
+        assert search_point is not None
+        device.tap(*search_point)
+        _replace_search_text(device, restaurant, submit=False)
+        break
+    else:
+        print("HUNGERSTATION_SEARCH_WARNING reason=editable-search-unavailable")
+        return False
+
+    for _ in range(3):
+        time.sleep(1.0)
+        try:
+            xml = device.dump()
+        except RuntimeError:
+            continue
+        if _is_restaurant_menu(xml, restaurant):
+            return True
+        node = _find_search_node(xml)
+        if node is None or _normalize(node.get("text", "")) != _normalize(restaurant.search_term):
+            continue
+        suggestion = _find_autocomplete_shortcut(xml, restaurant) or _find_search_suggestion(xml, restaurant)
+        if suggestion is not None:
+            device.tap(*suggestion)
+        else:
+            device.key("66")
+        return True
+    print("HUNGERSTATION_SEARCH_WARNING reason=search-text-not-confirmed")
+    return False
 
 
 def _ui_signature(xml: str) -> str:
@@ -602,6 +662,7 @@ def _ai_recover(
     action_history: list[str] = []
     unchanged_actions: dict[tuple[str, str], int] = {}
     black_screen_recoveries = 0
+    known_actions: dict[str, int] = {}
     for _ in range(config.AI_MAX_ACTIONS):
         if xml and ready(xml):
             return xml
@@ -629,6 +690,32 @@ def _ai_recover(
                 xml = device.dump()
             except RuntimeError:
                 xml = ""
+            continue
+        # These states can appear after searching as well as during startup.
+        # Resolve known controls before asking vision to guess another tap.
+        location = _find_location_setup_action(xml) if xml else None
+        search = _find_search_input(xml) if xml else None
+        searching_for_menu = phase in {
+            "find_and_open_restaurant_result", "recover_after_opening_restaurant_result"
+        }
+        known_action = None
+        if location is not None and known_actions.get("location", 0) < 2:
+            known_action = "location"
+            device.tap(*location)
+            time.sleep(2.5)
+        elif search is not None and searching_for_menu and known_actions.get("search", 0) < 2:
+            known_action = "search"
+            _search_restaurant(device, restaurant, search)
+        if known_action is not None:
+            known_actions[known_action] = known_actions.get(known_action, 0) + 1
+            print(f"HUNGERSTATION_ANDROID_RECOVERY phase={phase} action={known_action}")
+            before = _ui_signature(xml)
+            try:
+                xml = device.dump()
+            except RuntimeError:
+                xml = ""
+            outcome = "changed" if _ui_signature(xml) != before else "no_change"
+            action_history.append(f"system_{known_action}:{outcome}")
             continue
         try:
             screenshot = device.screenshot()
@@ -759,7 +846,7 @@ def open_restaurant(device: AndroidDevice, restaurant: Restaurant) -> str:
                 device,
                 restaurant,
                 phase="reach_restaurant_search_after_ui_dump_failure",
-                ready=_has_search_input,
+                ready=lambda candidate: _has_search_input(candidate) or _is_restaurant_menu(candidate, restaurant),
                 initial_xml=xml,
             )
             if recovered is None:
@@ -773,6 +860,8 @@ def open_restaurant(device: AndroidDevice, restaurant: Restaurant) -> str:
     # are still handled locally without API cost.
     startup_checks = 4 if config.AI_NAVIGATION_ENABLED else 10
     for _ in range(startup_checks):
+        if _is_restaurant_menu(xml, restaurant):
+            return restaurant.name
         if _has_android_app_error(xml):
             print("HUNGERSTATION_ANDROID_RECOVERY reason=app-error-dialog action=restart-app")
             device.start_app()
@@ -812,7 +901,7 @@ def open_restaurant(device: AndroidDevice, restaurant: Restaurant) -> str:
             device,
             restaurant,
             phase="reach_restaurant_search",
-            ready=_has_search_input,
+            ready=lambda candidate: _has_search_input(candidate) or _is_restaurant_menu(candidate, restaurant),
             initial_xml=xml,
         )
         if recovered is None:
@@ -822,27 +911,15 @@ def open_restaurant(device: AndroidDevice, restaurant: Restaurant) -> str:
             )
         xml = recovered
 
+    if _is_restaurant_menu(xml, restaurant):
+        return restaurant.name
     point = _find_search_input(xml)
     if point is None:
         raise CollectionFailure(
             "SEARCH_INPUT_NOT_FOUND",
             "The HungerStation search field was not available on the current screen.",
         )
-    device.tap(*point)
-    time.sleep(1.5)
-    xml = device.dump()
-    transitioned_point = _find_search_input(xml)
-    if transitioned_point is not None:
-        device.tap(*transitioned_point)
-    _replace_search_text(device, restaurant, submit=False)
-    xml = device.dump()
-    suggestion = _find_autocomplete_shortcut(xml, restaurant) or _find_search_suggestion(
-        xml, restaurant
-    )
-    if suggestion:
-        device.tap(*suggestion)
-    else:
-        device.key("66")
+    _search_restaurant(device, restaurant, point)
     result: tuple[int, int, str] | None = None
     search_shortcut_tapped = False
     result_checks = 4 if config.AI_NAVIGATION_ENABLED else 10
@@ -1165,7 +1242,7 @@ def save_product_images(
     return output
 
 
-def collect_menu(device: AndroidDevice, brand_id: str, *, max_pages: int = 45) -> tuple[list[dict[str, Any]], list[list[str]]]:
+def collect_menu(device: AndroidDevice, brand_id: str, *, max_pages: int = 90) -> tuple[list[dict[str, Any]], list[list[str]]]:
     width, height = device.screen_size()
     center = width // 2
     top = max(1, int(height * 0.25))
@@ -1246,6 +1323,12 @@ def collect_menu(device: AndroidDevice, brand_id: str, *, max_pages: int = 45) -
             break
         previous_signature = signature
         device.swipe(center, bottom, center, top, 600)
+    else:
+        raise CollectionFailure(
+            "MENU_SCROLL_LIMIT",
+            f"The {brand_id} menu was still changing after {max_pages} pages; "
+            "collection stopped before confirming the end of the menu.",
+        )
     items_by_source = {item["source_product_id"]: item for item in deduplicate(labels, brand_id)}
     for source_id, item in split_items.items():
         items_by_source.setdefault(source_id, item)

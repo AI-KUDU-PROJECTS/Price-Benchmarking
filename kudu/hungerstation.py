@@ -217,7 +217,9 @@ def collect(token: str, url: str = DEFAULT_URL, path: Path | None = None) -> dic
 
 
 def main() -> int:
-    load_dotenv(ROOT / ".env")
+    # Scheduled runs inherit the server environment, which may hold an old token.
+    # Reload the file on every invocation so token rotations take effect immediately.
+    load_dotenv(ROOT / ".env", override=True)
     token = (os.getenv("KUDU_AGGREGATOR_TOKEN") or "").strip()
     url = (os.getenv("KUDU_AGGREGATOR_URL") or "").strip() or DEFAULT_URL
     try:

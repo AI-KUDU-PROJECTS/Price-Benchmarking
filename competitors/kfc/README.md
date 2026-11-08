@@ -38,8 +38,8 @@ ever placed - see [Security & compliance](#security--compliance).
 
 ```
 API First
-  -> Playwright Bootstrap only when required   (collector/api-bootstrap.js)
-  -> direct HTTPS API calls                     (collector/api-client.js)
+  -> Playwright guest-session bootstrap         (collector/api-bootstrap.js)
+  -> API fetches in the same browser session    (collector/api-client.js)
   -> Playwright Screenshot Capture              (collector/screenshot-capture.js,
                                                    only for NEW_PRODUCT / NEW_OFFER)
   -> SQLite                                      (backend/database.py)
@@ -71,7 +71,7 @@ never inferred from a `service` field inside a later response. See
 [research/api-map/api-map.md](research/api-map/api-map.md) for the full,
 live-verified endpoint reference (request/response shapes, header
 requirements, and the real API quirks discovered while building this: a
-WAF header requirement, two sentinel values - `promoId=-1` and
+WAF browser-session requirement, two sentinel values - `promoId=-1` and
 `specialPrice=0` - that both mean "no active offer" rather than what they
 look like at first glance, and the 2026-08-06 branch-selection re-check).
 

@@ -151,29 +151,33 @@ async function main() {
     return;
   }
 
-  for (const channel of channels) {
-    try {
-      const result = await runOneChannel(channel, session, outDir);
-      summary.channels.push({
-        channel,
-        status: result.status,
-        errorMessage: result.errorMessage,
-        categoryCount: result.categoryCount,
-        expectedCategoryCount: result.expectedCategoryCount,
-        completionPercentage: result.completionPercentage,
-        productCount: result.productCount,
-        offerCount: (result.products || []).filter(isOfferProduct).length,
-        apiConfigId: result.apiConfigId,
-        clusterId: result.clusterId,
-        branchCurrentlyClosed: result.branchCurrentlyClosed,
-      });
-    } catch (e) {
-      logger.error(`[RUN] Unexpected error collecting ${channel}: ${e.stack || e.message}`);
-      const failed = { channel, status: 'FAILED', errorMessage: `Unexpected error: ${e.message}`, categoryCount: 0, expectedCategoryCount: 0, completionPercentage: 0, productCount: 0, offerCount: 0 };
-      summary.channels.push(failed);
-      writeJson(path.join(outDir, `${channel}.json`), failed);
+  try {
+    for (const channel of channels) {
+      try {
+        const result = await runOneChannel(channel, session, outDir);
+        summary.channels.push({
+          channel,
+          status: result.status,
+          errorMessage: result.errorMessage,
+          categoryCount: result.categoryCount,
+          expectedCategoryCount: result.expectedCategoryCount,
+          completionPercentage: result.completionPercentage,
+          productCount: result.productCount,
+          offerCount: (result.products || []).filter(isOfferProduct).length,
+          apiConfigId: result.apiConfigId,
+          clusterId: result.clusterId,
+          branchCurrentlyClosed: result.branchCurrentlyClosed,
+        });
+      } catch (e) {
+        logger.error(`[RUN] Unexpected error collecting ${channel}: ${e.stack || e.message}`);
+        const failed = { channel, status: 'FAILED', errorMessage: `Unexpected error: ${e.message}`, categoryCount: 0, expectedCategoryCount: 0, completionPercentage: 0, productCount: 0, offerCount: 0 };
+        summary.channels.push(failed);
+        writeJson(path.join(outDir, `${channel}.json`), failed);
+      }
+      await new Promise((r) => setTimeout(r, CONFIG.DELAY_BETWEEN_PAGES));
     }
-    await new Promise((r) => setTimeout(r, CONFIG.DELAY_BETWEEN_PAGES));
+  } finally {
+    if (session && typeof session.close === 'function') await session.close();
   }
 
   const statuses = summary.channels.map((c) => c.status);

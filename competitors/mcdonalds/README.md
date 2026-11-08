@@ -1,6 +1,52 @@
 # McDonald's Price Intelligence
 
-**Status: Blocked - site unreachable from this environment (see below).**
+## Official Android app investigation (2026-11-02)
+
+The requested source is McDonald's own Android app, with independent **Pickup**
+and **Delivery** collections for **Riyadh**. ALBAIK is only a reference for the
+existing project integration; its products and prices are not a data source.
+
+Installed `com.mcdonalds.mobileapp` **3.52.0** (82080) from Google Play on the
+project emulator. Selected **Saudi Arabia – Central, Northern and Eastern** and
+English (UK). The app fails before its home/menu screen with “Oops! Something
+went wrong”; repeated attempts produced `D2-T00-WXF-TQO`, `D2-S5I-4NE-84H`, and
+`D2-VB4-NTA-1T2`. Retrying, relaunching, setting Riyadh location/timezone, and
+using connected Wi-Fi did not resolve it. See the follow-up diagnosis below.
+
+Evidence: [result.json](research/app/2026-11-02/result.json).
+Screenshots and screen XML are retained locally and excluded from Git.
+No products were collected, no branch or delivery
+coverage was verified, and no official-app collection was added to the daily
+schedule. Existing HungerStation data remains a separate source.
+
+A working app session is required before observing navigation, product details,
+meal/size prices, and image behavior. Once available, implement an isolated
+McDonald's collector/database, verify each channel live, then connect the
+adapter, collection controls, and sequential daily schedule.
+
+### Follow-up diagnosis
+
+The user confirmed that the app works on their phone but has no Android device
+available to connect for collection. McDonald's [official Czech app FAQ](https://www.mcdonalds.cz/kupony-v-aplikaci/faq/lib/)
+identifies Android **D2** as a failed device security check. Its recommended
+Google Play Integrity checker was installed from Google Play on the emulator.
+All three UI checks showed **Fail**; the raw response contained no device
+recognition verdict and returned `UNEVALUATED` for app/account/environment
+checks. See [sanitized response](research/app/2026-11-02/integrity-response.json).
+The corresponding screenshot is retained locally. These results
+support a device-validation blocker; they do not expose McDonald's exact
+server-side decision. A later cold boot also produced network timeout **N2**.
+
+Inspection of bundled public configuration/URL strings did not identify a
+usable Saudi menu interface. A read-only request to the official McDelivery
+menu from this server returned **HTTP 403**. Website/app price equivalence has
+not been verified. No source substitution, fabricated data, collector, or
+scheduled run was introduced. Resume when a working accessible app session or
+a verified official app data interface is available.
+
+The website investigation below is historical; current results are above.
+
+**Historical website status: Blocked - site unreachable from this environment (see below).**
 No official collector, API research, database, or change-detection logic
 exists yet for McDonald's. This folder only holds the isolated
 structure future implementation will fill in - see root

@@ -48,6 +48,13 @@ file, to git, or to any log - see "What is never recorded" at the bottom.
    fixed branch succeeded end to end - see each endpoint's verification
    note below for the exact confirmed shapes.
 
+   **2026-10-25 update:** the edge subsequently began returning HTML `403`
+   responses to the Node HTTPS replay even with those headers and a valid
+   freshly bootstrapped session. Collection now keeps the Playwright page
+   alive and performs the same JSON fetches inside that first-party browser
+   session. Pickup and Delivery were both re-verified successfully against
+   all 14 current categories after this transport change.
+
 ## Branch selection update (2026-08-06)
 
 The fixed branch was changed from **SITEEN / storeId=251** to **RABWAH /

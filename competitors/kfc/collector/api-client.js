@@ -7,8 +7,10 @@
  * ../api-map.md, built on top of http-client.js. Every call:
  *   1. Builds the request from a `session` object (cookies + non-sensitive
  *      + sensitive headers captured once by api-bootstrap.js),
- *   2. Sends it via a direct HTTPS request (no browser involved - this is
- *      the "continue using direct API calls" half of the architecture),
+ *   2. Sends it through the live browser session when available so the
+ *      site's edge sees the same browser/TLS context that established the
+ *      guest session. A direct HTTPS transport remains as a compatibility
+ *      fallback for isolated tests and callers without a browser session,
  *   3. Validates the response against the minimal expected shape,
  *   4. Returns a uniform { ok, status, data, raw, error, schemaError }
  *      result - it NEVER throws for a bad HTTP status or a schema
@@ -51,7 +53,10 @@ async function call(session, { method, path, payload, logger, label }) {
   const url = `${BASE_URL}${path}`;
   const headers = buildHeaders(session);
   try {
-    const res = await http.request({ method, url, headers, body: payload, timeoutMs: CONFIG.API_TIMEOUT });
+    const request = session && typeof session.browserRequest === 'function'
+      ? session.browserRequest
+      : http.request;
+    const res = await request({ method, url, headers, body: payload, timeoutMs: CONFIG.API_TIMEOUT });
     mergeSetCookies(session, res.headers);
     if (res.parseError) {
       if (logger) logger.warn(`[API] ${label || path}: response was not valid JSON (${res.parseError})`);

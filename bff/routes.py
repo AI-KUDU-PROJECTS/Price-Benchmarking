@@ -33,6 +33,7 @@ from bff.registry import all_brands, connected_adapters, get_adapter
 from bff.pull_all import albaik_app_pull_manager, hungerstation_pull_manager, pull_manager
 from bff.auto_pull import schedule_status
 from bff.excel_export import build_market_workbook
+from bff.hungerstation_status import latest_collection_status as latest_hungerstation_status
 
 router = APIRouter()
 
@@ -66,7 +67,7 @@ def start_hungerstation_pull() -> dict[str, Any]:
 
 @router.get("/market/hungerstation/pull")
 def hungerstation_pull_status() -> dict[str, Any]:
-    return {"run": hungerstation_pull_manager.latest()}
+    return {"run": latest_hungerstation_status(hungerstation_pull_manager.latest())}
 
 
 @router.get("/market/pull/schedule")

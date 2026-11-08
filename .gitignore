@@ -91,3 +91,14 @@ bff/data/playground.db-shm
 bff/data/ai.db
 bff/data/ai.db-wal
 bff/data/ai.db-shm
+
+# Local collection outputs and app investigation captures
+competitors/*/data/images/
+competitors/*/data/*.db
+competitors/*/data/*.db-journal
+competitors/*/data/*.db-wal
+competitors/*/data/*.db-shm
+kudu/data/hungerstation.json
+competitors/*/research/app/**/*.png
+competitors/*/research/app/**/*.jpg
+competitors/*/research/app/**/*.xml

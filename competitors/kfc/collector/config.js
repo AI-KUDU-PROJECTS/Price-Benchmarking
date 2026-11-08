@@ -133,7 +133,7 @@ const CONFIG = {
     /phone/i, /mobile/i, /whatsapp/i,
   ],
 
-  // --- HTTP headers replayed on direct API calls ----------------------------
+  // --- HTTP headers replayed on browser-session API calls -------------------
   // Static, non-sensitive header values observed on saudi.kfc.me's own
   // first-party API calls. The per-run SESSION values (deviceid, cookies,
   // authorization/refreshtoken tokens) are NEVER hardcoded here - they are
@@ -150,11 +150,10 @@ const CONFIG = {
     devicemodel: 'Chrome',
     'is-dark-mode': '0',
     'accept-language': 'en-US',
-    // The site's edge WAF (Azure Application Gateway) 403s any request
-    // missing a browser-shaped User-Agent/Origin/Referer, even with a
-    // otherwise-valid session - confirmed live on 2026-08-05. These three
-    // are not secret (every browser sends them plainly) but ARE required
-    // for direct API calls to be accepted after the Playwright bootstrap.
+    // The site's edge WAF (Azure Application Gateway) requires a real browser
+    // request context. User-Agent/Origin/Referer are browser-controlled by
+    // the live Playwright page; these values remain useful only for the
+    // compatibility transport and document the expected first-party shape.
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
     origin: 'https://saudi.kfc.me',
     referer: 'https://saudi.kfc.me/en/home',

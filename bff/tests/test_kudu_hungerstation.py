@@ -95,6 +95,40 @@ def test_main_reports_success_and_failure_without_replacing_snapshot(
     assert json.loads(snapshot_path.read_text(encoding="utf-8")) == saved
 
 
+def test_main_reloads_rotated_token_from_dotenv(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    monkeypatch.setattr(kudu_hs, "ROOT", tmp_path)
+    monkeypatch.setattr(kudu_hs, "SNAPSHOT_PATH", tmp_path / "hungerstation.json")
+    monkeypatch.setattr(kudu_hs, "load_main_items", lambda: MAIN_ITEMS)
+    monkeypatch.setenv("KUDU_AGGREGATOR_TOKEN", "stale-inherited-token")
+    monkeypatch.setenv("KUDU_AGGREGATOR_URL", "https://example.test/menu")
+    authorizations = []
+
+    def get(url: str, *, headers: dict, timeout: object) -> httpx.Response:
+        authorizations.append(headers["Authorization"])
+        return httpx.Response(
+            200, request=httpx.Request("GET", url),
+            json=_raw_menu(("Drinks", [_item(1, "Orange Juice", 12)])),
+        )
+
+    monkeypatch.setattr(kudu_hs.httpx, "get", get)
+    for token in ("rotated-token-one", "rotated-token-two"):
+        (tmp_path / ".env").write_text(f"KUDU_AGGREGATOR_TOKEN={token}\n", encoding="utf-8")
+        assert kudu_hs.main() == 0
+        assert authorizations[-1] == f"Bearer {token}"
+        output = capsys.readouterr().out
+        assert "status=SUCCESS products=1" in output
+        assert token not in output
+        assert "stale-inherited-token" not in output
+
+    # Explicitly clearing the file must not revive the inherited credential.
+    (tmp_path / ".env").write_text("KUDU_AGGREGATOR_TOKEN=\n", encoding="utf-8")
+    assert kudu_hs.main() == 1
+    assert "code=TOKEN_MISSING" in capsys.readouterr().out
+    assert len(authorizations) == 2
+
+
 def test_missing_token_is_reported(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
     monkeypatch.setattr(kudu_hs, "load_dotenv", lambda *args, **kwargs: None)
     monkeypatch.setenv("KUDU_AGGREGATOR_TOKEN", "")

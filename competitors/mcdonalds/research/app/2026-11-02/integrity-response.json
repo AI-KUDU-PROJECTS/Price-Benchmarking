@@ -1,0 +1,18 @@
+{
+  "appIntegrity": {
+    "appRecognitionVerdict": "UNEVALUATED"
+  },
+  "deviceIntegrity": {
+    "recentDeviceActivity": {
+      "deviceActivityLevel": "UNEVALUATED"
+    },
+    "deviceAttributes": {}
+  },
+  "accountDetails": {
+    "appLicensingVerdict": "UNEVALUATED"
+  },
+  "environmentDetails": {
+    "playProtectVerdict": "UNEVALUATED",
+    "appAccessRiskVerdict": {}
+  }
+}

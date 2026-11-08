@@ -1,0 +1,61 @@
+{
+  "date": "2026-11-02",
+  "status": "blocked_before_menu",
+  "source": "official Android app from Google Play",
+  "package": "com.mcdonalds.mobileapp",
+  "version": "3.52.0",
+  "version_code": 82080,
+  "region": "Saudi Arabia – Central, Northern and Eastern",
+  "language": "English (UK)",
+  "requested_city": "Riyadh",
+  "requested_channels": [
+    "PICKUP",
+    "DELIVERY"
+  ],
+  "device": "emulator-5554",
+  "launch_activity": "com.mcdonalds.mobileapp/.SplashActivity",
+  "observed_message": "Oops! Something went wrong. Something's not working. Please try again and make sure you've updated to the latest version of the app.",
+  "observed_error_codes": [
+    "D2-T00-WXF-TQO",
+    "D2-S5I-4NE-84H",
+    "D2-VB4-NTA-1T2",
+    "N2-JF4-68W-RXU"
+  ],
+  "checks": [
+    "Installed from Google Play",
+    "Selected Saudi Central, Northern and Eastern region",
+    "Retried in app",
+    "Force-stopped and relaunched app",
+    "Set timezone Asia/Riyadh and emulator location to Riyadh",
+    "Confirmed validated cellular Internet and repeated with connected AndroidWifi"
+  ],
+  "root_cause": "D2 indicates a device security-check failure according to McDonald’s official FAQ; the checker returned no passing device-integrity verdict on this emulator. The exact McDonald’s server decision is not visible. A later cold boot also returned network timeout N2.",
+  "products_collected": 0,
+  "selected_branch": null,
+  "verified_delivery_coverage": false,
+  "next_step": "Resume when a working, accessible Android app session is available or a verified official app data interface is provided. No physical device is currently available from the user.",
+  "user_confirmed_app_works_on_phone": true,
+  "physical_device_available": false,
+  "integrity_check": {
+    "tool_package": "gr.nikolasspyr.integritycheck",
+    "installed_from": "Google Play",
+    "ui_results": {
+      "basic": "Fail",
+      "device": "Fail",
+      "strong": "Fail"
+    },
+    "device_recognition_verdict": null,
+    "other_verdicts": "UNEVALUATED",
+    "evidence": "integrity-response.json"
+  },
+  "official_error_reference": {
+    "url": "https://www.mcdonalds.cz/kupony-v-aplikaci/faq/lib/",
+    "meaning": "Official McDonald’s Czech FAQ maps Android D2 to a failed device security check. Market-specific Saudi internals were not inspected."
+  },
+  "public_service_investigation": {
+    "app_assets": "No usable public Saudi menu service identified in the bundled configuration/URL strings. No attestation bypass attempted.",
+    "web_url": "https://www.riyadh.mcdelivery.com.sa/sa/riy/menu.html",
+    "server_http_status": 403,
+    "source_equivalence": "Website prices were not established as equivalent to app prices; no replacement data ingested."
+  }
+}
