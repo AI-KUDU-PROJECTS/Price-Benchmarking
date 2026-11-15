@@ -163,6 +163,42 @@ KUDU's internal network, so the machine running it must reach that network.
 The API has no images: items reuse the main-menu image of the same item id,
 the same name, or a clearly matching name, and stay blank otherwise.
 
+## Restaurant sharing API
+
+`GET /api/v1/restaurants/{brand_id}` returns one restaurant and all its supported
+channels in one JSON response. Supported IDs: `kudu`, `kfc`, `hardees`,
+`burger-king`, `herfy`, `mcdonalds`, and `albaik`.
+
+Send a dedicated random token as `Authorization: Bearer <token>`. Configure its SHA-256
+hex digest as `SHARED_API_KEY_SHA256` in `.env`, then restart the API. An empty
+or malformed digest disables the endpoint (503); missing or invalid client
+tokens return 401 with `WWW-Authenticate: Bearer`. The previous `X-API-Key`
+header is no longer accepted. Unknown restaurant IDs return 404. The token authorizes this
+read-only export for all seven restaurants, not collection or mapping writes.
+This authentication applies only to this new route; existing application
+routes and image mounts retain their existing access behavior.
+
+The response contains `restaurant`, `channels`, and `generatedAt`. Each channel
+contains `products`, `productCount`, active `promotions`, `observedAt`,
+`sourceRunIds`, and `dataFreshness`. It includes all current products without
+pagination; it does not include full history or trigger collection. Data comes
+from the latest saved successful snapshots, so channels can have different
+observation times. Channels without menu data have empty lists and unavailable
+freshness. Each product includes `regularPrice`, `specialPrice`,
+`effectivePrice`, and `imageUrl`; unavailable prices/images stay null.
+
+Set `SHARED_API_BASE_URL` to the origin consumers can reach (for example,
+`https://prices.example.com`) to make local image URLs absolute. If unset,
+the request origin is used. Existing upstream HTTP(S) image URLs are preserved.
+Private server/image URLs still require access to that network.
+
+```bash
+curl --header "Authorization: Bearer $RESTAURANT_API_KEY" \
+  https://prices.example.com/api/v1/restaurants/kfc
+```
+
+The response schema and header authentication are documented in FastAPI `/docs`.
+
 ## AI mapping
 
 The AI page suggests, for one KUDU item, the closest item at each competitor

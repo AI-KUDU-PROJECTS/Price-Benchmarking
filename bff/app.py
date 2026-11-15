@@ -13,6 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from bff import auto_pull
 from bff.ai.routes import router as ai_router
 from bff.routes import router
+from bff.sharing import router as sharing_router
 from competitors.hungerstation import config as hungerstation_config
 from competitors.albaik import app_config as albaik_config
 
@@ -52,6 +53,7 @@ app.add_middleware(
 
 app.include_router(router, prefix="/api/v1")
 app.include_router(ai_router, prefix="/api/v1")
+app.include_router(sharing_router, prefix="/api/v1")
 app.mount(
     "/hungerstation-images",
     StaticFiles(directory=hungerstation_config.IMAGE_DIR, check_dir=False),
