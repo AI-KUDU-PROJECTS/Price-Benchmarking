@@ -186,44 +186,41 @@ def latest_run(db: sqlite3.Connection, brand_id: str, *, success_only: bool = Fa
 
 
 def latest_products(db: sqlite3.Connection, brand_id: str) -> list[sqlite3.Row]:
+    """Use run/product indexes instead of windowing the entire brand history."""
     return db.execute(
         """
         WITH latest AS (
             SELECT run_id FROM runs
             WHERE brand_id = ? AND status = 'SUCCESS'
-            ORDER BY started_at DESC LIMIT 1
-        ),
-        history AS (
-            SELECT
-                p.*,
-                r.started_at AS run_started,
-                LAG(p.regular_price) OVER (
-                    PARTITION BY p.source_product_id ORDER BY r.started_at
-                ) AS previous_regular_price,
-                LAG(p.special_price) OVER (
-                    PARTITION BY p.source_product_id ORDER BY r.started_at
-                ) AS previous_special_price,
-                LAG(p.effective_price) OVER (
-                    PARTITION BY p.source_product_id ORDER BY r.started_at
-                ) AS previous_effective_price,
-                LAG(p.availability) OVER (
-                    PARTITION BY p.source_product_id ORDER BY r.started_at
-                ) AS previous_availability,
-                LAG(p.run_id) OVER (
-                    PARTITION BY p.source_product_id ORDER BY r.started_at
-                ) AS previous_run_id,
-                MIN(p.captured_at) OVER (
-                    PARTITION BY p.source_product_id
-                ) AS first_seen_at,
-                MAX(p.captured_at) OVER (
-                    PARTITION BY p.source_product_id
-                ) AS last_seen_at
-            FROM products p
-            JOIN runs r ON r.run_id = p.run_id
-            WHERE p.brand_id = ? AND r.status = 'SUCCESS'
+            ORDER BY started_at DESC, rowid DESC LIMIT 1
         )
-        SELECT history.* FROM history JOIN latest ON latest.run_id = history.run_id
-        ORDER BY history.category_name_en, history.name_en
+        SELECT p.*, r.started_at AS run_started,
+               previous.regular_price AS previous_regular_price,
+               previous.special_price AS previous_special_price,
+               previous.effective_price AS previous_effective_price,
+               previous.availability AS previous_availability,
+               previous.run_id AS previous_run_id,
+               (SELECT MIN(seen.captured_at) FROM products seen
+                JOIN runs seen_run ON seen_run.run_id = seen.run_id
+                WHERE seen.brand_id = p.brand_id AND seen.source_product_id = p.source_product_id
+                  AND seen_run.status = 'SUCCESS') AS first_seen_at,
+               (SELECT MAX(seen.captured_at) FROM products seen
+                JOIN runs seen_run ON seen_run.run_id = seen.run_id
+                WHERE seen.brand_id = p.brand_id AND seen.source_product_id = p.source_product_id
+                  AND seen_run.status = 'SUCCESS') AS last_seen_at
+        FROM latest
+        JOIN runs r ON r.run_id = latest.run_id
+        JOIN products p ON p.run_id = latest.run_id AND p.brand_id = ?
+        LEFT JOIN products previous ON previous.id = (
+            SELECT old.id FROM products old
+            JOIN runs old_run ON old_run.run_id = old.run_id
+            WHERE old.brand_id = p.brand_id AND old.source_product_id = p.source_product_id
+              AND old_run.status = 'SUCCESS'
+              AND (old_run.started_at < r.started_at
+                   OR (old_run.started_at = r.started_at AND old.id < p.id))
+            ORDER BY old_run.started_at DESC, old.id DESC LIMIT 1
+        )
+        ORDER BY p.category_name_en, p.name_en
         """,
         (brand_id, brand_id),
     ).fetchall()

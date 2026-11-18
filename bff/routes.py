@@ -35,6 +35,7 @@ from bff.auto_pull import schedule_status
 from bff.excel_export import build_market_workbook
 from bff.hungerstation_status import latest_collection_status as latest_hungerstation_status
 from bff.menu import menu_rows, menu_sort_key
+from bff.read_cache import cached_read
 
 router = APIRouter()
 
@@ -180,7 +181,7 @@ def market_overview() -> dict[str, Any]:
         if adapter is None:
             brand_rows.append(BrandStatusRow(brand=brand))
             continue
-        overview: BrandOverview = adapter.get_overview()
+        overview: BrandOverview = _brand_overview(adapter)
         # recent_changes is the RECENT_WINDOW_DAYS window, so every count,
         # highlight, and per-brand change total covers the same period.
         window = overview.recent_changes
@@ -297,7 +298,14 @@ def list_brands() -> dict[str, Any]:
 @router.get("/brands/{brand_id}/overview")
 def brand_overview(brand_id: str) -> dict[str, Any]:
     adapter = _require_adapter(brand_id)
-    return dump(adapter.get_overview())
+    return dump(_brand_overview(adapter))
+
+
+def _brand_overview(adapter) -> BrandOverview:
+    overview = cached_read(adapter, ("overview",), adapter.get_overview)
+    # Health/freshness remain live even while expensive counts are cached.
+    overview.brand = adapter.get_brand()
+    return overview
 
 
 @router.get("/brands/{brand_id}/products")
@@ -310,7 +318,8 @@ def brand_products(
     page_size: int = Query(200, ge=1, le=500),
 ) -> dict[str, Any]:
     adapter = _require_adapter(brand_id)
-    items = sorted(adapter.list_products(channel=channel, category=category, query=q), key=menu_sort_key)
+    items = cached_read(adapter, ("products", channel, category, q), lambda: sorted(
+        adapter.list_products(channel=channel, category=category, query=q), key=menu_sort_key))
     brand = adapter.get_brand()
     run_ids = sorted({p.source_run_id for p in items if p.source_run_id})
     return _meta(items, brand.data_freshness, run_ids, page=page, page_size=page_size)
@@ -326,11 +335,16 @@ def brand_menu(
     page_size: int = Query(200, ge=1, le=500),
 ) -> dict[str, Any]:
     adapter = _require_adapter(brand_id)
-    products = adapter.list_products(channel=channel)
-    rows = menu_rows(products, compare=channel is None)
-    if category or q:
-        matching_ids = {p.id for p in adapter.list_products(channel=channel, category=category, query=q)}
-        rows = [row for row in rows if any(p.id in matching_ids for p in row.channels.values())]
+    def load_rows():
+        products = adapter.list_products(channel=channel)
+        rows = menu_rows(products, compare=channel is None)
+        if category or q:
+            matching_ids = {p.id for p in adapter.list_products(channel=channel, category=category, query=q)}
+            rows = [row for row in rows if any(p.id in matching_ids for p in row.channels.values())]
+        return rows
+
+    # Cache the complete result so pagination still happens after grouping.
+    rows = cached_read(adapter, ("menu", channel, category, q), load_rows)
     brand = adapter.get_brand()
     run_ids = sorted({p.source_run_id for row in rows for p in row.channels.values() if p.source_run_id})
     return _meta(rows, brand.data_freshness, run_ids, page=page, page_size=page_size)

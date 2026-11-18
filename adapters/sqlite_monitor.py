@@ -293,12 +293,15 @@ class SQLiteMonitorAdapter:
         conn: sqlite3.Connection,
         channel: Channel | None = None,
     ) -> list[Product]:
+        # Read current rows via the run index, then look up each product's
+        # previous successful observation via the product-key index. A product
+        # may be absent from intervening runs; failed/partial data never wins.
         source_channel = _from_channel(channel)
         products: list[Product] = []
-        params: list[Any] = [self.branch_id, self.branch_id]
+        params: list[Any] = [self.branch_id]
         channel_sql = ""
         if source_channel and source_channel != "HUNGERSTATION":
-            channel_sql = "AND ranked.channel = ?"
+            channel_sql = "AND channel = ?"
             params.append(source_channel)
         if source_channel != "HUNGERSTATION":
             rows = conn.execute(
@@ -307,39 +310,38 @@ class SQLiteMonitorAdapter:
                 SELECT channel, run_id FROM (
                     SELECT channel, run_id,
                            ROW_NUMBER() OVER (
-                             PARTITION BY channel ORDER BY started_at DESC
+                             PARTITION BY channel ORDER BY started_at DESC, rowid DESC
                            ) AS rn
                     FROM crawl_runs
-                    WHERE branch_id = ? AND status = 'SUCCESS'
+                    WHERE branch_id = ? AND status = 'SUCCESS' {channel_sql}
                 ) ranked_runs
                 WHERE rn = 1
-            ),
-            ranked AS (
-                SELECT
-                    ps.*,
-                    cr.started_at AS run_started,
-                    LAG(ps.regular_price) OVER (
-                        PARTITION BY ps.product_key ORDER BY cr.started_at
-                    ) AS prev_regular,
-                    LAG(ps.special_price) OVER (
-                        PARTITION BY ps.product_key ORDER BY cr.started_at
-                    ) AS prev_special
-                FROM product_snapshots ps
-                JOIN crawl_runs cr
-                  ON cr.run_id = ps.run_id AND cr.status = 'SUCCESS'
-                WHERE ps.branch_id = ?
             )
             SELECT
-                ranked.*,
+                ps.*,
+                cr.started_at AS run_started,
+                previous.regular_price AS prev_regular,
+                previous.special_price AS prev_special,
                 p.status AS entity_status,
                 p.first_seen_at,
                 p.last_seen_at,
                 p.canonical_product_key
-            FROM ranked
-            JOIN latest ON latest.run_id = ranked.run_id
-            JOIN products p ON p.canonical_product_key = ranked.product_key
-            WHERE 1 = 1 {channel_sql}
-            ORDER BY ranked.category_name_en, ranked.product_name_en
+            FROM latest
+            JOIN crawl_runs cr ON cr.run_id = latest.run_id
+            JOIN product_snapshots ps ON ps.run_id = latest.run_id AND ps.branch_id = cr.branch_id
+            JOIN products p ON p.canonical_product_key = ps.product_key
+            LEFT JOIN product_snapshots previous ON previous.id = (
+                SELECT old.id
+                FROM product_snapshots old
+                JOIN crawl_runs old_run ON old_run.run_id = old.run_id
+                WHERE old.product_key = ps.product_key AND old.branch_id = ps.branch_id
+                  AND old_run.status = 'SUCCESS'
+                  AND (old_run.started_at < cr.started_at
+                       OR (old_run.started_at = cr.started_at AND old.id < ps.id))
+                ORDER BY old_run.started_at DESC, old.id DESC
+                LIMIT 1
+            )
+            ORDER BY ps.category_name_en, ps.product_name_en
             """,
                 params,
             ).fetchall()
