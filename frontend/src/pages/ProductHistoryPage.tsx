@@ -17,6 +17,7 @@ export function ProductHistoryPage({ brandId }: { brandId: string }) {
   const { data, error, loading } = useApi(
     () => api.productHistory(brandId, productId),
     [brandId, productId],
+    { live: true },
   );
 
   if (loading) return <LoadingState variant="detail" />;

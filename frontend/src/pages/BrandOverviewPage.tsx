@@ -11,7 +11,7 @@ import { changeHref } from "../lib/links";
 import { formatRiyadhDateTime } from "../lib/dateTime";
 
 export function BrandOverviewPage({ brandId }: { brandId: string }) {
-  const { data, error, loading } = useApi(() => api.brandOverview(brandId), [brandId]);
+  const { data, error, loading } = useApi(() => api.brandOverview(brandId), [brandId], { live: true });
   if (loading) return <LoadingState variant="metrics" />;
   if (error) return <ErrorState error={error} />;
   if (!data) return <EmptyState message="No brand data." />;

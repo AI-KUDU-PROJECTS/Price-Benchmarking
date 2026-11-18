@@ -10,7 +10,7 @@ import { formatRiyadhDateTime } from "../lib/dateTime";
 
 export function ChangeDetailPage() {
   const { changeId = "" } = useParams();
-  const { data, error, loading } = useApi(() => api.change(changeId), [changeId]);
+  const { data, error, loading } = useApi(() => api.change(changeId), [changeId], { live: true });
 
   if (loading) return <LoadingState variant="detail" />;
   if (error) return <ErrorState error={error} />;

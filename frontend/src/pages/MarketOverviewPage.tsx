@@ -23,7 +23,7 @@ export function MarketOverviewPage() {
   const [hungerstationStarting, setHungerstationStarting] = useState(false);
   const [hungerstationError, setHungerstationError] = useState<string | null>(null);
   const [schedule, setSchedule] = useState<PullSchedule | null>(null);
-  const { data, error, loading } = useApi(() => api.marketOverview(), [refreshKey]);
+  const { data, error, loading } = useApi(() => api.marketOverview(), [refreshKey], { live: true });
 
   useEffect(() => {
     let active = true;

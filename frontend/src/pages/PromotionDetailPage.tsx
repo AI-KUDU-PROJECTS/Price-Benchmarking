@@ -16,6 +16,7 @@ export function PromotionDetailPage({ brandId }: { brandId: string }) {
   const { data, error, loading } = useApi(
     () => api.promotion(brandId, promotionId),
     [brandId, promotionId],
+    { live: true },
   );
 
   if (loading) return <LoadingState variant="detail" />;

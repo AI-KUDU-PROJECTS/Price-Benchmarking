@@ -196,8 +196,98 @@ def test_warm_cache_still_requires_authentication(menu_client, monkeypatch):
         monkeypatch.setattr(auth, "settings", lambda: SimpleNamespace())
         monkeypatch.setattr(auth, "current_session", lambda *_: None)
         assert client.get("/api/v1/brands/kfc/menu").status_code == 401
+        assert client.get("/api/v1/data-version").status_code == 401
     finally:
         if previous is None:
             app.dependency_overrides.pop(auth.require_user, None)
         else:
             app.dependency_overrides[auth.require_user] = previous
+
+
+def test_browser_version_changes_with_database_wal_and_json(tmp_path):
+    from bff.read_cache import data_version
+    path = tmp_path / "prices.db"
+    catalog = tmp_path / "catalog.json"
+    catalog.write_text("20")
+    adapter = SimpleNamespace(db_path=path, base=SimpleNamespace(catalog_path=catalog))
+    with sqlite3.connect(path) as writer:
+        writer.execute("PRAGMA journal_mode=WAL")
+        writer.execute("CREATE TABLE prices (value REAL)")
+        writer.execute("INSERT INTO prices VALUES (20)")
+        writer.commit()
+        writer.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        first = data_version({"test": adapter})
+        assert first == data_version({"test": adapter})
+        before = path.stat().st_mtime_ns
+        writer.execute("UPDATE prices SET value=25")
+        writer.commit()
+        assert path.stat().st_mtime_ns == before
+        second = data_version({"test": adapter})
+        assert second != first
+        replacement = tmp_path / "replacement.json"
+        replacement.write_text("25")
+        replacement.replace(catalog)
+        assert data_version({"test": adapter}) != second
+    writer.close()
+    assert data_version({"custom": object()}) is None
+
+
+def test_version_endpoint_and_response_headers_follow_new_prices(menu_client):
+    client, path, _ = menu_client
+    first = client.get("/api/v1/data-version")
+    assert first.status_code == 200
+    version = first.json()["version"]
+    assert first.headers["cache-control"] == "no-store"
+    menu = client.get("/api/v1/brands/kfc/menu")
+    assert menu.headers["x-data-version"] == version
+    with sqlite3.connect(path) as db:
+        db.execute("UPDATE product_snapshots SET regular_price=25 WHERE run_id='run-new-p'")
+    new_version = client.get("/api/v1/data-version").json()["version"]
+    assert new_version != version
+    assert client.get("/api/v1/brands/kfc/menu").headers["x-data-version"] == new_version
+
+
+def test_commit_during_read_is_retried_instead_of_tagging_old_data(menu_client, monkeypatch):
+    client, path, adapter = menu_client
+    original = adapter.list_products
+    changed = False
+
+    def read_then_commit(**kwargs):
+        nonlocal changed
+        result = original(**kwargs)
+        if not changed:
+            changed = True
+            with sqlite3.connect(path) as db:
+                db.execute("UPDATE product_snapshots SET regular_price=27 WHERE run_id='run-new-p'")
+        return result
+
+    monkeypatch.setattr(adapter, "list_products", read_then_commit)
+    url = "/api/v1/brands/kfc/menu?channel=pickup"
+    first = client.get(url)
+    assert first.status_code == 409
+    assert "x-data-version" not in first.headers
+    second = client.get(url)
+    assert second.status_code == 200
+    assert second.json()["items"][0]["channels"]["pickup"]["regularPrice"] == 27
+
+
+@pytest.mark.parametrize("kind", ["changes", "promotions"])
+def test_changes_and_promotions_share_cache_and_refresh_on_commit(menu_client, monkeypatch, kind):
+    client, path, adapter = menu_client
+    original = getattr(adapter, f"list_{kind}")
+    calls = []
+
+    def counted(**kwargs):
+        calls.append(kwargs)
+        return original(**kwargs)
+
+    monkeypatch.setattr(adapter, f"list_{kind}", counted)
+    for url in (f"/api/v1/brands/kfc/{kind}", f"/api/v1/market/{kind}"):
+        assert client.get(url).status_code == 200
+    assert len(calls) == 1
+    assert client.get(f"/api/v1/market/{kind}?channel=pickup").status_code == 200
+    assert len(calls) == 2
+    with sqlite3.connect(path) as db:
+        db.execute("UPDATE product_snapshots SET regular_price=28 WHERE run_id='run-new-p'")
+    assert client.get(f"/api/v1/market/{kind}").status_code == 200
+    assert len(calls) == 3

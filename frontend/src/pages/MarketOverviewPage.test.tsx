@@ -64,9 +64,11 @@ describe("HungerStation latest collection status", () => {
     await act(async () => { await vi.advanceTimersByTimeAsync(15000); });
     expect(screen.queryByText("failed")).toBeNull();
     expect(screen.getByText(/Collected 166 products/)).toBeTruthy();
-    expect(apiMock.marketOverview).toHaveBeenCalledTimes(2);
+    // Three five-second version validations plus the collection completion refresh.
+    expect(apiMock.marketOverview).toHaveBeenCalledTimes(5);
     await act(async () => { await vi.advanceTimersByTimeAsync(15000); });
-    expect(apiMock.marketOverview).toHaveBeenCalledTimes(2);
+    // No extra collection-completion refresh when its state has not changed.
+    expect(apiMock.marketOverview).toHaveBeenCalledTimes(8);
   });
 
   it("keeps active collection progress and disables duplicate starts", async () => {

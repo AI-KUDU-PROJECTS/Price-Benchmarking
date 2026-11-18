@@ -55,7 +55,7 @@ export function BrandMenuPage({ brandId }: { brandId: string }) {
   if (q) query.set("q", q);
   if (params.get("page")) query.set("page", params.get("page") as string);
   const suffix = query.toString() ? `?${query}` : "";
-  const { data, error, loading } = useApi(() => api.menu(brandId, suffix), [brandId, suffix], { keepPreviousData: true });
+  const { data, error, loading } = useApi(() => api.menu(brandId, suffix), [brandId, suffix], { keepPreviousData: true, live: true });
 
   if (loading && !data) return <LoadingState />;
   if (error) return <ErrorState error={error} />;

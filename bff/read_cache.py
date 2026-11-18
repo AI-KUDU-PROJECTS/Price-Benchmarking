@@ -1,4 +1,4 @@
-"""Bounded, process-local cache for file-backed menu/overview reads only.
+"""Bounded, process-local cache for file-backed restaurant reads only.
 
 Authentication still runs on every HTTP request. No sessions or user data are
 cached here. DB/WAL and JSON signatures invalidate entries on the next request;
@@ -115,3 +115,25 @@ def cached_read(adapter: Any, key: tuple, load: Callable[[], T]) -> T:
         return load()
     identity, paths = source
     return _cache.get((identity, key), lambda: file_version(paths), load)
+
+
+def data_version(adapters: dict[str, Any]) -> str | None:
+    """Opaque version covering every DB/WAL/catalog, including overlay sources.
+
+    No TTL here: a committed write or atomic catalog replacement must be seen
+    by the very next validation request. Unknown sources disable browser reuse.
+    """
+    from hashlib import sha256
+    import json
+
+    sources = []
+    for brand_id, adapter in sorted(adapters.items()):
+        source = _source(adapter)
+        if source is None:
+            return None
+        identity, paths = source
+        version = file_version(paths)
+        if version is None:
+            return None
+        sources.append((brand_id, identity, version))
+    return sha256(json.dumps(("restaurant-data-v1", sources)).encode()).hexdigest()

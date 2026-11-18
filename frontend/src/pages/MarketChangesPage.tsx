@@ -44,7 +44,7 @@ export function MarketChangesPage() {
   }
   if (params.get("page")) query.set("page", params.get("page") as string);
   const suffix = query.toString() ? `?${query}` : "";
-  const { data, error, loading } = useApi(() => api.marketChanges(suffix), [suffix], { keepPreviousData: true });
+  const { data, error, loading } = useApi(() => api.marketChanges(suffix), [suffix], { keepPreviousData: true, live: true });
   const hasFilters = FILTER_KEYS.some((key) => params.get(key));
 
   if (loading && !data) return <LoadingState />;

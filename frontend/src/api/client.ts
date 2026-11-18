@@ -17,6 +17,7 @@ import type {
   PullResponse,
   PullSchedule,
 } from "./types";
+import { ReadCache } from "./readCache";
 import { createPlaygroundDemoApi } from "./playgroundDemoStorage";
 import { withLatestKuduResult } from "../lib/hungerstationStatus";
 
@@ -36,8 +37,11 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+async function request<T>(path: string, init?: RequestInit, onResponse?: (response: Response) => void): Promise<T> {
   const response = await fetch(`${BASE}${path}`, init);
+  if (response.status === 401) {
+    reads.clear();
+  }
   const body = await response.json().catch(() => null);
   if (!response.ok) {
     const detail =
@@ -46,7 +50,36 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
         : response.statusText;
     throw new ApiError(response.status, body, detail);
   }
+  onResponse?.(response);
   return body as T;
+}
+
+const reads = new ReadCache(async () => {
+  const result = await request<{ version: string | null }>("/data-version", { signal: AbortSignal.timeout(15_000) });
+  return result.version ?? null;
+});
+if (typeof window !== "undefined") {
+  window.addEventListener("kudu:session-expired", () => reads.clear());
+  // A restored tab must validate again; no price cache survives a page session.
+  window.addEventListener("pagehide", () => reads.clear());
+}
+
+async function readRequest<T>(path: string): Promise<T> {
+  return reads.read(path, async () => {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      let version: string | null = null;
+      try {
+        const data = await request<T>(path, { signal: AbortSignal.timeout(15_000) }, (response) => {
+          version = response.headers?.get("X-Data-Version") ?? null;
+        });
+        return { data, version };
+      } catch (error) {
+        if (!(error instanceof ApiError) || error.status !== 409 ||
+            !JSON.stringify(error.body).includes("data_changed_during_read")) throw error;
+      }
+    }
+    throw new Error("New data is arriving. Please try again in a moment.");
+  });
 }
 
 async function allProducts(brand: string, channel: Channel): Promise<Product[]> {
@@ -58,7 +91,7 @@ async function allProducts(brand: string, channel: Channel): Promise<Product[]> 
       page: String(page),
       page_size: "500",
     });
-    const response = await request<ListResponse<Product>>(
+    const response = await readRequest<ListResponse<Product>>(
       `/brands/${brand}/products?${query.toString()}`,
     );
     items.push(...response.items);
@@ -103,7 +136,7 @@ async function demoMappingOr404(id: string): Promise<PriceMapping> {
 }
 
 export const api = {
-  marketOverview: () => request<MarketOverview>("/market/overview"),
+  marketOverview: () => readRequest<MarketOverview>("/market/overview"),
   pullStatus: () => request<PullResponse>("/market/pull"),
   startPullAll: () => request<PullResponse>("/market/pull", { method: "POST" }),
   hungerstationPullStatus: async (): Promise<PullResponse> => {
@@ -129,25 +162,25 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ kuduProductId, channel }),
     }),
-  marketChanges: (params = "") => request<ListResponse<ChangeEvent>>(`/market/changes${params}`),
-  marketPromotions: (params = "") => request<ListResponse<Promotion>>(`/market/promotions${params}`),
-  brands: () => request<ListResponse<Brand>>("/brands"),
-  brandOverview: (brand: string) => request<BrandOverview>(`/brands/${brand}/overview`),
+  marketChanges: (params = "") => readRequest<ListResponse<ChangeEvent>>(`/market/changes${params}`),
+  marketPromotions: (params = "") => readRequest<ListResponse<Promotion>>(`/market/promotions${params}`),
+  brands: () => readRequest<ListResponse<Brand>>("/brands"),
+  brandOverview: (brand: string) => readRequest<BrandOverview>(`/brands/${brand}/overview`),
   products: (brand: string, params = "") =>
-    request<ListResponse<Product>>(`/brands/${brand}/products${params}`),
+    readRequest<ListResponse<Product>>(`/brands/${brand}/products${params}`),
   menu: (brand: string, params = "") =>
-    request<ListResponse<MenuRow>>(`/brands/${brand}/menu${params}`),
+    readRequest<ListResponse<MenuRow>>(`/brands/${brand}/menu${params}`),
   product: (brand: string, id: string) =>
-    request<Product>(`/brands/${brand}/products/${encodeURIComponent(id)}`),
+    readRequest<Product>(`/brands/${brand}/products/${encodeURIComponent(id)}`),
   productHistory: (brand: string, id: string) =>
-    request<ProductHistory>(`/brands/${brand}/products/${encodeURIComponent(id)}/history`),
+    readRequest<ProductHistory>(`/brands/${brand}/products/${encodeURIComponent(id)}/history`),
   promotions: (brand: string, params = "") =>
-    request<ListResponse<Promotion>>(`/brands/${brand}/promotions${params}`),
+    readRequest<ListResponse<Promotion>>(`/brands/${brand}/promotions${params}`),
   promotion: (brand: string, id: string) =>
-    request<Promotion>(`/brands/${brand}/promotions/${encodeURIComponent(id)}`),
+    readRequest<Promotion>(`/brands/${brand}/promotions/${encodeURIComponent(id)}`),
   changes: (brand: string, params = "") =>
-    request<ListResponse<ChangeEvent>>(`/brands/${brand}/changes${params}`),
-  change: (id: string) => request<ChangeEvent>(`/changes/${encodeURIComponent(id)}`),
+    readRequest<ListResponse<ChangeEvent>>(`/brands/${brand}/changes${params}`),
+  change: (id: string) => readRequest<ChangeEvent>(`/changes/${encodeURIComponent(id)}`),
   allProducts,
   playgroundMappings: () => playgroundUsesBrowserStorage
     ? demoApi().list()

@@ -36,8 +36,15 @@ from bff.excel_export import build_market_workbook
 from bff.hungerstation_status import latest_collection_status as latest_hungerstation_status
 from bff.menu import menu_rows, menu_sort_key
 from bff.read_cache import cached_read
+from bff.versioned_reads import VersionedReadRoute, current_version
 
-router = APIRouter()
+router = APIRouter(route_class=VersionedReadRoute)
+
+
+@router.get("/data-version")
+def read_data_version(response: Response) -> dict[str, str | None]:
+    response.headers["Cache-Control"] = "no-store"
+    return {"version": current_version()}
 
 
 @router.get("/market/export.xlsx")
@@ -243,13 +250,7 @@ def market_changes(
     items = []
     for adapter in adapters.values():
         items.extend(
-            adapter.list_changes(
-                channel=channel,
-                event_type=type,
-                category=category,
-                date_from=date_from,
-                date_to=date_to,
-            )
+            _brand_changes(adapter, channel, type, category, date_from, date_to)
         )
     items = _filter_change_query(items, q)
     items.sort(key=lambda event: event.detected_at, reverse=True)
@@ -277,12 +278,7 @@ def market_promotions(
     items = []
     for adapter in adapters.values():
         items.extend(
-            adapter.list_promotions(
-                channel=channel,
-                status=status,
-                category=category,
-                query=q,
-            )
+            _brand_promotions(adapter, channel, status, category, q)
         )
     items.sort(key=lambda promotion: (promotion.last_seen_at or "", promotion.title or ""), reverse=True)
     return _meta(items, _market_freshness(adapters), [], page=page, page_size=page_size)
@@ -306,6 +302,18 @@ def _brand_overview(adapter) -> BrandOverview:
     # Health/freshness remain live even while expensive counts are cached.
     overview.brand = adapter.get_brand()
     return overview
+
+
+def _brand_changes(adapter, channel, event_type, category, date_from, date_to):
+    return cached_read(adapter, ("changes", channel, event_type, category, date_from, date_to),
+                       lambda: adapter.list_changes(channel=channel, event_type=event_type,
+                           category=category, date_from=date_from, date_to=date_to))
+
+
+def _brand_promotions(adapter, channel, status, category, query):
+    return cached_read(adapter, ("promotions", channel, status, category, query),
+                       lambda: adapter.list_promotions(channel=channel, status=status,
+                           category=category, query=query))
 
 
 @router.get("/brands/{brand_id}/products")
@@ -388,7 +396,7 @@ def brand_promotions(
     page_size: int = Query(200, ge=1, le=500),
 ) -> dict[str, Any]:
     adapter = _require_adapter(brand_id)
-    items = adapter.list_promotions(channel=channel, status=status, category=category, query=q)
+    items = _brand_promotions(adapter, channel, status, category, q)
     brand = adapter.get_brand()
     return _meta(items, brand.data_freshness, [], page=page, page_size=page_size)
 
@@ -406,13 +414,7 @@ def brand_changes(
     page_size: int = Query(200, ge=1, le=500),
 ) -> dict[str, Any]:
     adapter = _require_adapter(brand_id)
-    items = adapter.list_changes(
-        channel=channel,
-        event_type=type,
-        category=category,
-        date_from=date_from,
-        date_to=date_to,
-    )
+    items = _brand_changes(adapter, channel, type, category, date_from, date_to)
     items = _filter_change_query(items, q)
     brand = adapter.get_brand()
     run_ids = sorted({e.source_run_id for e in items if e.source_run_id})
